@@ -1,0 +1,223 @@
+#include "..\include\vrShape.h"
+#include <stdio.h>
+
+void vrVertexDestroy(vrVertex * vertex)
+{
+	vrFree(vertex);
+}
+
+vrShape * vrShapeAlloc()
+{
+	return vrAlloc(sizeof(vrShape));
+}
+
+vrShape * vrShapeInit(vrShape * shape)
+{
+	shape->shape = NULL;
+	shape->shapeType = VR_NOSHAPE;
+	return shape;
+}
+
+void vrShapeDestroy(vrShape * shape)
+{
+	vrShapeDataDestroy(shape);
+	vrFree(shape);
+}
+
+void vrShapeDataDestroy(vrShape * shape)
+{
+	switch (shape->shapeType)
+	{
+	case VR_CIRCLE:
+		vrCircleDestroy(shape->shape);
+		break;
+	case VR_POLYGON:
+		vrPolyDestroy(shape->shape);
+		break;
+	}
+	shape->shape = NULL;
+}
+
+vrPolygonShape * vrPolyAlloc()
+{
+	return vrAlloc(sizeof(vrPolygonShape));
+}
+
+vrPolygonShape * vrPolyInit(vrPolygonShape * polygon)
+{
+	polygon->center = vrVect(0, 0);
+	polygon->num_vertices = 0;
+	polygon->vertices = vrLinkedListInit(vrLinkedListAlloc());
+	polygon->axes = vrLinkedListInit(vrLinkedListAlloc());
+	polygon->vertices->deleteFunc = vrVertexDestroy;
+	polygon->axes->deleteFunc = vrVertexDestroy;
+	return polygon;
+}
+
+void vrPolyDestroy(vrPolygonShape * polygon)
+{
+	vrLinkedListClear(polygon->vertices);
+	vrLinkedListClear(polygon->axes);
+
+	vrFree(polygon);
+}
+
+vrShape * vrShapePolyInit(vrShape * shape)
+{
+	if (shape->shapeType != VR_NOSHAPE)
+		vrShapeDataDestroy(shape);
+
+	shape->shape = vrPolyInit(vrPolyAlloc());
+	shape->getCenter = vrPolyGetCenter;
+	shape->rotate = vrRotatePolyShape;
+	shape->move = vrMovePolyShape;
+	shape->shapeType = VR_POLYGON;
+	return shape;
+}
+
+void vrAddVertexToPolyShape(vrPolygonShape * shape, vrVec2 vertex)
+{
+	vrNode* new_vertex = vrAlloc(sizeof(vrNode));
+	new_vertex->data = vrAlloc(sizeof(vrVertex));
+	((vrVertex*)new_vertex->data)->vertex = vertex;
+	vrLinkedListAddBack(shape->vertices, new_vertex);
+}
+
+void vrAddNormalToPolyShape(vrPolygonShape * shape, vrVec2 axis)
+{
+}
+
+void vrMovePolyShape(vrPolygonShape * shape, vrVec2 move)
+{
+	vrNode* v = shape->vertices->head;
+	while (v)
+	{
+		((vrVertex*)v->data)->vertex = vrAdd(((vrVertex*)v->data)->vertex, move);
+		v = v->next;
+	}
+	vrUpdatePolyCenter(shape);
+}
+
+vrPolygonShape* vrPolyBoxInit(vrPolygonShape* shape, vrFloat x, vrFloat y, vrFloat hw, vrFloat hh)
+{
+	x -= hw;
+	y -= hh;
+	hw *= 2;
+	hh *= 2;
+	vrAddVertexToPolyShape(shape, vrVect(x, y));
+	vrAddVertexToPolyShape(shape, vrVect(x  + hw,y));
+	vrAddVertexToPolyShape(shape, vrVect(x + hw,y + hh));
+	vrAddVertexToPolyShape(shape, vrVect(x, y + hh));
+	return shape;
+}
+
+void vrRotatePolyShape(vrPolygonShape * shape, vrFloat angle)
+{
+	vrFloat ca = VR_COSINE(angle);
+	vrFloat sa = VR_SINE(angle);
+	vrVec2 c = shape->center;
+	vrNode* v = shape->vertices->head;
+	while(v)
+	{
+		((vrVertex*)v->data)->vertex = vrSub(((vrVertex*)v->data)->vertex, c);
+		((vrVertex*)v->data)->vertex = vrVect(((vrVertex*)v->data)->vertex.x * ca - ((vrVertex*)v->data)->vertex.y * sa, ((vrVertex*)v->data)->vertex.x *sa + ((vrVertex*)v->data)->vertex.y * ca);
+		((vrVertex*)v->data)->vertex = vrAdd(((vrVertex*)v->data)->vertex, c);
+		v = v->next;
+	}
+	vrUpdatePolyAxes(shape);
+}
+
+void vrUpdatePolyCenter(vrPolygonShape * shape)
+{
+	vrVec2 center = vrVect(0, 0);
+	int num_v = 0;
+	vrNode* vertex = shape->vertices->head;
+	while (vertex)
+	{
+		center = vrAdd(center, ((vrVertex*)vertex->data)->vertex);
+		num_v++;
+		vertex = vertex->next;
+	}
+	center = vrVect(center.x / num_v, center.y / num_v);
+
+	shape->center = center;
+}
+
+void vrUpdatePolyAxes(vrPolygonShape * shape)
+{
+	vrNode* vertex = shape->vertices->head;
+	vrNode* axes = shape->axes->head;
+	while (vertex)
+	{
+		if (axes == NULL)
+		{
+			vrNode* a = vrAlloc(sizeof(vrNode));
+			a->data = vrAlloc(sizeof(vrVertex));
+			((vrVertex*)a->data)->vertex = vrVect(0, 0);
+			vrLinkedListAddBack(shape->axes, a);
+			axes = a;
+		}
+		if (vertex->next == NULL)
+		{
+			((vrVertex*)axes->data)->vertex = vrSub(((vrVertex*)vertex->data)->vertex, ((vrVertex*)shape->vertices->head->data)->vertex);
+			((vrVertex*)axes->data)->vertex = vrNormalize(vrVect(-((vrVertex*)axes->data)->vertex.y, ((vrVertex*)axes->data)->vertex.x));
+		}
+		else
+		{
+			((vrVertex*)axes->data)->vertex = vrSub(((vrVertex*)vertex->data)->vertex, ((vrVertex*)vertex->next->data)->vertex);
+			((vrVertex*)axes->data)->vertex = vrNormalize(vrVect(-((vrVertex*)axes->data)->vertex.y, ((vrVertex*)axes->data)->vertex.x));
+		}
+		axes = axes->next;
+		vertex = vertex->next;
+	}
+}
+
+vrVec2 vrPolyGetCenter(vrPolygonShape * shape)
+{
+	return shape->center;
+}
+
+vrCircleShape * vrCircleAlloc()
+{
+	return vrAlloc(sizeof(vrCircleShape));
+}
+
+vrCircleShape * vrCircleInit(vrCircleShape * circle)
+{
+	circle->center = vrVect(0, 0);
+	circle->radius = 0;
+	return circle;
+}
+
+void vrCircleDestroy(vrCircleShape * circle)
+{
+	vrFree(circle);
+}
+
+vrShape * vrShapeCircleInit(vrShape * shape)
+{
+	if (shape->shapeType != VR_NOSHAPE)
+		vrShapeDataDestroy(shape);
+
+	shape->shape = vrCircleInit(vrCircleAlloc());
+	shape->rotate = vrRotateCircleShape;
+	shape->getCenter = vrCircleGetCenter;
+	shape->move = vrMoveCircleShape;
+	shape->shapeType = VR_CIRCLE;
+	return shape;
+}
+
+void vrRotateCircleShape(vrCircleShape * shape, vrFloat angle)
+{
+	//Circles rotation can be stored in body
+}
+
+void vrMoveCircleShape(vrCircleShape * shape, vrVec2 move)
+{
+	shape->center = vrAdd(shape->center, move);
+}
+
+vrVec2 vrCircleGetCenter(vrCircleShape * shape)
+{
+	return shape->center;
+}
