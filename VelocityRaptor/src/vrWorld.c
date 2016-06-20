@@ -25,7 +25,7 @@ vrWorld * vrWorldAlloc()
 
 vrWorld * vrWorldInit(vrWorld * world)
 {
-	world->bodies = vrAlignedArrayInit(vrAlignedArrayAlloc(), sizeof(vrRigidBody*));
+	world->bodies = vrArrayInit(vrArrayAlloc(), sizeof(vrRigidBody*));
 	world->accumulator = 0;
 	world->lastTime = 0;
 	world->timeStep = (1.0f / 60.0f);
@@ -82,5 +82,5 @@ void vrWorldStep(vrWorld * world)
 
 void vrWorldAddBody(vrWorld* world, vrRigidBody * body)
 {
-	vrAlignedArrayPush(world->bodies, body);
+	vrArrayPush(world->bodies, body);
 }

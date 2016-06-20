@@ -16,14 +16,15 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "../include/vrAlignedArray.h"
+#include "../include/vrArray.h"
+#include "../include/velocityraptor.h"
 
-vrAlignedArray * vrAlignedArrayAlloc()
+vrArray * vrArrayAlloc()
 {
-	return vrAlloc(sizeof(vrAlignedArray));
+	return vrAlloc(sizeof(vrArray));
 }
 
-vrAlignedArray * vrAlignedArrayInit(vrAlignedArray * arr, int sizeofdata)
+vrArray * vrArrayInit(vrArray * arr, int sizeofdata)
 {
 	arr->sizeof_active = 0;
 	arr->sizeof_data = sizeofdata;
@@ -33,7 +34,13 @@ vrAlignedArray * vrAlignedArrayInit(vrAlignedArray * arr, int sizeofdata)
 	return arr;
 }
 
-void vrAlignedArrayPush(vrAlignedArray* arr, void * object)
+void vrArrayDestroy(vrArray * arr)
+{
+	free(arr->data);
+	free(arr);
+}
+
+void vrArrayPush(vrArray* arr, void * object)
 {
 	if (1)
 	{
@@ -58,13 +65,13 @@ void vrAlignedArrayPush(vrAlignedArray* arr, void * object)
 	}
 }
 
-void vrAlignedArrayPop(vrAlignedArray* arr)
+void vrArrayPop(vrArray* arr)
 {
 	arr->sizeof_active--;
 	arr->size_available++;
 }
 
-void vrAlignedArrayReserve(vrAlignedArray * arr, int size)
+void vrArrayReserve(vrArray * arr, int size)
 {
 	void** buffer = realloc(arr->data, arr->sizeof_data * ( arr->sizeof_array + size));
 	arr->sizeof_array += size;
@@ -73,7 +80,7 @@ void vrAlignedArrayReserve(vrAlignedArray * arr, int size)
 	arr->data = buffer;
 }
 
-void vrAlignedArrayErase(vrAlignedArray* arr, int index)
+void vrArrayErase(vrArray* arr, int index)
 {
 	if (index > arr->sizeof_array || index < 0) return;
 
@@ -91,4 +98,13 @@ void vrAlignedArrayErase(vrAlignedArray* arr, int index)
 	arr->data = buffer;
 	arr->sizeof_active--;
 	arr->sizeof_array--;
+}
+
+void vrArrayCopy(vrArray * dest, vrArray * src)
+{
+	free(dest->data);
+	dest->data = src->data;
+	dest->sizeof_active = src->sizeof_active;
+	dest->sizeof_array = src->sizeof_array;
+	dest->sizeof_data = src->sizeof_data;
 }

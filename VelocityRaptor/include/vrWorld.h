@@ -24,13 +24,13 @@
 #include "vrRigidBody.h"
 #include "vrMemoryPool.h"
 #include "vrLinkedList.h"
-#include "vrAlignedArray.h"
+#include "vrArray.h"
 
 typedef struct vrWorld
 {
 	vrMemoryPool* memoryPool;
 	vrLinkedList* memoryList;
-	vrAlignedArray* bodies;
+	vrArray* bodies;
 	int num_bodies;
 
 	/* For Stepper */

@@ -82,12 +82,13 @@ void vrLinkedListAddBack(vrLinkedList * list, vrNode * node)
 
 void vrLinkedListRemove(vrLinkedList * list, vrNode * node)
 {
-	vrNode* current = list->head;
-	vrNode* prev = NULL;
+	vrNode** current = &list->head;
+	vrNode** prev = NULL;
+
 	//Linear search
 	while (1)
 	{
-		if (current == node)
+		if (*current == node)
 		{
 			if (prev == NULL)
 			{
@@ -99,13 +100,13 @@ void vrLinkedListRemove(vrLinkedList * list, vrNode * node)
 			}
 			else
 			{
-				prev->next = current->next;
-				if (list->deleteFunc) list->deleteFunc(current->data);
-				vrFree(current);
+				(*prev)->next = (*current)->next;
+				if (list->deleteFunc) list->deleteFunc((*current)->data);
+				vrFree(*current);
 			}
 			break;
 		}
-		current = current->next;
+		*current = (*current)->next;
 		prev = current;
 	}
 }

@@ -16,25 +16,25 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef HEADER_VRALIGNEDARRAY
-#define HEADER_VRALIGNEDARRAY
+#ifndef HEADER_VRARRAY
+#define HEADER_VRARRAY
 
-#include "velocityraptor.h"
-
-typedef struct vrAlignedArray
+typedef struct vrArray
 {
 	void** data;
 	int sizeof_active;
 	int sizeof_data;
 	int sizeof_array;
 	int size_available;
-} vrAlignedArray;
+} vrArray;
 
-vrAlignedArray* vrAlignedArrayAlloc();
-vrAlignedArray* vrAlignedArrayInit(vrAlignedArray* arr, int sizeofdata);
-void vrAlignedArrayPush(vrAlignedArray* arr, void* object);
-void vrAlignedArrayPop(vrAlignedArray* arr);
-void vrAlignedArrayReserve(vrAlignedArray* arr, int size);
-void vrAlignedArrayErase(vrAlignedArray* arr, int index);
+vrArray* vrArrayAlloc();
+vrArray* vrArrayInit(vrArray* arr, int sizeofdata);
+void vrArrayDestroy(vrArray* arr);
+void vrArrayPush(vrArray* arr, void* object);
+void vrArrayPop(vrArray* arr);
+void vrArrayReserve(vrArray* arr, int size);
+void vrArrayErase(vrArray* arr, int index);
+void vrArrayCopy(vrArray* dest, vrArray* src);
 
 #endif

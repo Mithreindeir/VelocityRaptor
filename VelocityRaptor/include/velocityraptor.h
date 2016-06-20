@@ -48,5 +48,8 @@
 #ifndef vrFree
 #define vrFree free
 #endif
+#ifndef vrCalloc
+#define vrCalloc calloc
+#endif
 
 #endif

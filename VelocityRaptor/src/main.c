@@ -1,25 +1,8 @@
-/*
-* Copyright (c) 2006-2009 Cormac Grindall (Mithreindeir)
-*
-* This software is provided 'as-is', without any express or implied
-* warranty.  In no event will the authors be held liable for any damages
-* arising from the use of this software.
-* Permission is granted to anyone to use this software for any purpose,
-* including commercial applications, and to alter it and redistribute it
-* freely, subject to the following restrictions:
-* 1. The origin of this software must not be misrepresented; you must not
-* claim that you wrote the original software. If you use this software
-* in a product, an acknowledgment in the product documentation would be
-* appreciated but is not required.
-* 2. Altered source versions must be plainly marked as such, and must not be
-* misrepresented as being the original software.
-* 3. This notice may not be removed or altered from any source distribution.
-*/
 #include "../include/vrRigidBody.h"
 #include "../include/velocityraptor.h"
 #include "../include/vrCollision.h"
 #include "../include/vrMemoryPool.h"
-#include "../include/vrAlignedArray.h"
+#include "../include/vrArray.h"
 #include "../include/vrWorld.h"
 #include "../include/vrHashMap.h"
 #include <stdio.h>
@@ -33,7 +16,7 @@ void vrManifoldDestroy(vrManifold* manifold);
 vrMemoryPool* memPool;
 vrBOOL keys[1024];
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
-vrAlignedArray* arr;
+vrArray* arr;
 vrWorld* world;
 
 int
@@ -41,7 +24,7 @@ main(void)
 {
 	GLFWwindow* window;
 	glfwInit();
-
+		
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
@@ -83,14 +66,14 @@ main(void)
 	body2->bodyMaterial.invMomentInertia = 0;
 //	((vrCircleShape*)body2->shape->shape)->center = vrVect(400, 600);
 //	((vrCircleShape*)body2->shape->shape)->radius = 50;
-
+	
 	body2->shape = vrShapePolyInit(body2->shape);
-
+	
 	body2->shape->shape = vrPolyBoxInit(body2->shape->shape, 400, 650, 200, 50);
 	body2->bodyMaterial.invMass = 0;
 	body2->bodyMaterial.invMomentInertia = 0;
 	vrManifold* m = vrManifoldInit(vrManifoldAlloc());
-
+	
 	//vrPolyPoly(m, *((vrPolygonShape*)body->shape->shape), *((vrPolygonShape*)body2->shape->shape));
 	vrWorldAddBody(world, body);
 	vrWorldAddBody(world, body2);
@@ -102,15 +85,62 @@ main(void)
 	manifolds->head = NULL;
 
 
-	vrHashTable* map = vrHashTableInit(vrHashTableAlloc());
-	vrHashEntry* entry = vrAlloc(sizeof(vrHashEntry));
-	entry->data = 15;
-	entry->key = "BANANA";
-	entry->next = NULL;
-	vrHashTableInsert(map, entry, entry->key);
+	vrHashTable* map = vrHashTableInit(vrHashTableAlloc(), 200);
+	static char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	srand(time(NULL));
+	vrArray* varray;
+	varray = vrArrayInit(vrArrayAlloc(), sizeof(char*));
+	
+	for (int i = 0; i < 100; i++)
+	{
+		char* string = calloc(sizeof(char), 11);
+		char* str = calloc(sizeof(char), 11);
 
-	vrHashEntry* test = vrHashTableLookup(map, "BANANA");
-	printf("%d\n", (int)test->data);
+		for (int i = 0; i < 10; i++)
+		{
+			int ch = rand() % sizeof(charset);
+			string[i] = charset[ch];
+			str[i] = charset[ch];
+		}
+		string[10] = '\0';
+		str[10] = '\0';
+		vrHashEntry* entry = vrAlloc(sizeof(vrHashEntry));
+		entry->data = malloc(sizeof(int));
+		*((int*)entry->data) = i;
+		entry->key = string;
+		entry->next = NULL;
+		vrHashTableInsert(map, entry, entry->key);
+		vrArrayPush(varray, str);
+	}
+	for (int i = 0; i < varray->sizeof_active; i++)
+	{
+		//vrHashEntry* test = vrHashTableLookup(map, ((char*)varray->data[i]));
+		//if (test) printf("%s \n", ((char*)test->key));
+	}
+	for (int i = 0; i < varray->sizeof_active; i++)
+	{
+		//vrHashTableRemove(map, ((char*)varray->data[i]));
+	}
+
+	for (int i = 0; i < varray->sizeof_active; i++)
+	{
+		vrHashEntry* test = vrHashTableLookup(map, ((char*)varray->data[i]));
+		if (test) printf("%s \n", ((char*)test->key));
+	}
+	vrHashTableResize(map);
+	vrHashTableResize(map);
+	vrHashTableResize(map);
+	vrHashTableResize(map);
+	vrHashTableResize(map);
+	printf("\n\n\n\n\n\n");
+	printf("\n\n\n\n\n\n");
+	printf("\n\n\n\n\n\n");
+
+	for (int i = 0; i < varray->sizeof_active; i++)
+	{
+		vrHashEntry* test = vrHashTableLookup(map, ((char*)varray->data[i]));
+		if (test) printf("%s \n", ((char*)test->key));
+	}
 	while (!glfwWindowShouldClose(window))
 	{
 
@@ -127,17 +157,18 @@ main(void)
 		glViewport(0, 0, display_w, display_h);
 		glClearColor(1, 1, 1, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
-		//vrWorldStep(world);
+		vrWorldStep(world);
 
+		/*
 		while (accumulator >= dt)
 		{
 			body->force.y += 980;
-			body->torque += .1;
+			//body->torque += .1;
 			//body->force.x += 10;
 
 			vrBodyIntegrateForces(body, frameTime);
 			vrBodyIntegrateForces(body2, frameTime);
-
+						
 			vrManifold* man = vrManifoldInit(vrManifoldAlloc());
 
 			if(body->shape->shapeType == VR_POLYGON && body2->shape->shapeType == VR_POLYGON)
@@ -205,14 +236,15 @@ main(void)
 				glEnd();
 				node = node->next;
 			}
-
-
+		
+		
 			vrBodyIntegrateVelocity(body, frameTime);
 			vrBodyIntegrateVelocity(body2, frameTime);
 			accumulator -= dt;
 
 		}
-
+		*/
+		
 		glColor3f(0, 0, 0);
 
 		glLineWidth(4);
@@ -276,7 +308,7 @@ void vrDebugDrawCircle(vrCircleShape* circle)
 
 void vrDebugDrawPolygon(vrPolygonShape* shape)
 {
-
+	
 	vrNode* v = shape->vertices->head;
 	glBegin(GL_LINE_LOOP);
 	glColor3f(0, 0, 0);

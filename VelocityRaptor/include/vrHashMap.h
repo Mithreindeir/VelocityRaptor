@@ -21,7 +21,8 @@
 
 #include <stdint.h>
 #include <string.h>
-#include "vrAlignedArray.h"
+#include "vrArray.h"
+#include "../include/vrMath.h"
 
 typedef unsigned int vrHashValue;
 typedef vrHashValue*(*vrHashFunc)(const char* key, int len);
@@ -37,14 +38,17 @@ typedef struct vrHashEntry
 typedef struct vrHashTable
 {
 	vrHashFunc hash;
-	vrAlignedArray* buckets;
+	vrArray* buckets;
 } vrHashTable;
 
 vrHashTable* vrHashTableAlloc();
-vrHashTable* vrHashTableInit(vrHashTable* table);
+vrHashTable* vrHashTableInit(vrHashTable* table, int size);
 vrHashEntry* vrHashTableLookup(vrHashTable* table, const char* key);
 void vrHashTableInsert(vrHashTable* table, vrHashEntry* entry, const char* key);
 void vrHashTableRemove(vrHashTable* table, const char* key);
 vrHashValue vrHashFuncDefault(const char* key, int len);
+void vrHashTableResize(vrHashTable* table);
+unsigned int getPrime(int current_prime);
+
 
 #endif
