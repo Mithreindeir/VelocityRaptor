@@ -94,15 +94,17 @@ void vrLinkedListRemove(vrLinkedList * list, vrNode * node)
 			{
 				//Removing the first node
 				vrNode* n = list->head->next;
-				if (list->deleteFunc) list->deleteFunc(list->head->data);
-				vrFree(list->head);
+				if (list->deleteFunc && list->head->data) list->deleteFunc(list->head->data);
+
 				list->head = n;
 			}
 			else
 			{
 				(*prev)->next = (*current)->next;
-				if (list->deleteFunc) list->deleteFunc((*current)->data);
+				if (list->deleteFunc && (*current)->data) list->deleteFunc((*current)->data);
+
 				vrFree(*current);
+				
 			}
 			break;
 		}

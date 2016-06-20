@@ -19,17 +19,19 @@
 #ifndef HEADER_VRWORLD
 #define HEADER_VRWORLD
 
+//Adds them and multiplies them by large prime
+#define COMBINE_PTR(a, b) (((a)*25165843 + (b)*25165843))
+
 #include <time.h>
 #include "velocityraptor.h"
 #include "vrRigidBody.h"
-#include "vrMemoryPool.h"
-#include "vrLinkedList.h"
 #include "vrArray.h"
+#include "vrHashMap.h"
+#include "vrCollision.h"
 
 typedef struct vrWorld
 {
-	vrMemoryPool* memoryPool;
-	vrLinkedList* memoryList;
+
 	vrArray* bodies;
 	int num_bodies;
 
@@ -42,6 +44,8 @@ typedef struct vrWorld
 	int velIterations;
 	int posIterations;
 	vrVec2 gravity;
+
+	vrHashTable* manifoldMap;
 } vrWorld;
 
 vrWorld* vrWorldAlloc();
@@ -49,6 +53,5 @@ vrWorld* vrWorldInit(vrWorld* world);
 void vrWorldDestroy(vrWorld* world);
 void vrWorldStep(vrWorld* world);
 void vrWorldAddBody(vrWorld* world, vrRigidBody * body);
-
 
 #endif

@@ -25,28 +25,29 @@
 #include "../include/vrMath.h"
 
 typedef unsigned int vrHashValue;
-typedef vrHashValue*(*vrHashFunc)(const char* key, int len);
+typedef vrHashValue*(*vrHashFunc)(unsigned int key);
+typedef void*(*vrDataDeleteFunc)(void* data);
 
 typedef struct vrHashEntry vrHashEntry;
 typedef struct vrHashEntry
 {
 	void* data;
-	vrHashValue key;
-	struct vrHashEntry* next;
+	unsigned int key;
 } vrHashEntry;
 
 typedef struct vrHashTable
 {
 	vrHashFunc hash;
 	vrArray* buckets;
+	vrDataDeleteFunc deleteFunc;
 } vrHashTable;
 
 vrHashTable* vrHashTableAlloc();
 vrHashTable* vrHashTableInit(vrHashTable* table, int size);
-vrHashEntry* vrHashTableLookup(vrHashTable* table, const char* key);
-void vrHashTableInsert(vrHashTable* table, vrHashEntry* entry, const char* key);
-void vrHashTableRemove(vrHashTable* table, const char* key);
-vrHashValue vrHashFuncDefault(const char* key, int len);
+vrHashEntry* vrHashTableLookup(vrHashTable* table, unsigned int key);
+void vrHashTableInsert(vrHashTable* table, vrHashEntry* entry,  unsigned int key);
+void vrHashTableRemove(vrHashTable* table, const unsigned int key);
+vrHashValue vrHashFuncDefault(unsigned int key);
 void vrHashTableResize(vrHashTable* table);
 unsigned int getPrime(int current_prime);
 

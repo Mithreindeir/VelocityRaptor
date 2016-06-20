@@ -1,21 +1,3 @@
-/*
-* Copyright (c) 2006-2009 Cormac Grindall (Mithreindeir)
-*
-* This software is provided 'as-is', without any express or implied
-* warranty.  In no event will the authors be held liable for any damages
-* arising from the use of this software.
-* Permission is granted to anyone to use this software for any purpose,
-* including commercial applications, and to alter it and redistribute it
-* freely, subject to the following restrictions:
-* 1. The origin of this software must not be misrepresented; you must not
-* claim that you wrote the original software. If you use this software
-* in a product, an acknowledgment in the product documentation would be
-* appreciated but is not required.
-* 2. Altered source versions must be plainly marked as such, and must not be
-* misrepresented as being the original software.
-* 3. This notice may not be removed or altered from any source distribution.
-*/
-
 #include "..\include\vrCollision.h"
 #define GLEW_STATIC
 #include <glew.h>
@@ -47,6 +29,7 @@ void vrPolyPoly(vrManifold* manifold, const vrPolygonShape A, const vrPolygonSha
 		normal = faceB;
 		should_flip = (vrDot(normal, vrSub(A.center, B.center)) >= 0);
 		normal = should_flip ? vrVect(-normal.x, -normal.y) : normal;
+
 		vrVec2 neg_norm = vrVect(-normal.x, -normal.y);
 		ref = vrPolyBestEdge(B, vrPolyGetFarthestVertex(B, neg_norm), neg_norm);
 		inc = vrPolyBestEdge(A, vrPolyGetFarthestVertex(A, normal), normal);
@@ -62,6 +45,7 @@ void vrPolyPoly(vrManifold* manifold, const vrPolygonShape A, const vrPolygonSha
 		ref = vrPolyBestEdge(A, vrPolyGetFarthestVertex(A, normal), normal);
 		flip = vrTRUE;
 	}
+	
 	glColor3f(0, 0, 1);
 	glBegin(GL_LINES);
 	glVertex2f(ref.a.x, ref.a.y);
@@ -72,6 +56,7 @@ void vrPolyPoly(vrManifold* manifold, const vrPolygonShape A, const vrPolygonSha
 	glVertex2f(inc.a.x, inc.a.y);
 	glVertex2f(inc.b.x, inc.b.y);
 	glEnd();
+	
 	vrVec2 refV = vrNormalize(vrSub(ref.b, ref.a));
 	vrVec2 refNorm = vrVect(refV.y, -refV.x);
 	should_flip = (vrDot(refNorm, vrSub(B.center, A.center)) >= 0);
@@ -89,7 +74,7 @@ void vrPolyPoly(vrManifold* manifold, const vrPolygonShape A, const vrPolygonSha
 
 	if (Clip(inc.a, inc.b, vrVect(-refV.x, -refV.y), negativeOffset, clipped_points) < 2) return;
 	if (Clip(clipped_points[0], clipped_points[1], refV, positiveOffset, clipped_points) < 2) return;
-
+	
 	manifold->penetration = 0;
 	int cp = 0;
 	vrFloat separation = vrDot(refNorm, clipped_points[0]) - Max;
@@ -160,7 +145,7 @@ void vrPolyCircle(vrManifold * manifold, const vrPolygonShape A, const vrCircleS
 		}
 		if (s > B.radius)
 			return;
-
+			
 		if (s > separation)
 		{
 			if (flip)

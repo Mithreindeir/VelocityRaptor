@@ -35,7 +35,6 @@ vrManifold * vrManifoldInit(vrManifold * manifold)
 	manifold->penetration = 0;
 	manifold->contact_points = 0;
 	manifold->flip = vrFALSE;
-	manifold->contacts = calloc(sizeof(vrContact), 2);
 	manifold->contacts[0].point = vrVect(0, 0);
 	manifold->contacts[0].depth = 0;
 	manifold->contacts[0].normalImpulseSum = 0;
@@ -58,6 +57,12 @@ vrManifold * vrManifoldInit(vrManifold * manifold)
 	manifold->contacts[1].ra = vrVect(0, 0);
 	manifold->contacts[1].rb = vrVect(0, 0);
 	return manifold;
+}
+
+void vrManifoldDestroy(vrManifold* manifold)
+{
+	//vrFree(manifold->contacts);
+	vrFree(manifold);
 }
 
 void vrManifoldPreStep(vrManifold * manifold, vrFloat dt)

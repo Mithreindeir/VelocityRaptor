@@ -75,7 +75,7 @@ typedef struct vrManifold
 	vrRigidBody* B;
 
 	//Contact information
-	vrContact* contacts;
+	vrContact contacts[2];
 	int contact_points;
 
 	//Collision information
@@ -95,6 +95,8 @@ typedef struct vrManifold
 
 vrManifold* vrManifoldAlloc();
 vrManifold* vrManifoldInit(vrManifold* manifold);
+void vrManifoldDestroy(vrManifold* manifold);
+
 void vrManifoldPreStep(vrManifold* manifold, vrFloat dt);
 void vrManifoldPostStep(vrManifold* manifold, vrFloat dt);
 vrVec2 vrManifoldRelativeVelocity(vrRigidBody* a, vrRigidBody* b, vrVec2 ra, vrVec2 rb);

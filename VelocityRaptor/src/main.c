@@ -51,7 +51,7 @@ main(void)
 	vrRigidBody* body = vrBodyInit(vrBodyAlloc());
 	body->shape = vrShapeInit(vrShapeAlloc());
 	body->shape = vrShapePolyInit(body->shape);
-	body->shape->shape = vrPolyBoxInit(body->shape->shape, 400, 50, 50, 5);
+	body->shape->shape = vrPolyBoxInit(body->shape->shape, 400, 625, 50, 50);
 	body->bodyMaterial.restitution = 0.0;
 	//body->shape = vrShapeCircleInit(body->shape);
 	//((vrCircleShape*)body->shape->shape)->center = vrVect(400, 400);
@@ -83,64 +83,20 @@ main(void)
 	manifolds->deleteFunc = vrManifoldDestroy;
 
 	manifolds->head = NULL;
-
-
+	/*
 	vrHashTable* map = vrHashTableInit(vrHashTableAlloc(), 200);
-	static char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-	srand(time(NULL));
-	vrArray* varray;
-	varray = vrArrayInit(vrArrayAlloc(), sizeof(char*));
-	
-	for (int i = 0; i < 100; i++)
-	{
-		char* string = calloc(sizeof(char), 11);
-		char* str = calloc(sizeof(char), 11);
-
-		for (int i = 0; i < 10; i++)
-		{
-			int ch = rand() % sizeof(charset);
-			string[i] = charset[ch];
-			str[i] = charset[ch];
-		}
-		string[10] = '\0';
-		str[10] = '\0';
-		vrHashEntry* entry = vrAlloc(sizeof(vrHashEntry));
-		entry->data = malloc(sizeof(int));
-		*((int*)entry->data) = i;
-		entry->key = string;
-		entry->next = NULL;
-		vrHashTableInsert(map, entry, entry->key);
-		vrArrayPush(varray, str);
-	}
-	for (int i = 0; i < varray->sizeof_active; i++)
-	{
-		//vrHashEntry* test = vrHashTableLookup(map, ((char*)varray->data[i]));
-		//if (test) printf("%s \n", ((char*)test->key));
-	}
-	for (int i = 0; i < varray->sizeof_active; i++)
-	{
-		//vrHashTableRemove(map, ((char*)varray->data[i]));
-	}
-
-	for (int i = 0; i < varray->sizeof_active; i++)
-	{
-		vrHashEntry* test = vrHashTableLookup(map, ((char*)varray->data[i]));
-		if (test) printf("%s \n", ((char*)test->key));
-	}
-	vrHashTableResize(map);
-	vrHashTableResize(map);
-	vrHashTableResize(map);
-	vrHashTableResize(map);
-	vrHashTableResize(map);
-	printf("\n\n\n\n\n\n");
-	printf("\n\n\n\n\n\n");
-	printf("\n\n\n\n\n\n");
-
-	for (int i = 0; i < varray->sizeof_active; i++)
-	{
-		vrHashEntry* test = vrHashTableLookup(map, ((char*)varray->data[i]));
-		if (test) printf("%s \n", ((char*)test->key));
-	}
+	map->deleteFunc = vrFree;
+	vrHashEntry* entry = vrAlloc(sizeof(vrHashEntry));
+	entry->data = vrAlloc(sizeof(int));
+	*((int*)entry->data) = 5;
+	entry->key = 29348;
+	vrHashTableInsert(map, entry, entry->key);
+	vrHashEntry* t = vrHashTableLookup(map, 29348);
+	printf("%d and \n", *((int*)t->data));
+	vrHashTableRemove(map, 29348);
+	t = vrHashTableLookup(map, 29348);
+	printf("%d and \n", *((int*)t->data));
+	*/
 	while (!glfwWindowShouldClose(window))
 	{
 
@@ -157,8 +113,6 @@ main(void)
 		glViewport(0, 0, display_w, display_h);
 		glClearColor(1, 1, 1, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
-		vrWorldStep(world);
-
 		/*
 		while (accumulator >= dt)
 		{
@@ -282,6 +236,8 @@ main(void)
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		glOrtho(0, 800, 800, 0 + 1.f, 1.f, -1.f);
+		vrWorldStep(world);
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
@@ -320,11 +276,6 @@ void vrDebugDrawPolygon(vrPolygonShape* shape)
 	glEnd();
 }
 
-void vrManifoldDestroy(vrManifold* manifold)
-{
-	vrFree(manifold->contacts);
-	vrFree(manifold);
-}
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {

@@ -85,6 +85,7 @@ vrFloat vrLength(const vrVec2 a);
 vrVec2 vrNormalize(const vrVec2 a);
 vrFloat vrClamp(vrFloat a, vrFloat low, vrFloat high);
 
+#define VR_ABS abs
 #define VR_SQRT sqrt
 #define VR_POW pow
 #define VR_COSINE cos
