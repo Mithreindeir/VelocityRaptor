@@ -19,6 +19,7 @@
 #ifndef HEADER_VRMATH
 #define HEADER_VRMATH
 #include <math.h>
+#include "velocityraptor.h"
 
 typedef float vrFloat;
 
@@ -63,26 +64,26 @@ typedef struct vrMat2
 	vrVec2 n;
 } vrMat2;
 
-vrMat2 vrMat(const vrVec2 m, const vrVec2 n);
-vrMat2 vrMat2Scale(const vrMat2 a, const vrFloat b);
-vrVec2 vrMat2Mult( const vrMat2 a, const vrVec2 b);
-vrVec2 vrVect(vrFloat x, vrFloat y);
-vrVec2 vrAdd(const vrVec2 a, const vrVec2 b);
-vrVec2 vrSub(const vrVec2 a, const vrVec2 b);
-vrVec2 vrMult(const vrVec2 a, const vrVec2 b);
-vrVec2 vrDiv(const vrVec2 a, const vrVec2 b);
-vrFloat vrDot(const vrVec2 a, const vrVec2 b);
-vrFloat vrCross(const vrVec2 a, const vrVec2 b);
-vrVec2 vrCrossScalar(const vrFloat a, const vrVec2 b);
-vrVec2 vrScale(const vrVec2 a, const vrFloat scale);
-vrFloat vrMax(const vrFloat a, const vrFloat b);
-vrFloat vrMin(const vrFloat a, const vrFloat b);
-vrFloat vrDist(const vrVec2 a, const vrVec2 b);
-vrFloat vrDist_Sqr(const vrVec2 a, const vrVec2 b);
-vrFloat vrLength(const vrVec2 a);
+extern inline vrMat2 vrMat(const vrVec2 m, const vrVec2 n);
+extern inline vrMat2 vrMat2Scale(const vrMat2 a, const vrFloat b);
+extern inline vrVec2 vrMat2Mult( const vrMat2 a, const vrVec2 b);
+extern inline vrVec2 vrVect(vrFloat x, vrFloat y);
+extern inline vrVec2 vrAdd(const vrVec2 a, const vrVec2 b);
+extern inline vrVec2 vrSub(const vrVec2 a, const vrVec2 b);
+extern inline vrVec2 vrMult(const vrVec2 a, const vrVec2 b);
+extern inline vrVec2 vrDiv(const vrVec2 a, const vrVec2 b);
+extern inline vrFloat vrDot(const vrVec2 a, const vrVec2 b);
+extern inline vrFloat vrCross(const vrVec2 a, const vrVec2 b);
+extern inline vrVec2 vrCrossScalar(const vrFloat a, const vrVec2 b);
+extern inline vrVec2 vrScale(const vrVec2 a, const vrFloat scale);
+extern inline vrFloat vrMax(const vrFloat a, const vrFloat b);
+extern inline vrFloat vrMin(const vrFloat a, const vrFloat b);
+extern inline vrFloat vrDist(const vrVec2 a, const vrVec2 b);
+extern inline vrFloat vrDist_Sqr(const vrVec2 a, const vrVec2 b);
+extern inline vrFloat vrLength(const vrVec2 a);
 
-vrVec2 vrNormalize(const vrVec2 a);
-vrFloat vrClamp(vrFloat a, vrFloat low, vrFloat high);
+extern inline vrVec2 vrNormalize(const vrVec2 a);
+extern inline vrFloat vrClamp(vrFloat a, vrFloat low, vrFloat high);
 
 #define VR_ABS abs
 #define VR_SQRT sqrt

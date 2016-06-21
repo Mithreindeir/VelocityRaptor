@@ -130,7 +130,7 @@ void vrWorldQueryCollisions(vrWorld * world)
 
 				vrManifoldSetBodies(manifold->data, body, body2);
 				vrHashEntry* m = vrHashTableLookup(world->manifoldMap, key);
-
+				/*
 				glPointSize(8);
 				glColor3f(1, 0, 0);
 				glBegin(GL_POINTS);
@@ -141,6 +141,7 @@ void vrWorldQueryCollisions(vrWorld * world)
 
 				}
 				glEnd();
+				*/
 				if (m)
 				{
 					vrManifoldAddContactPoints(((vrManifold*)m->data), *((vrManifold*)manifold->data));

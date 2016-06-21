@@ -179,8 +179,8 @@ void vrManifoldSolveVelocity(vrManifold * manifold)
 	{
 		manifold->solverData.contactVel = vrVect(vrManifoldGetContactVel(manifold, 0) + manifold->contacts[0].velocityBias, vrManifoldGetContactVel(manifold, 1) + manifold->contacts[1].velocityBias );
 		manifold->solverData.lo = vrVect(-manifold->contacts[0].normalImpulseSum, -manifold->contacts[1].normalImpulseSum);
-		vrVec2 t = vrManifoldGuassSeidel(manifold->solverData);
-		//vrVec2 t = vrManifoldConjugateGradient(manifold->solverData, 1e-10);
+		//vrVec2 t = vrManifoldGuassSeidel(manifold->solverData);
+		vrVec2 t = vrManifoldConjugateGradient(manifold->solverData, 1e-10);
 		//printf("%f and %f \t %f and %f\n", t.x, t.y, t2.x, t2.y);
 
 		vrFloat oldAccum = manifold->contacts[0].normalImpulseSum;

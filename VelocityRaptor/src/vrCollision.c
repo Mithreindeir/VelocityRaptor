@@ -348,7 +348,6 @@ vrEdge vrPolyBestEdge(const vrPolygonShape shape, vrNode* vert, const vrVec2 nor
 		return edge;
 	}
 }
-
 vrProjection vrProject(const vrPolygonShape a, const vrVec2 axis)
 {
 	vrFloat c = vrDot(((vrVertex*)a.vertices->head->data)->vertex, axis);

@@ -99,8 +99,10 @@ void vrLinkedListRemove(vrLinkedList * list, vrNode * node)
 			}
 			else
 			{
+				vrNode* n = (*current)->next;
 				(*prev)->next = (*current)->next;
 				vrFree(*current);
+				*current = n;
 			}
 			break;
 		}

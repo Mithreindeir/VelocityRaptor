@@ -28,6 +28,10 @@
 #include <alloca.h>
 #endif
 
+#ifdef _MSC_VER
+#define inline __inline
+#endif
+
 #ifndef vrBOOL
 #define vrBOOL int
 	#ifndef vrTRUE
