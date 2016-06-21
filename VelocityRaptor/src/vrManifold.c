@@ -85,7 +85,6 @@ void vrManifoldPreStep(vrManifold * manifold, vrFloat dt)
 		{
 			manifold->contacts[i].velocityBias = rv * manifold->restitution;
 		}
-		manifold->contacts[i].velocityBias = 0;
 
 		manifold->contacts[i].ra = ra;
 		manifold->contacts[i].rb = rb;
@@ -103,7 +102,7 @@ void vrManifoldPreStep(vrManifold * manifold, vrFloat dt)
 
 		vrVec2 impulse = vrAdd(vrScale(manifold->normal, manifold->contacts[i].normalImpulseSum), vrScale(manifold->tangent, manifold->contacts[i].tangentImpulseSum));
 
-		vrManifoldApplyImpulse(manifold->A, manifold->B, ra, rb, impulse);
+		vrManifoldApplyImpulse(manifold->A, manifold->B, ra, rb, vrScale(impulse, 1 + 0*dt));
 	}
 
 	if (manifold->contact_points == 2)
@@ -133,7 +132,7 @@ void vrManifoldPostStep(vrManifold * manifold, vrFloat dt)
 		vrFloat rat = vrCross(manifold->contacts[i].ra, manifold->tangent);
 		vrFloat rbt = vrCross(manifold->contacts[i].rb, manifold->tangent);
 		manifold->contacts[i].effectiveMassT = manifold->A->bodyMaterial.invMass + manifold->B->bodyMaterial.invMass + (rat*rat) * manifold->A->bodyMaterial.invMomentInertia + (rbt*rbt) * manifold->B->bodyMaterial.invMomentInertia;
-
+		
 		manifold->contacts[i].bias = -k_bias * VR_MIN((vrFloat)0.0, manifold->contacts[i].depth + allowedPenetration) / dt;
 	}
 	if (manifold->contact_points == 2)
@@ -199,6 +198,7 @@ void vrManifoldSolveVelocity(vrManifold * manifold)
 
 void vrManifoldSolvePosition(vrManifold * manifold, vrFloat dt)
 {
+	//return;
 	if (manifold->contact_points == 1)
 	{
 		for (int i = 0; i < manifold->contact_points; i++)

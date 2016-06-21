@@ -19,8 +19,8 @@
 #ifndef HEADER_VRWORLD
 #define HEADER_VRWORLD
 
-//Adds them and multiplies them by large prime
-#define COMBINE_PTR(a, b) (((a)*25165843 + (b)*25165843))
+//Credit to Chipmunk2D for this hashing macro
+#define COMBINE_PTR(a, b) (((unsigned int)(a)*(3344921057ul) ^ (unsigned int)(b)*(3344921057ul)))
 
 #include <time.h>
 #include "velocityraptor.h"

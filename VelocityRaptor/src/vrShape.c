@@ -215,7 +215,7 @@ vrOrientedBoundingBox vrPolyGetOBB(vrPolygonShape * shape)
 
 		vertex = vertex->next;
 	}
-	return vrOBBCreate(vrVect(least_x, least_y), vrVect(farthest_x - least_x, farthest_y - least_y));
+	return vrOBBCreate(vrVect(least_x-1, least_y-1), vrVect(farthest_x - least_x + 1, farthest_y - least_y + 1));
 }
 
 vrCircleShape * vrCircleAlloc()

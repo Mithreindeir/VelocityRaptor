@@ -50,13 +50,13 @@ main(void)
 
 	vrRigidBody* body = vrBodyInit(vrBodyAlloc());
 	body->shape = vrShapeInit(vrShapeAlloc());
-	body->shape = vrShapePolyInit(body->shape);
-	body->shape->shape = vrPolyBoxInit(body->shape->shape, 400, 425, 50, 50);
+	//body->shape = vrShapePolyInit(body->shape);
+	//body->shape->shape = vrPolyBoxInit(body->shape->shape, 400, 425, 50, 50);
 	body->bodyMaterial.restitution = 0.0;
 
-	//body->shape = vrShapeCircleInit(body->shape);
-	//((vrCircleShape*)body->shape->shape)->center = vrVect(400, 400);
-	//((vrCircleShape*)body->shape->shape)->radius = 50;
+	body->shape = vrShapeCircleInit(body->shape);
+	((vrCircleShape*)body->shape->shape)->center = vrVect(400, 400);
+	((vrCircleShape*)body->shape->shape)->radius = 50;
 
 	vrRigidBody* body2 = vrBodyInit(vrBodyAlloc());
 

@@ -52,7 +52,6 @@ static unsigned int primes[] =
 	805306457,
 	1610612741
 };
-
 typedef struct vrVec2
 {
 	vrFloat x;

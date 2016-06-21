@@ -44,7 +44,7 @@ vrRigidBody * vrBodyAlloc()
 vrMaterial vrMaterialInit()
 {
 	vrMaterial material;
-	material.friction = 0.3;
+	material.friction = 0.1;
 	material.mass = 100.0;
 	material.invMass = 1.0 / material.mass;
 	material.momentInertia = 10000.0;

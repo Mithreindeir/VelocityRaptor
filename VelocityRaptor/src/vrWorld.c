@@ -31,10 +31,10 @@ vrWorld * vrWorldInit(vrWorld * world)
 	world->bodies = vrArrayInit(vrArrayAlloc(), sizeof(vrRigidBody*));
 	world->accumulator = 0;
 	world->lastTime = 0;
-	world->timeStep = (1.0f / 180.0f);
-	world->gravity = vrVect(0, 981);
-	world->velIterations = 8;
-	world->posIterations = 2;
+	world->timeStep = (1.0f / 60.0f);
+	world->gravity = vrVect(0, 9810);
+	world->velIterations = 30;
+	world->posIterations = 20;
 	world->manifoldMap = vrHashTableInit(vrHashTableAlloc(), 1000);
 	world->manifoldMap->deleteFunc = &vrManifoldDestroy;
 	world->manifoldKeys = vrArrayInit(vrArrayAlloc(), sizeof(unsigned int));
@@ -102,9 +102,10 @@ void vrWorldQueryCollisions(vrWorld * world)
 			if (i == j) continue;
 			vrRigidBody* body = world->bodies->data[i];
 			vrRigidBody* body2 = world->bodies->data[j];
-			unsigned int key = COMBINE_PTR((unsigned int)body, (unsigned int)body2);
+			unsigned int key = COMBINE_PTR(body, body2);
 
 			vrBOOL overlap = vrOBBOverlaps(body->shape->obb, body2->shape->obb);
+			overlap = 1;
 			vrHashEntry* manifold = NULL;
 			if (overlap)
 			{
@@ -182,31 +183,39 @@ void vrWorldQueryCollisions(vrWorld * world)
 
 void vrWorldSolve(vrWorld * world, vrFloat dt)
 {
+	vrArray* manifolds = vrArrayInit(vrArrayAlloc(), sizeof(vrManifold*));
 	for (int i = 0; i < world->manifoldKeys->sizeof_array; i++)
 	{
 		vrHashEntry* m = vrHashTableLookup(world->manifoldMap, world->manifoldKeys->data[i]);
 		if (m)
 		{
-			vrManifold* manifold = m->data;
-
-			vrManifoldPreStep(manifold, dt);
-			for (int i = 0; i < world->velIterations; i++)
-				vrManifoldSolveVelocity(manifold);
-			vrManifoldPostStep(manifold, dt);
-
-			for (int i = 0; i < world->posIterations; i++)
-				vrManifoldSolvePosition(manifold, dt);
-
-			glPointSize(8);
-			glColor3f(1, 0, 0);
-			glBegin(GL_POINTS);
-
-			for (int i = 0; i < manifold->contact_points; i++)
-			{
-				glVertex2f(manifold->contacts[i].point.x, manifold->contacts[i].point.y);
-
-			}
-			glEnd();
+			vrArrayPush(manifolds, m->data);
 		}
 	}
+	for (int i = 0; i < manifolds->sizeof_active; i++)
+	{
+		vrManifoldPreStep(manifolds->data[i], dt);
+	}
+
+	for (int i = 0; i < world->velIterations; i++)
+	{
+		for (int i = 0; i < manifolds->sizeof_active; i++)
+		{
+			vrManifoldSolveVelocity(manifolds->data[i]);
+		}
+	}
+	for (int i = 0; i < manifolds->sizeof_active; i++)
+	{
+		vrManifoldPostStep(manifolds->data[i], dt);
+	}
+	for (int i = 0; i < world->posIterations; i++)
+	{
+		for (int i = 0; i < manifolds->sizeof_active; i++)
+		{
+			vrManifoldSolvePosition(manifolds->data[i], dt);
+		}
+	}
+
+	vrFree(manifolds->data);
+	vrFree(manifolds);
 }

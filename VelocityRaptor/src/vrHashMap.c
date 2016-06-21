@@ -72,6 +72,7 @@ void vrHashTableInsert(vrHashTable * table, vrHashEntry * entry, unsigned int ke
 	{
 		if (((vrHashEntry*)node->data)->key == key)
 		{
+			return;
 			vrFree(((vrHashEntry*)node->data)->data);
 			vrFree(((vrHashEntry*)node->data));
 			vrLinkedListRemove(table->buckets->data[index], node);
@@ -94,9 +95,10 @@ void vrHashTableRemove(vrHashTable * table, unsigned int key)
 	{
 		if (((vrHashEntry*)node->data)->key == key)
 		{
-			vrFree(((vrHashEntry*)node->data)->data);
-			vrFree(((vrHashEntry*)node->data));
+			if(((vrHashEntry*)node->data)->data) vrFree(((vrHashEntry*)node->data)->data);
+			if(((vrHashEntry*)node->data)) vrFree(((vrHashEntry*)node->data));
 			vrLinkedListRemove(table->buckets->data[index], node);
+			return;
 		}
 		node = node->next;
 	}
