@@ -53,5 +53,7 @@ vrWorld* vrWorldInit(vrWorld* world);
 void vrWorldDestroy(vrWorld* world);
 void vrWorldStep(vrWorld* world);
 void vrWorldAddBody(vrWorld* world, vrRigidBody * body);
+void vrWorldQueryCollisions(vrWorld* world);
+void vrWorldSolve(vrWorld* world, vrFloat dt);
 
 #endif

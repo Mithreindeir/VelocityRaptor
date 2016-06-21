@@ -45,7 +45,7 @@ void vrPolyPoly(vrManifold* manifold, const vrPolygonShape A, const vrPolygonSha
 		ref = vrPolyBestEdge(A, vrPolyGetFarthestVertex(A, normal), normal);
 		flip = vrTRUE;
 	}
-	
+	/*
 	glColor3f(0, 0, 1);
 	glBegin(GL_LINES);
 	glVertex2f(ref.a.x, ref.a.y);
@@ -56,7 +56,7 @@ void vrPolyPoly(vrManifold* manifold, const vrPolygonShape A, const vrPolygonSha
 	glVertex2f(inc.a.x, inc.a.y);
 	glVertex2f(inc.b.x, inc.b.y);
 	glEnd();
-	
+	*/
 	vrVec2 refV = vrNormalize(vrSub(ref.b, ref.a));
 	vrVec2 refNorm = vrVect(refV.y, -refV.x);
 	should_flip = (vrDot(refNorm, vrSub(B.center, A.center)) >= 0);
@@ -106,6 +106,7 @@ void vrPolyPoly(vrManifold* manifold, const vrPolygonShape A, const vrPolygonSha
 	manifold->normal = refNorm;
 	manifold->flip = flip;
 	manifold->penetration = penetration;
+
 	return manifold;
 }
 
@@ -207,8 +208,10 @@ void vrPolyCircle(vrManifold * manifold, const vrPolygonShape A, const vrCircleS
 		else
 			return;
 	}
+	
 	manifold->contact_points = 1;
 	manifold->normal = (vrDot(manifold->normal, vrSub(B.center, A.center)) >= 0) ? vrVect(-manifold->normal.x, -manifold->normal.y) : manifold->normal;
+
 	manifold->contacts[0].point = point;
 	manifold->contacts[0].depth = -manifold->penetration;
 	manifold->contacts[0].normalImpulseSum = 0;
