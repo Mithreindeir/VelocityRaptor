@@ -6,7 +6,25 @@
 Velocity Raptor is a 2D physics engine for games. Several solvers are available, including Projected Guass Seidel, and the Conjugate Gradient method at the moment. 
 
 Planned features:
-Smoothes Particle Hydrodynamics fluid simulation.
+
+Smoothed Particle Hydrodynamics fluid simulation.
+
 Joints. 
+
 Current features:
-Rigidbody physics (mostly done porting to C).
+
+SAT Collision detection.
+
+Guass Seidel LPC solver.
+
+Conjugate Gradient LPC Solver.
+
+Accumulated Impulses solver;
+
+Position correction.
+
+Hash table
+
+Dynamic arrays
+
+linked lists
