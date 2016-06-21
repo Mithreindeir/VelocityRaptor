@@ -20,6 +20,7 @@
 #define HEADER_VRRIGIDBODY
 
 #include "vrShape.h"
+#include "vrArray.h"
 
 //A rigidbodies material values
 typedef struct vrMaterial
@@ -59,6 +60,8 @@ typedef struct vrRigidBody
 	vrCollisionGroup collisionData;
 	vrMaterial bodyMaterial;
 	vrShape* shape;
+
+
 } vrRigidBody;
 
 /* Body control functions */

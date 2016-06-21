@@ -49,6 +49,12 @@ typedef struct vrWorld
 	vrHashTable* manifoldMap;
 } vrWorld;
 
+typedef struct vrBodyPair
+{
+	vrRigidBody* A;
+	vrRigidBody* B;
+} vrBodyPair;
+
 vrWorld* vrWorldAlloc();
 vrWorld* vrWorldInit(vrWorld* world);
 void vrWorldDestroy(vrWorld* world);

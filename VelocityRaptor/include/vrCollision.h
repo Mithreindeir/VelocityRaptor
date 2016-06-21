@@ -21,6 +21,7 @@
 #include "vrManifold.h"
 #include "vrMath.h"
 
+#define GJK_MAX_ITERATIONS 20
 typedef struct vrProjection
 {
 	vrFloat max;
@@ -36,6 +37,7 @@ typedef struct vrEdge
 	vrVec2 edge;
 } vrEdge;
 
+void GJKPoly(vrManifold* manifold, const vrPolygonShape A, const vrPolygonShape B);
 void vrPolyPoly(vrManifold* manifold, const vrPolygonShape A, const vrPolygonShape B);
 void vrPolyCircle(vrManifold* manifold, const vrPolygonShape A, const vrCircleShape B);
 void vrCirclePoly(vrManifold* manifold, const vrCircleShape A, const vrPolygonShape B);

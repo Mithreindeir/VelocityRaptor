@@ -117,15 +117,24 @@ void vrMovePolyShape(vrPolygonShape * shape, vrVec2 move)
 	vrUpdatePolyCenter(shape);
 }
 
-vrPolygonShape* vrPolyBoxInit(vrPolygonShape* shape, vrFloat x, vrFloat y, vrFloat hw, vrFloat hh)
+vrPolygonShape* vrPolyBoxInit(vrPolygonShape* shape, vrFloat x, vrFloat y, vrFloat w, vrFloat h)
+{
+	vrAddVertexToPolyShape(shape, vrVect(x, y));
+	vrAddVertexToPolyShape(shape, vrVect(x  + w,y));
+	vrAddVertexToPolyShape(shape, vrVect(x + w,y + h));
+	vrAddVertexToPolyShape(shape, vrVect(x, y + h));
+	return shape;
+}
+
+vrPolygonShape * vrPolyBoxInitPoint(vrPolygonShape * shape, vrFloat x, vrFloat y, vrFloat hw, vrFloat hh)
 {
 	x -= hw;
 	y -= hh;
 	hw *= 2;
 	hh *= 2;
 	vrAddVertexToPolyShape(shape, vrVect(x, y));
-	vrAddVertexToPolyShape(shape, vrVect(x  + hw,y));
-	vrAddVertexToPolyShape(shape, vrVect(x + hw,y + hh));
+	vrAddVertexToPolyShape(shape, vrVect(x + hw, y));
+	vrAddVertexToPolyShape(shape, vrVect(x + hw, y + hh));
 	vrAddVertexToPolyShape(shape, vrVect(x, y + hh));
 	return shape;
 }

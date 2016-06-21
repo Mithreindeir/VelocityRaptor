@@ -87,7 +87,8 @@ vrPolygonShape* vrPolyInit(vrPolygonShape* polygon);
 void vrPolyDestroy(vrPolygonShape* polygon);
 //Misc:
 vrShape* vrShapePolyInit(vrShape* shape);
-vrPolygonShape* vrPolyBoxInit(vrPolygonShape* shape, vrFloat x, vrFloat y, vrFloat hw, vrFloat hh);
+vrPolygonShape* vrPolyBoxInit(vrPolygonShape* shape, vrFloat x, vrFloat y, vrFloat w, vrFloat h);
+vrPolygonShape* vrPolyBoxInitPoint(vrPolygonShape* shape, vrFloat x, vrFloat y, vrFloat hw, vrFloat hh);
 void vrAddVertexToPolyShape(vrPolygonShape* shape, vrVec2 vertex);
 void vrAddNormalToPolyShape(vrPolygonShape* shape, vrVec2 axis);
 void vrMovePolyShape(vrPolygonShape* shape, vrVec2 move);

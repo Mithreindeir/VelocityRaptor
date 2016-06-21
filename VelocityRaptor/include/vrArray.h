@@ -19,6 +19,8 @@
 #ifndef HEADER_VRARRAY
 #define HEADER_VRARRAY
 
+//Note: You must deallocate/free
+//all memory for objects yourself
 typedef struct vrArray
 {
 	void** data;
@@ -36,5 +38,6 @@ void vrArrayPop(vrArray* arr);
 void vrArrayReserve(vrArray* arr, int size);
 void vrArrayErase(vrArray* arr, int index);
 void vrArrayCopy(vrArray* dest, vrArray* src);
+void vrArrayClear(vrArray* arr);
 
 #endif

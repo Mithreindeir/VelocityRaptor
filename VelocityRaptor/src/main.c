@@ -70,13 +70,13 @@ main(void)
 	
 	body2->shape = vrShapePolyInit(body2->shape);
 	
-	body2->shape->shape = vrPolyBoxInit(body2->shape->shape, 400, 650, 200, 50);
+	body2->shape->shape = vrPolyBoxInit(body2->shape->shape, 0, 700, 800, 100);
 	body2->bodyMaterial.invMass = 0;
 	body2->bodyMaterial.invMomentInertia = 0;
 	vrManifold* m = vrManifoldInit(vrManifoldAlloc());
 	
 	//vrPolyPoly(m, *((vrPolygonShape*)body->shape->shape), *((vrPolygonShape*)body2->shape->shape));
-	vrWorldAddBody(world, body);
+	//vrWorldAddBody(world, body);
 
 	vrWorldAddBody(world, body2);
 
@@ -99,6 +99,18 @@ main(void)
 	t = vrHashTableLookup(map, 29348);
 	printf("%d and \n", *((int*)t->data));
 	*/
+	for (int i = 14; i >= 0; i--) {
+		for (int j = 0; j <= i; j++) {
+			vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
+			body3->shape = vrShapeInit(vrShapeAlloc());
+			body3->shape = vrShapePolyInit(body3->shape);
+			vrVec2 pos = vrVect(400 + j * 32 - i * 16, (700 - 448) - 32 + i * 32);
+			body3->shape->shape = vrPolyBoxInit(body3->shape->shape, pos.x, pos.y, 30, 30);
+			body3->bodyMaterial.restitution = 0.0;
+			vrWorldAddBody(world, body3);
+
+		}
+	}
 	vrFloat timer = glfwGetTime();
 	while (!glfwWindowShouldClose(window))
 	{
@@ -109,7 +121,7 @@ main(void)
 			vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
 			body3->shape = vrShapeInit(vrShapeAlloc());
 			body3->shape = vrShapePolyInit(body3->shape);
-			body3->shape->shape = vrPolyBoxInit(body3->shape->shape, x, y, 15, 15);
+			body3->shape->shape = vrPolyBoxInit(body3->shape->shape, x, y, 30, 30);
 			body3->bodyMaterial.restitution = 0.0;
 			vrWorldAddBody(world, body3);
 			timer = glfwGetTime();
@@ -131,7 +143,7 @@ main(void)
 		vrFloat f = glfwGetTime();
 		vrWorldStep(world);
 		f = glfwGetTime() - f;
-	//	printf("Framerate: %f\n", 1 / f);
+		printf("Framerate: %f\n", 1 / f);
 
 		for (int i = 0; i < world->bodies->sizeof_active; i++)
 		{

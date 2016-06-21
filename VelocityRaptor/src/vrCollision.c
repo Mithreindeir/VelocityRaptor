@@ -10,6 +10,10 @@ inline vrBOOL BiasGreater(const vrFloat a, const vrFloat b)
 	return a >= b * rel + a * abs;
 }
 
+void GJKPoly(vrManifold * manifold, const vrPolygonShape A, const vrPolygonShape B)
+{
+}
+
 void vrPolyPoly(vrManifold* manifold, const vrPolygonShape A, const vrPolygonShape B)
 {
 	manifold->contact_points = 0;
@@ -20,8 +24,9 @@ void vrPolyPoly(vrManifold* manifold, const vrPolygonShape A, const vrPolygonSha
 	vrBOOL should_flip = vrFALSE;
 	vrVec2 faceA = vrVect(0, 0), faceB = vrVect(0, 0);
 	vrFloat penA = vrPolyGetLeastAxis(A, B, &faceA);
+	if (penA <= 0) return;
 	vrFloat penB = vrPolyGetLeastAxis(B, A, &faceB);
-	if (penA <= 0 || penB <= 0) return;
+	if (penB <= 0) return;
 
 	if (penA > penB)
 	{
@@ -44,21 +49,10 @@ void vrPolyPoly(vrManifold* manifold, const vrPolygonShape A, const vrPolygonSha
 		vrVec2 neg_norm = vrVect(-normal.x, -normal.y);
 		inc = vrPolyBestEdge(B, vrPolyGetFarthestVertex(B, neg_norm), neg_norm);
 		ref = vrPolyBestEdge(A, vrPolyGetFarthestVertex(A, normal), normal);
+		
 		flip = vrTRUE;
 	}
-	/*
-	glColor3f(0, 0, 1);
-	glBegin(GL_LINES);
-	glVertex2f(ref.a.x, ref.a.y);
-	glVertex2f(ref.b.x, ref.b.y);
-	glEnd();
-	glColor3f(1, 0, 0);
-	glBegin(GL_LINES);
-	glVertex2f(inc.a.x, inc.a.y);
-	glVertex2f(inc.b.x, inc.b.y);
-	glEnd();
-	*/
-	vrVec2 refV = vrNormalize(vrSub(ref.b, ref.a));
+	vrVec2 refV = vrNormalize(ref.edge);
 	vrVec2 refNorm = vrVect(refV.y, -refV.x);
 
 	should_flip = (vrDot(refNorm, vrSub(B.center, A.center)) >= 0);
@@ -262,26 +256,31 @@ vrFloat vrPolyGetLeastAxis(const vrPolygonShape a, const vrPolygonShape b, vrVec
 {
 	if (a.axes->head == NULL) return 0.0;
 	vrVec2 axis = ((vrVertex*)a.axes->head->data)->vertex;
+
 	vrProjection p1 = vrProject(a, axis);
 	vrProjection p2 = vrProject(b, axis);
 	vrFloat penetration = (VR_MIN(p2.max, p1.max) - VR_MAX(p2.min, p1.min));
-	vrNode* current = a.axes->head;
+	vrNode* current = a.axes->head->next;
 
 	vrVec2 la = axis;
+	if (penetration <= 0) return penetration;
 
 	while (current)
 	{
-		p1 = vrProject(a, ((vrVertex*)current->data)->vertex);
-		p2 = vrProject(b, ((vrVertex*)current->data)->vertex);
-
-		vrFloat pen = (VR_MIN(p2.max, p1.max) - VR_MAX(p2.min, p1.min));
-
-		if (pen < penetration && (vrDot(la, vrSub(a.center, b.center)) >= 0))
+		if ((vrDot(((vrVertex*)current->data)->vertex, vrSub(a.center, b.center)) >= 0))
 		{
-			penetration = pen;
-			la = ((vrVertex*)current->data)->vertex;
-		}
+			p1 = vrProject(a, ((vrVertex*)current->data)->vertex);
+			p2 = vrProject(b, ((vrVertex*)current->data)->vertex);
 
+			vrFloat pen = (VR_MIN(p2.max, p1.max) - VR_MAX(p2.min, p1.min));
+
+			if (pen < penetration)
+			{
+				penetration = pen;
+				if (penetration <= 0) return penetration;
+				la = ((vrVertex*)current->data)->vertex;
+			}
+		}
 		current = current->next;
 	}
 
@@ -294,7 +293,7 @@ vrNode* vrPolyGetFarthestVertex(const vrPolygonShape shape, const vrVec2 normal)
 	vrNode* f = shape.vertices->head;
 	vrVec2 fv = ((vrVertex*)shape.vertices->head->data)->vertex;
 	vrFloat max = vrDot(normal, fv);
-	vrNode* current = shape.vertices->head;
+	vrNode* current = shape.vertices->head->next;
 	while (current)
 	{
 		vrVec2 v = ((vrVertex*)current->data)->vertex;
@@ -312,7 +311,6 @@ vrNode* vrPolyGetFarthestVertex(const vrPolygonShape shape, const vrVec2 normal)
 
 vrEdge vrPolyBestEdge(const vrPolygonShape shape, vrNode* vert, const vrVec2 normal)
 {
-
 	vrEdge edge;
 	vrVec2 v = ((vrVertex*)vert->data)->vertex;
 	vrVec2 v1;
@@ -328,7 +326,8 @@ vrEdge vrPolyBestEdge(const vrPolygonShape shape, vrNode* vert, const vrVec2 nor
 		v2 = ((vrVertex*)shape.vertices->head->prev->data)->vertex;
 	vrVec2 l = vrSub(v, v1);
 	vrVec2 r = vrSub(v, v2);
-
+	vrVec2 le = l;
+	vrVec2 re = vrVect(-r.x, -r.y);
 	l = vrNormalize(l);
 	r = vrNormalize(r);
 	if (vrDot(r, normal) <= vrDot(l, normal))
@@ -337,6 +336,7 @@ vrEdge vrPolyBestEdge(const vrPolygonShape shape, vrNode* vert, const vrVec2 nor
 		edge.min = v2;
 		edge.a = v;
 		edge.b = v2;
+		edge.edge = re;
 		return edge;
 	}
 	else
@@ -345,11 +345,12 @@ vrEdge vrPolyBestEdge(const vrPolygonShape shape, vrNode* vert, const vrVec2 nor
 		edge.min = v1;
 		edge.a = v1;
 		edge.b = v;
+		edge.edge = le;
 		return edge;
 	}
 }
 vrProjection vrProject(const vrPolygonShape a, const vrVec2 axis)
-{
+{	
 	vrFloat c = vrDot(((vrVertex*)a.vertices->head->data)->vertex, axis);
 	//returns the min and the max
 	vrProjection p = vrInitProjection(c, c);
@@ -359,6 +360,7 @@ vrProjection vrProject(const vrPolygonShape a, const vrVec2 axis)
 		c = vrDot(((vrVertex*)vertex->data)->vertex, axis);
 		if (c < p.min) p.min = c;
 		else if (c > p.max) p.max = c;
+
 		vertex = vertex->next;
 	}
 	return p;

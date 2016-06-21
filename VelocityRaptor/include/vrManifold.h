@@ -91,6 +91,7 @@ typedef struct vrManifold
 	//Maintenance variables
 	vrBOOL flip;
 	vrBOOL active;
+	vrBOOL firstTime;
 } vrManifold;
 
 vrManifold* vrManifoldAlloc();

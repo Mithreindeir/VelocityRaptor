@@ -33,6 +33,7 @@ vrRigidBody * vrBodyInit(vrRigidBody* body)
 	body->torque = 0.0;
 
 	body->bodyMaterial = vrMaterialInit();
+
 	return body;
 }
 

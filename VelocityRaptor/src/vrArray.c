@@ -68,6 +68,7 @@ void vrArrayPush(vrArray* arr, void * object)
 void vrArrayPop(vrArray* arr)
 {
 	arr->sizeof_active--;
+	arr->data[arr->sizeof_active] = NULL;
 	arr->size_available++;
 }
 
@@ -95,9 +96,12 @@ void vrArrayErase(vrArray* arr, int index)
 			c++;
 		}
 	}
+
+	vrFree(arr->data);
 	arr->data = buffer;
 	arr->sizeof_active--;
 	arr->sizeof_array--;
+	
 }
 
 void vrArrayCopy(vrArray * dest, vrArray * src)
@@ -107,4 +111,12 @@ void vrArrayCopy(vrArray * dest, vrArray * src)
 	dest->sizeof_active = src->sizeof_active;
 	dest->sizeof_array = src->sizeof_array;
 	dest->sizeof_data = src->sizeof_data;
+}
+
+void vrArrayClear(vrArray * arr)
+{
+	for (int i = 0; i < arr->sizeof_active; i++)
+	{
+		vrArrayPop(arr);
+	}
 }
