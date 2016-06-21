@@ -45,10 +45,11 @@ vrMaterial vrMaterialInit()
 {
 	vrMaterial material;
 	material.friction = 0.3;
-	material.invMass = 0.1;
-	material.invMomentInertia = 0.001;
-	material.mass = 10.0;
-	material.momentInertia = 10.0;
+	material.mass = 100.0;
+	material.invMass = 1.0 / material.mass;
+	material.momentInertia = 10000.0;
+	material.invMomentInertia = 1.0 / material.momentInertia;
+
 	material.restitution = 0.0;
 	return material;
 }
@@ -70,11 +71,15 @@ void vrBodyIntegrateForces(vrRigidBody * body, vrFloat dt)
 
 void vrBodyIntegrateVelocity(vrRigidBody * body, vrFloat dt)
 {
+	//Integrate velocity
 	body->position = vrAdd(body->position, vrScale(vrAdd(body->velocity, body->vel_bias), dt));
 	body->shape->move(body->shape->shape, vrScale(vrAdd(body->velocity, body->vel_bias), dt));
 
 	body->orientation += ( body->angv_bias + body->angularVelocity )* dt;
 	body->shape->rotate(body->shape->shape, (body->angv_bias + body->angularVelocity)* dt);
+
+	//Update Oriented Bounding box
+	body->shape->obb = body->shape->updateOBB(body->shape->shape);
 
 	body->angv_bias = 0;
 	body->vel_bias = vrVect(0, 0);

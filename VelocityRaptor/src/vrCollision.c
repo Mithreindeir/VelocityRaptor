@@ -23,7 +23,7 @@ void vrPolyPoly(vrManifold* manifold, const vrPolygonShape A, const vrPolygonSha
 	vrFloat penB = vrPolyGetLeastAxis(B, A, &faceB);
 	if (penA <= 0 || penB <= 0) return;
 
-	if (BiasGreater(penA, penB))
+	if (penA > penB)
 	{
 		penetration = penB;
 		normal = faceB;
@@ -40,6 +40,7 @@ void vrPolyPoly(vrManifold* manifold, const vrPolygonShape A, const vrPolygonSha
 		normal = faceA;
 		should_flip = (vrDot(normal, vrSub(A.center, B.center)) >= 0);
 		normal = should_flip ? vrVect(-normal.x, -normal.y) : normal;
+
 		vrVec2 neg_norm = vrVect(-normal.x, -normal.y);
 		inc = vrPolyBestEdge(B, vrPolyGetFarthestVertex(B, neg_norm), neg_norm);
 		ref = vrPolyBestEdge(A, vrPolyGetFarthestVertex(A, normal), normal);
@@ -59,6 +60,7 @@ void vrPolyPoly(vrManifold* manifold, const vrPolygonShape A, const vrPolygonSha
 	*/
 	vrVec2 refV = vrNormalize(vrSub(ref.b, ref.a));
 	vrVec2 refNorm = vrVect(refV.y, -refV.x);
+
 	should_flip = (vrDot(refNorm, vrSub(B.center, A.center)) >= 0);
 	refNorm = should_flip ? vrVect(-refNorm.x, -refNorm.y) : refNorm;
 	if (flip) refNorm = vrVect(-refNorm.x, -refNorm.y);
@@ -72,9 +74,9 @@ void vrPolyPoly(vrManifold* manifold, const vrPolygonShape A, const vrPolygonSha
 	clipped_points[1] = vrVect(0, 0);
 
 
-	if (Clip(inc.a, inc.b, vrVect(-refV.x, -refV.y), negativeOffset, clipped_points) < 2) return;
-	if (Clip(clipped_points[0], clipped_points[1], refV, positiveOffset, clipped_points) < 2) return;
-	
+	if (Clip(inc.a, inc.b, refV, positiveOffset, clipped_points) < 2) return;
+	if (Clip(clipped_points[0], clipped_points[1], vrVect(-refV.x, -refV.y), negativeOffset, clipped_points) < 2) return;
+
 	manifold->penetration = 0;
 	int cp = 0;
 	vrFloat separation = vrDot(refNorm, clipped_points[0]) - Max;
@@ -271,7 +273,7 @@ vrFloat vrPolyGetLeastAxis(const vrPolygonShape a, const vrPolygonShape b, vrVec
 
 		vrFloat pen = (VR_MIN(p2.max, p1.max) - VR_MAX(p2.min, p1.min));
 
-		if (pen < penetration)
+		if (pen < penetration && (vrDot(la, vrSub(a.center, b.center)) >= 0))
 		{
 			penetration = pen;
 			la = ((vrVertex*)current->data)->vertex;

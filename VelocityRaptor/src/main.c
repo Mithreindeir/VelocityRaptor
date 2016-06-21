@@ -54,11 +54,6 @@ main(void)
 	body->shape->shape = vrPolyBoxInit(body->shape->shape, 400, 425, 50, 50);
 	body->bodyMaterial.restitution = 0.0;
 
-	vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
-	body3->shape = vrShapeInit(vrShapeAlloc());
-	body3->shape = vrShapePolyInit(body3->shape);
-	body3->shape->shape = vrPolyBoxInit(body3->shape->shape, 400, 25, 50, 50);
-	body3->bodyMaterial.restitution = 0.0;
 	//body->shape = vrShapeCircleInit(body->shape);
 	//((vrCircleShape*)body->shape->shape)->center = vrVect(400, 400);
 	//((vrCircleShape*)body->shape->shape)->radius = 50;
@@ -82,7 +77,7 @@ main(void)
 	
 	//vrPolyPoly(m, *((vrPolygonShape*)body->shape->shape), *((vrPolygonShape*)body2->shape->shape));
 	vrWorldAddBody(world, body);
-	vrWorldAddBody(world, body3);
+
 	vrWorldAddBody(world, body2);
 
 
@@ -104,9 +99,22 @@ main(void)
 	t = vrHashTableLookup(map, 29348);
 	printf("%d and \n", *((int*)t->data));
 	*/
+	vrFloat timer = glfwGetTime();
 	while (!glfwWindowShouldClose(window))
 	{
+		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))
+		{
+			double x, y;
+			glfwGetCursorPos(window, &x, &y);
+			vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
+			body3->shape = vrShapeInit(vrShapeAlloc());
+			body3->shape = vrShapePolyInit(body3->shape);
+			body3->shape->shape = vrPolyBoxInit(body3->shape->shape, x, y, 15, 15);
+			body3->bodyMaterial.restitution = 0.0;
+			vrWorldAddBody(world, body3);
+			timer = glfwGetTime();
 
+		}
 		lastTime = currentTime;
 		currentTime = glfwGetTime();
 		vrFloat deltaTime = currentTime - lastTime;
@@ -123,7 +131,7 @@ main(void)
 		vrFloat f = glfwGetTime();
 		vrWorldStep(world);
 		f = glfwGetTime() - f;
-		printf("Framerate: %f\n", 1 / f);
+	//	printf("Framerate: %f\n", 1 / f);
 
 		for (int i = 0; i < world->bodies->sizeof_active; i++)
 		{
@@ -147,6 +155,15 @@ main(void)
 				vrDebugDrawCircle(vbody->shape->shape);
 
 			}
+			/*
+			vrOrientedBoundingBox obb = vbody->shape->obb;
+			glBegin(GL_LINE_LOOP);
+			glVertex2f(obb.position.x, obb.position.y);
+			glVertex2f(obb.position.x + obb.size.x, obb.position.y);
+			glVertex2f(obb.position.x + obb.size.x, obb.position.y + obb.size.y);
+			glVertex2f(obb.position.x, obb.position.y + obb.size.y);
+			glEnd();
+			*/
 		}
 
 		glMatrixMode(GL_PROJECTION);

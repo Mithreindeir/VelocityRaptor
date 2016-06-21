@@ -16,45 +16,21 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef HEADER_VRWORLD
-#define HEADER_VRWORLD
+#ifndef HEADER_VRBOUNDBOX
+#define HEADER_VRBOUNDBOX
 
-//Adds them and multiplies them by large prime
-#define COMBINE_PTR(a, b) (((a)*25165843 + (b)*25165843))
-
-#include <time.h>
 #include "velocityraptor.h"
-#include "vrRigidBody.h"
-#include "vrArray.h"
-#include "vrHashMap.h"
-#include "vrCollision.h"
+#include "vrMath.h"
 
-typedef struct vrWorld
+typedef struct vrOrientedBoundingBox
 {
+	vrVec2 position;
+	vrVec2 size;
 
-	vrArray* bodies;
-	int num_bodies;
+} vrOrientedBoundingBox;
 
-	/* For Stepper */
-	vrFloat lastTime;
-	vrFloat accumulator;
-	vrFloat timeStep;
-
-	/* Body controls */
-	int velIterations;
-	int posIterations;
-	vrVec2 gravity;
-
-	vrArray* manifoldKeys;
-	vrHashTable* manifoldMap;
-} vrWorld;
-
-vrWorld* vrWorldAlloc();
-vrWorld* vrWorldInit(vrWorld* world);
-void vrWorldDestroy(vrWorld* world);
-void vrWorldStep(vrWorld* world);
-void vrWorldAddBody(vrWorld* world, vrRigidBody * body);
-void vrWorldQueryCollisions(vrWorld* world);
-void vrWorldSolve(vrWorld* world, vrFloat dt);
+vrBOOL vrOBBOverlaps(const vrOrientedBoundingBox a, const vrOrientedBoundingBox b);
+vrBOOL vrOBBContains(const vrOrientedBoundingBox a, const vrOrientedBoundingBox b);
+vrOrientedBoundingBox vrOBBCreate(vrVec2 pos, vrVec2 size);
 
 #endif

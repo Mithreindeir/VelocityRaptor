@@ -86,9 +86,10 @@ vrShape * vrShapePolyInit(vrShape * shape)
 		vrShapeDataDestroy(shape);
 
 	shape->shape = vrPolyInit(vrPolyAlloc());
-	shape->getCenter = vrPolyGetCenter;
-	shape->rotate = vrRotatePolyShape;
-	shape->move = vrMovePolyShape;
+	shape->getCenter = &vrPolyGetCenter;
+	shape->rotate = &vrRotatePolyShape;
+	shape->move = &vrMovePolyShape;
+	shape->updateOBB = &vrPolyGetOBB;
 	shape->shapeType = VR_POLYGON;
 	return shape;
 }
@@ -178,12 +179,12 @@ void vrUpdatePolyAxes(vrPolygonShape * shape)
 		if (vertex->next == NULL)
 		{
 			((vrVertex*)axes->data)->vertex = vrSub(((vrVertex*)vertex->data)->vertex, ((vrVertex*)shape->vertices->head->data)->vertex);
-			((vrVertex*)axes->data)->vertex = vrNormalize(vrVect(-((vrVertex*)axes->data)->vertex.y, ((vrVertex*)axes->data)->vertex.x));
+			((vrVertex*)axes->data)->vertex = vrNormalize(vrVect(((vrVertex*)axes->data)->vertex.y, -((vrVertex*)axes->data)->vertex.x));
 		}
 		else
 		{
 			((vrVertex*)axes->data)->vertex = vrSub(((vrVertex*)vertex->data)->vertex, ((vrVertex*)vertex->next->data)->vertex);
-			((vrVertex*)axes->data)->vertex = vrNormalize(vrVect(-((vrVertex*)axes->data)->vertex.y, ((vrVertex*)axes->data)->vertex.x));
+			((vrVertex*)axes->data)->vertex = vrNormalize(vrVect(((vrVertex*)axes->data)->vertex.y, -((vrVertex*)axes->data)->vertex.x));
 		}
 		axes = axes->next;
 		vertex = vertex->next;
@@ -193,6 +194,28 @@ void vrUpdatePolyAxes(vrPolygonShape * shape)
 vrVec2 vrPolyGetCenter(vrPolygonShape * shape)
 {
 	return shape->center;
+}
+
+vrOrientedBoundingBox vrPolyGetOBB(vrPolygonShape * shape)
+{
+	vrNode* vertex = shape->vertices->head;
+	vrVertex* v = ((vrVertex*)vertex->data);
+	int least_x = v->vertex.x;
+	int farthest_x = v->vertex.x;
+	int least_y = v->vertex.y;
+	int farthest_y = v->vertex.y;
+	while (vertex)
+	{
+		v = ((vrVertex*)vertex->data);
+		vrVec2 vert = v->vertex;
+		if (vert.x < least_x) least_x = vert.x;
+		if (vert.x > farthest_x) farthest_x = vert.x;
+		if (vert.y < least_y) least_y = vert.y;
+		if (vert.y > farthest_y) farthest_y = vert.y;
+
+		vertex = vertex->next;
+	}
+	return vrOBBCreate(vrVect(least_x, least_y), vrVect(farthest_x - least_x, farthest_y - least_y));
 }
 
 vrCircleShape * vrCircleAlloc()
@@ -218,9 +241,10 @@ vrShape * vrShapeCircleInit(vrShape * shape)
 		vrShapeDataDestroy(shape);
 
 	shape->shape = vrCircleInit(vrCircleAlloc());
-	shape->rotate = vrRotateCircleShape;
-	shape->getCenter = vrCircleGetCenter;
-	shape->move = vrMoveCircleShape;
+	shape->rotate = &vrRotateCircleShape;
+	shape->getCenter = &vrCircleGetCenter;
+	shape->move = &vrMoveCircleShape;
+	shape->updateOBB = &vrCircleGetOBB;
 	shape->shapeType = VR_CIRCLE;
 	return shape;
 }
@@ -238,4 +262,9 @@ void vrMoveCircleShape(vrCircleShape * shape, vrVec2 move)
 vrVec2 vrCircleGetCenter(vrCircleShape * shape)
 {
 	return shape->center;
+}
+
+vrOrientedBoundingBox vrCircleGetOBB(vrCircleShape * shape)
+{
+	return vrOBBCreate(vrVect(shape->center.x - shape->radius, shape->center.y - shape->radius), vrVect(shape->radius * 2, shape->radius * 2));
 }

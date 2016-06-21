@@ -21,10 +21,13 @@
 #include "vrMath.h"
 #include "vrLinkedList.h"
 #include "velocityraptor.h"
+#include "vrBoundingBox.h"
 
 typedef void*(*vrShapeMoveFunc)(void* shape, vrVec2 move);
 typedef void*(*vrShapeRotateFunc)(void* shape, vrFloat angle);
 typedef vrVec2(*vrShapeCenterFunc)(void* shape);
+typedef vrOrientedBoundingBox(*vrShapeOBBFunc)(void* shape);
+
 
 typedef enum
 {
@@ -50,6 +53,9 @@ typedef struct vrShape
 	vrShapeMoveFunc move;
 	vrShapeRotateFunc rotate;
 	vrShapeCenterFunc getCenter;
+	vrShapeOBBFunc updateOBB;
+
+	vrOrientedBoundingBox obb;
 } vrShape;
 
 //Polygon shape
@@ -89,6 +95,7 @@ void vrRotatePolyShape(vrPolygonShape* shape, vrFloat angle);
 void vrUpdatePolyCenter(vrPolygonShape* shape);
 void vrUpdatePolyAxes(vrPolygonShape* shape);
 vrVec2 vrPolyGetCenter(vrPolygonShape* shape);
+vrOrientedBoundingBox vrPolyGetOBB(vrPolygonShape* shape);
 
 //Returns a shape struct with an empty circle
 vrCircleShape* vrCircleAlloc();
@@ -100,5 +107,6 @@ vrShape* vrShapeCircleInit(vrShape* shape);
 void vrRotateCircleShape(vrCircleShape* shape, vrFloat angle);
 void vrMoveCircleShape(vrCircleShape* shape, vrVec2 move);
 vrVec2 vrCircleGetCenter(vrCircleShape* shape);
+vrOrientedBoundingBox vrCircleGetOBB(vrCircleShape* shape);
 
 #endif

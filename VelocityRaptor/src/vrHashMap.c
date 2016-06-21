@@ -74,8 +74,7 @@ void vrHashTableInsert(vrHashTable * table, vrHashEntry * entry, unsigned int ke
 		{
 			vrFree(((vrHashEntry*)node->data)->data);
 			vrFree(((vrHashEntry*)node->data));
-			node->data = entry;
-			return;
+			vrLinkedListRemove(table->buckets->data[index], node);
 		}
 		node = node->next;
 	}
