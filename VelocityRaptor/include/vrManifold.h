@@ -26,6 +26,12 @@
 
 typedef struct vrContactPoint
 {
+	//Orientation on contact body
+	vrFloat oCB;
+	//Orientation on reference body
+	vrFloat oRB;
+	//To redo penetration
+	vrVec2 best_Ref;
 	//World coordinates of the contact point
 	vrVec2 point;
 	//Penetration of point

@@ -99,7 +99,9 @@ void vrAddVertexToPolyShape(vrPolygonShape * shape, vrVec2 vertex)
 	vrNode* new_vertex = vrAlloc(sizeof(vrNode));
 	new_vertex->data = vrAlloc(sizeof(vrVertex));
 	((vrVertex*)new_vertex->data)->vertex = vertex;
+	shape->num_vertices++;
 	vrLinkedListAddBack(shape->vertices, new_vertex);
+	vrUpdatePolyCenter(shape);
 }
 
 void vrAddNormalToPolyShape(vrPolygonShape * shape, vrVec2 axis)

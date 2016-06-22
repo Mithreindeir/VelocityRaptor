@@ -58,27 +58,66 @@ main(void)
 	((vrCircleShape*)body->shape->shape)->center = vrVect(400, 400);
 	((vrCircleShape*)body->shape->shape)->radius = 50;
 
-	vrRigidBody* body2 = vrBodyInit(vrBodyAlloc());
+	if (1)
+	{
+		vrRigidBody* body2 = vrBodyInit(vrBodyAlloc());
 
-	body2->shape = vrShapeInit(vrShapeAlloc());
+		body2->shape = vrShapeInit(vrShapeAlloc());
+		//body2->shape = vrShapeCircleInit(body2->shape);
+		body2->bodyMaterial.invMass = 0;
+
+		body2->bodyMaterial.invMomentInertia = 0;
+		//	((vrCircleShape*)body2->shape->shape)->center = vrVect(400, 600);
+		//	((vrCircleShape*)body2->shape->shape)->radius = 50;
+
+		body2->shape = vrShapePolyInit(body2->shape);
+
+		body2->shape->shape = vrPolyBoxInit(body2->shape->shape, -100, 0, 100, 8000);
+		body2->bodyMaterial.invMass = 0;
+		body2->bodyMaterial.invMomentInertia = 0;
+		vrWorldAddBody(world, body2);
+	}
+	vrRigidBody* bodyt = vrBodyInit(vrBodyAlloc());
+
+	bodyt->shape = vrShapeInit(vrShapeAlloc());
 	//body2->shape = vrShapeCircleInit(body2->shape);
-	body2->bodyMaterial.invMass = 0;
+	bodyt->bodyMaterial.invMass = 0;
 
-	body2->bodyMaterial.invMomentInertia = 0;
-//	((vrCircleShape*)body2->shape->shape)->center = vrVect(400, 600);
-//	((vrCircleShape*)body2->shape->shape)->radius = 50;
-	
-	body2->shape = vrShapePolyInit(body2->shape);
-	
-	body2->shape->shape = vrPolyBoxInit(body2->shape->shape, 0, 700, 800, 100);
-	body2->bodyMaterial.invMass = 0;
-	body2->bodyMaterial.invMomentInertia = 0;
+	bodyt->bodyMaterial.invMomentInertia = 0;
+	//	((vrCircleShape*)body2->shape->shape)->center = vrVect(400, 600);
+	//	((vrCircleShape*)body2->shape->shape)->radius = 50;
+
+	bodyt->shape = vrShapePolyInit(bodyt->shape);
+
+	bodyt->shape->shape = vrPolyBoxInit(bodyt->shape->shape, 0, 700, 800, 100);
+	bodyt->bodyMaterial.invMass = 0;
+	bodyt->bodyMaterial.invMomentInertia = 0;
+	vrWorldAddBody(world, bodyt);
+
+	if (1)
+	{
+		vrRigidBody* body2 = vrBodyInit(vrBodyAlloc());
+
+		body2->shape = vrShapeInit(vrShapeAlloc());
+		//body2->shape = vrShapeCircleInit(body2->shape);
+		body2->bodyMaterial.invMass = 0;
+
+		body2->bodyMaterial.invMomentInertia = 0;
+		//	((vrCircleShape*)body2->shape->shape)->center = vrVect(400, 600);
+		//	((vrCircleShape*)body2->shape->shape)->radius = 50;
+
+		body2->shape = vrShapePolyInit(body2->shape);
+
+		body2->shape->shape = vrPolyBoxInit(body2->shape->shape, 800, 0, 100, 8000);
+		body2->bodyMaterial.invMass = 0;
+		body2->bodyMaterial.invMomentInertia = 0;
+		vrWorldAddBody(world, body2);
+	}
 	vrManifold* m = vrManifoldInit(vrManifoldAlloc());
 	
 	//vrPolyPoly(m, *((vrPolygonShape*)body->shape->shape), *((vrPolygonShape*)body2->shape->shape));
 	//vrWorldAddBody(world, body);
 
-	vrWorldAddBody(world, body2);
 
 
 	vrLinkedList* manifolds = vrLinkedListInit(vrLinkedListAlloc());
@@ -99,6 +138,7 @@ main(void)
 	t = vrHashTableLookup(map, 29348);
 	printf("%d and \n", *((int*)t->data));
 	*/
+	/*
 	for (int i = 14; i >= 0; i--) {
 		for (int j = 0; j <= i; j++) {
 			vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
@@ -111,6 +151,62 @@ main(void)
 
 		}
 	}
+	*/
+	/*
+	vrVec2 p = vrVect(150, 100);
+	int size = 25;
+	vrVec2 verts[5];
+	for (int i = 0; i<5; i++) {
+		vrFloat angle = -2.0f*VR_PI*i / ((vrFloat)5);
+		verts[i] = vrVect(size * cos(angle), size * sin(angle));
+	}
+	for (int j = 0; j < 8; j++)
+	{
+		for (int i = 0; i < 10; i++)
+		{
+			
+			vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
+			body3->shape = vrShapeInit(vrShapeAlloc());
+			body3->shape = vrShapePolyInit(body3->shape);
+
+			vrAddVertexToPolyShape(body3->shape->shape, vrAdd(verts[0], p));
+			vrAddVertexToPolyShape(body3->shape->shape, vrAdd(verts[1], p));
+			vrAddVertexToPolyShape(body3->shape->shape, vrAdd(verts[2], p));
+			vrAddVertexToPolyShape(body3->shape->shape, vrAdd(verts[3], p));
+			vrAddVertexToPolyShape(body3->shape->shape, vrAdd(verts[4], p));
+			body3->bodyMaterial.restitution = 0.0;
+			body3->bodyMaterial.invMomentInertia = 11.0 / vrMomentForPoly(body3->shape->shape, body3->bodyMaterial.mass);
+			vrWorldAddBody(world, body3);
+			//printf("Moment = %f \n", vrMomentForPoly(body3->shape->shape, body3->bodyMaterial.mass));
+
+			p.x += 50;
+		}
+		p.y -= 150;
+		p.x = 150;
+	}
+	p.y = 200;
+	p.x = 100;
+	for (int j = 0; j < 8; j++)
+	{
+		for (int i = 0; i < 7; i++)
+		{
+			vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
+			body3->shape = vrShapeInit(vrShapeAlloc());
+			body3->shape = vrShapePolyInit(body3->shape);
+			vrAddVertexToPolyShape(body3->shape->shape, vrAdd(vrVect(0, -size), p));
+			vrAddVertexToPolyShape(body3->shape->shape, vrAdd(vrVect(size, size), p));
+			vrAddVertexToPolyShape(body3->shape->shape, vrAdd(vrVect(-size, size), p));
+
+			body3->bodyMaterial.restitution = 0.0;
+			body3->bodyMaterial.invMass = 0;
+			body3->bodyMaterial.invMomentInertia = 0;
+			vrWorldAddBody(world, body3);
+			p.x += 100;
+		}
+		p.y += 150;
+		p.x = 100;
+	}
+	*/
 	vrFloat timer = glfwGetTime();
 	while (!glfwWindowShouldClose(window))
 	{
@@ -121,8 +217,9 @@ main(void)
 			vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
 			body3->shape = vrShapeInit(vrShapeAlloc());
 			body3->shape = vrShapePolyInit(body3->shape);
-			body3->shape->shape = vrPolyBoxInit(body3->shape->shape, x, y, 30, 30);
+			body3->shape->shape = vrPolyBoxInit(body3->shape->shape, x, y, 60, 60);
 			body3->bodyMaterial.restitution = 0.0;
+			body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForBox(60, 60, 1);
 			vrWorldAddBody(world, body3);
 			timer = glfwGetTime();
 
@@ -144,7 +241,19 @@ main(void)
 		vrWorldStep(world);
 		f = glfwGetTime() - f;
 		printf("Framerate: %f\n", 1 / f);
+		for (int i = 0; i < world->bodies->sizeof_active; i++)
+		{
+			vrRigidBody* b = world->bodies->data[i];
+			vrVec2 center = b->shape->getCenter(b->shape->shape);
+			if (center.y > 900)
+			{
+				vrFloat move = -200 - center.y;
+				vrVec2 mov = vrVect(0, move);
+				b->shape->move(b->shape->shape, mov);
+				b->position = vrAdd(b->position, mov);
+			}
 
+		}
 		for (int i = 0; i < world->bodies->sizeof_active; i++)
 		{
 			vrRigidBody* vbody = world->bodies->data[i];

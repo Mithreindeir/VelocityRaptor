@@ -32,7 +32,7 @@ vrWorld * vrWorldInit(vrWorld * world)
 	world->accumulator = 0;
 	world->lastTime = 0;
 	world->timeStep = (1.0f / 180.0f);
-	world->gravity = vrVect(0, 9810);
+	world->gravity = vrVect(0, 981);
 	world->velIterations = 15;
 	world->posIterations = 10;
 	world->manifoldMap = vrHashTableInit(vrHashTableAlloc(), 1000);
@@ -135,6 +135,7 @@ void vrWorldQueryCollisions(vrWorld * world)
 			}
 			if (manifold && ((vrManifold*)manifold->data)->contact_points > 0)
 			{
+
 				collisions++;
 				vrManifoldSetBodies(manifold->data, body, body2);
 
@@ -151,7 +152,15 @@ void vrWorldQueryCollisions(vrWorld * world)
 					vrHashTableInsert(world->manifoldMap, manifold, key);
 					vrArrayPush(world->manifoldKeys, key);
 				}
-
+				glPointSize(8.0);
+				glColor3f(1, 0, 0);
+				glBegin(GL_POINTS);
+				vrManifold* t = vrHashTableLookup(world->manifoldMap, key)->data;
+				for (int i = 0; i < t->contact_points; i++)
+				{
+					glVertex2f(t->contacts[i].point.x, t->contacts[i].point.y);
+				}
+				glEnd();
 			}
 			else
 			{
@@ -178,8 +187,7 @@ void vrWorldQueryCollisions(vrWorld * world)
 
 		}
 	}
-
-	//printf("%d collision checks and %d actual collisions and %d bodies and %d double checks\n ", collision_checks, collisions, world->num_bodies, double_checks);
+	printf("%d collision checks and %d actual collisions and %d bodies \n ", collision_checks, collisions, world->num_bodies);
 }
 
 void vrWorldSolve(vrWorld * world, vrFloat dt)
@@ -205,6 +213,7 @@ void vrWorldSolve(vrWorld * world, vrFloat dt)
 
 		}
 	}
+	
 	for (int i = 0; i < world->manifoldKeys->sizeof_array; i++)
 	{
 		vrHashEntry* m = vrHashTableLookup(world->manifoldMap, world->manifoldKeys->data[i]);
@@ -226,5 +235,6 @@ void vrWorldSolve(vrWorld * world, vrFloat dt)
 
 		}
 	}
+	
 }
 

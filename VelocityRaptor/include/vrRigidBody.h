@@ -33,6 +33,9 @@ typedef struct vrMaterial
 
 	vrFloat invMass;
 	vrFloat invMomentInertia;
+
+	vrFloat linearDamping;
+	vrFloat angularDamping;
 } vrMaterial;
 
 //Holds data for collision marks
@@ -80,4 +83,7 @@ vrMaterial vrMaterialInit();
 void vrBodyIntegrateForces(vrRigidBody* body, vrFloat dt);
 void vrBodyIntegrateVelocity(vrRigidBody* body, vrFloat dt);
 
+vrFloat vrMomentForBox(vrFloat w, vrFloat h, vrFloat mass);
+vrFloat vrMomentForPoly(vrPolygonShape* shape, vrFloat mass);
+vrFloat vrMomentForCircle(vrCircleShape* shape, vrFloat mass);
 #endif
