@@ -115,7 +115,7 @@ void vrParticleSystemStep(vrParticleSystem * system, vrFloat dt)
 				//Calculate force due to pressure
 				vrVec2 gradient = GradW(diff, p->r);
 				// pressure = -(mj * (pi + pj) / ( 2.0 * dj) * W(r - rb, h))
-				// f = particles[nIdx].Mass * ((particles[nIdx].Velocity - particles[i].Velocity) / particles[nIdx].Density) * WViscosityLap(ref dist) * Constants.VISC0SITY;
+				// viscosity = 
 
 				vrVec2 pressure = vrScale(gradient, p2->m * (p->p + p2->p) / (2.0 * p2->d));
 				vrVec2 viscosity = vrScale((vrScale(vrScale(vrSub(p2->vel, p->vel), 1.0 / p2->d), LaplacianW(dist, p->r))), p2->m * system->viscosity);
