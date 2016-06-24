@@ -5,6 +5,7 @@
 #include "../include/vrArray.h"
 #include "../include/vrWorld.h"
 #include "../include/vrHashMap.h"
+#include "../include/vrParticleSystem.h"
 #include <stdio.h>
 #include <conio.h>
 #define GLEW_STATIC
@@ -18,6 +19,7 @@ vrBOOL keys[1024];
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 vrArray* arr;
 vrWorld* world;
+vrParticleSystem* psys;
 
 int
 main(void)
@@ -207,9 +209,12 @@ main(void)
 		p.x = 100;
 	}
 	*/
+	psys = vrParticleSystemInit(vrParticleSystemAlloc());
+	
 	vrFloat timer = glfwGetTime();
 	while (!glfwWindowShouldClose(window))
 	{
+		/*
 		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))
 		{
 			double x, y;
@@ -224,6 +229,7 @@ main(void)
 			timer = glfwGetTime();
 
 		}
+		*/
 		lastTime = currentTime;
 		currentTime = glfwGetTime();
 		vrFloat deltaTime = currentTime - lastTime;
@@ -238,9 +244,37 @@ main(void)
 		glClearColor(1, 1, 1, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
 		vrFloat f = glfwGetTime();
-		vrWorldStep(world);
+		//vrWorldStep(world);
 		f = glfwGetTime() - f;
-		printf("Framerate: %f\n", 1 / f);
+		//printf("Framerate: %f\n", 1 / f);
+		vrFloat ts = 0.01;
+		while (accumulator > 0.01)
+		{
+			vrParticleSystemStep(psys, ts);
+			accumulator -= ts;
+		}
+
+		glPointSize(16);
+		glLineWidth(12);
+		glColor3f(1, 0, 0);
+
+		for (int i = 0; i < psys->particles->sizeof_active; i++)
+		{
+			vrParticle* p = psys->particles->data[i];
+			int vrMax_segs = 30;
+			glBegin(GL_LINE_LOOP);
+			for (int i = 0; i < vrMax_segs; i++)
+			{
+				vrFloat theta = 2.0f * 3.1415926f * (vrFloat)i / vrMax_segs;
+
+				vrFloat x = (p->r*200) * cos(theta);
+				vrFloat y = (p->r *200) * sin(theta);
+				glVertex2f(x + p->pos.x *200, y + p->pos.y *200);
+			}
+			glEnd();
+		}
+		/*
+
 		for (int i = 0; i < world->bodies->sizeof_active; i++)
 		{
 			vrRigidBody* b = world->bodies->data[i];
@@ -276,7 +310,7 @@ main(void)
 				vrDebugDrawCircle(vbody->shape->shape);
 
 			}
-			/*
+			
 			vrOrientedBoundingBox obb = vbody->shape->obb;
 			glBegin(GL_LINE_LOOP);
 			glVertex2f(obb.position.x, obb.position.y);
@@ -284,9 +318,9 @@ main(void)
 			glVertex2f(obb.position.x + obb.size.x, obb.position.y + obb.size.y);
 			glVertex2f(obb.position.x, obb.position.y + obb.size.y);
 			glEnd();
-			*/
+			
 		}
-
+	*/
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		glOrtho(0, 800, 800, 0 + 1.f, 1.f, -1.f);

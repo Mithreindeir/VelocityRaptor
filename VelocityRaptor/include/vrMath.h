@@ -88,6 +88,7 @@ extern inline vrFloat vrClamp(vrFloat a, vrFloat low, vrFloat high);
 #define VR_ABS abs
 #define VR_SQRT sqrt
 #define VR_POW pow
+#define VR_POWF powf
 #define VR_COSINE cos
 #define VR_SINE sin
 #define VR_TANGENT tan

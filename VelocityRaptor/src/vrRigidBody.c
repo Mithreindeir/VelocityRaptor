@@ -143,7 +143,7 @@ vrFloat vrMomentForPoly(vrPolygonShape * shape, vrFloat mass)
 		sumT += cross * (vrDot(P, P) + vrDot(P, N) + vrDot(N, N));
 		sumB += cross;
 		n = n->next;
-		printf("P (%f, %f) and N (%f and %f) and C (%f, %f)\n", P.x, P.y, N.x, N.y, center.x, center.y);
+		//printf("P (%f, %f) and N (%f and %f) and C (%f, %f)\n", P.x, P.y, N.x, N.y, center.x, center.y);
 
 	}
 

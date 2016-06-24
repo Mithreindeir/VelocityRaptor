@@ -313,8 +313,8 @@ vrVec2 vrManifoldConjugateGradient(vrBlockSolverData solverData, vrFloat toleran
 		}
 		else
 		{
-			vrFloat beta = vrDot(rp, rp) / vrDot(rpp, rpp);
-			vrVec2 oldScaled = vrScale(pp, beta);
+			vrFloat k = vrDot(rp, rp) / vrDot(rpp, rpp);
+			vrVec2 oldScaled = vrScale(pp, k);
 			p = vrAdd(r, oldScaled);
 		}
 		s = vrMat2Mult(A, p);
