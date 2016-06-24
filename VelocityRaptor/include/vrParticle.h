@@ -30,11 +30,10 @@ typedef struct vrParticle
 	vrVec2 force; //Force
 
 	vrFloat d;//Density
-	vrFloat dn; //Density near
 	vrFloat p;//Pressure
-	vrFloat pn;//Pressure near
 	vrFloat m;//Mass
 	vrFloat r;//Radius
+	vrFloat damping;//Damping
 
 } vrParticle;
 

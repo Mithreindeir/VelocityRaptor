@@ -230,6 +230,21 @@ main(void)
 
 		}
 		*/
+		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))
+		{
+			if (psys->gravity.x == 0)
+			{
+				psys->gravity.x = 9.81;
+				psys->gravity.y = 0;
+			}
+			else
+			{
+				psys->gravity.x = 0;
+				psys->gravity.y = 9.81;
+
+			}
+			timer = glfwGetTime();
+		}
 		lastTime = currentTime;
 		currentTime = glfwGetTime();
 		vrFloat deltaTime = currentTime - lastTime;
@@ -248,7 +263,7 @@ main(void)
 		f = glfwGetTime() - f;
 		//printf("Framerate: %f\n", 1 / f);
 		vrFloat ts = 0.01;
-		while (accumulator > 0.01)
+		while (accumulator > ts)
 		{
 			vrParticleSystemStep(psys, ts);
 			accumulator -= ts;
@@ -267,9 +282,9 @@ main(void)
 			{
 				vrFloat theta = 2.0f * 3.1415926f * (vrFloat)i / vrMax_segs;
 
-				vrFloat x = (p->r*200) * cos(theta);
-				vrFloat y = (p->r *200) * sin(theta);
-				glVertex2f(x + p->pos.x *200, y + p->pos.y *200);
+				vrFloat x = (p->r*133.333) * cos(theta);
+				vrFloat y = (p->r *133.333) * sin(theta);
+				glVertex2f(x + p->pos.x *133.333, y + p->pos.y *133.333);
 			}
 			glEnd();
 		}

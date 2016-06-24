@@ -31,21 +31,30 @@ vrParticle * vrParticleInit(vrParticle * particle, vrVec2 p)
 	particle->acc = vrVect(0, 0);
 	particle->force = vrVect(0, 0);
 
-	particle->d = 0;
-	particle->dn = 0;
+	particle->d = 100;
 	particle->p = 0;
-	particle->pn = 0;
-	particle->r = 0.075;
-	particle->m = 1.0;
+	particle->r = 0.190625;
+	particle->m = 3.8;
+	particle->damping = 0.01;
 
 	return particle;
 }
 
 void vrParticleIntegrate(vrParticle * particle, vrFloat dt)
 {
+	//particle->pos = vrAdd(particle->pos, vrAdd(vrSub(particle->pos, particle->oldp), vrScale(particle->acc, dt*dt)));
 	//xi+1 = xi + (xi - xi-1) + a * dt * dt
-	particle->pos = vrAdd(particle->pos, vrAdd(vrSub(particle->pos, particle->oldp), vrScale(particle->acc, dt*dt)));
-	particle->oldp = particle->pos;
+
+	vrVec2 t;
+	vrVec2 oldPos = particle->pos;
+	particle->acc = vrScale(particle->acc, dt*dt);
+	t = vrSub(particle->pos, particle->oldp);
+	t = vrScale(t, (1.0 - particle->damping));
+	t = vrAdd(t, particle->acc);
+	particle->pos = vrAdd(particle->pos, t);
+	particle->oldp = oldPos;
+	t = vrSub(particle->pos, particle->oldp);
+	particle->vel = vrScale(t, 1.0 / dt);
+
 	particle->force = vrVect(0, 0);
-	particle->acc = vrVect(0, 0);
 }

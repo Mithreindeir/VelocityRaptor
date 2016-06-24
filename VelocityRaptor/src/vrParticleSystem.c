@@ -18,7 +18,7 @@
 
 #include "../include/vrParticleSystem.h"
 #include "../include/velocityraptor.h"
-
+#define EPSILON 1.192092896e-07f
 vrParticleSystem * vrParticleSystemAlloc()
 {
 	return vrAlloc(sizeof(vrParticleSystem));
@@ -26,17 +26,17 @@ vrParticleSystem * vrParticleSystemAlloc()
 
 vrParticleSystem * vrParticleSystemInit(vrParticleSystem * psys)
 {
-	psys->resting_d = 5;
-	psys->k_stiff = 1.0;
-	psys->viscosity = 0.002;
+	psys->resting_d = 80;
+	psys->k_stiff = 0.1;
+	psys->viscosity = 0.00;
 	psys->epsilon = 0.00001f;
-	psys->gamma = 3.0;
+	psys->gamma = 2.0;
 	psys->particles = vrArrayInit(vrArrayAlloc(), sizeof(vrParticle*));
-	psys->gravity = vrVect(0, 1.81);
+	psys->gravity = vrVect(0, 9.81);
 	srand(time(NULL));
 	int amount = 100;
 	vrFloat pw = VR_SQRT(amount);
-	vrFloat dist = 0.075*3;
+	vrFloat dist = 0.1;
 
 	vrVec2 opos = vrVect(lower_bound , lower_bound);
 	vrVec2 pos = opos;
@@ -52,8 +52,8 @@ vrParticleSystem * vrParticleSystemInit(vrParticleSystem * psys)
 		}
 		for (int j = 0; j < pw; j++)
 		{
-			//pos.x = lower_bound + (float)(rand()) / ((RAND_MAX / (upper_bound - lower_bound)));
-			//pos.y = lower_bound + (float)(rand()) / ((RAND_MAX / (upper_bound - lower_bound)));
+			pos.x = lower_bound + (float)(rand()) / ((RAND_MAX / (upper_bound - lower_bound)));
+			pos.y = lower_bound + (float)(rand()) / ((RAND_MAX / (upper_bound - lower_bound)));
 			vrParticle* p = vrParticleInit(vrParticleAlloc(), pos);
 			vrArrayPush(psys->particles, p);
 			pos.x = pos.x + dist;
@@ -76,23 +76,24 @@ void vrParticleSystemStep(vrParticleSystem * system, vrFloat dt)
 	for (int i = 0; i < system->particles->sizeof_active; i++)
 	{
 		vrParticle* p = system->particles->data[i];
+		p->d = 0.0;
 		//Calculate densities
 		for (int j = 0; j < system->particles->sizeof_active; j++)
 		{
-			if (j > i) continue;
+			//if (j > i) continue;
 
 			vrParticle* p2 = system->particles->data[j];
 
 			//Find distance
 			vrVec2 diff = vrSub(p->pos, p2->pos);
 			vrFloat dist = vrLength(diff);
-			if (dist < p->r * 6)
+			if (dist <= p->r)
 			{
-				p->d += p2->m * W(dist, p->r);
+				p->d += p2->m * W(dist, p->r);		
 			}
 		}
 		//Calculate pressure
-		p->p = system->k_stiff * (p->d - system->resting_d);
+		p->p = system->k_stiff * (VR_POW(p->d / system->resting_d, system->gamma) - 1.0);
 	}
 	for (int i = 0; i < system->particles->sizeof_active; i++)
 	{
@@ -109,21 +110,29 @@ void vrParticleSystemStep(vrParticleSystem * system, vrFloat dt)
 			//Find distance
 			vrVec2 diff = vrSub(p->pos, p2->pos);
 			vrFloat dist = vrLength(diff);
-			if (dist < p->r*6)
+			if (dist <= p->r)
 			{
 				//Calculate force due to pressure
 				vrVec2 gradient = GradW(diff, p->r);
 				// pressure = -(mj * (pi + pj) / ( 2.0 * dj) * W(r - rb, h))
-				if (p2->d <= system->epsilon)
-					p2->d = system->epsilon;
+				// f = particles[nIdx].Mass * ((particles[nIdx].Velocity - particles[i].Velocity) / particles[nIdx].Density) * WViscosityLap(ref dist) * Constants.VISC0SITY;
 
 				vrVec2 pressure = vrScale(gradient, p2->m * (p->p + p2->p) / (2.0 * p2->d));
+				vrVec2 viscosity = vrScale((vrScale(vrScale(vrSub(p2->vel, p->vel), 1.0 / p2->d), LaplacianW(dist, p->r))), p2->m * system->viscosity);
 
-				p->force = vrSub(p->force, pressure);	
-				p2->force = vrAdd(p2->force, pressure);
+				if (p2->d >= EPSILON)
+				{
+
+					p2->force = vrAdd(p2->force, pressure);
+					p->force = vrSub(p->force, pressure);
+					p2->force = vrSub(p2->force, viscosity);
+					p->force = vrAdd(p->force, viscosity);
+
+				}
+
+
 			}
 		}
-		//printf("%f and %f this\n", p->force.x, p->force.y);
 	}
 	for (int i = 0; i < system->particles->sizeof_active; i++)
 	{
@@ -134,10 +143,11 @@ void vrParticleSystemStep(vrParticleSystem * system, vrFloat dt)
 	}
 
 	vrParticleSystemBoundaries(system);
+	/*
 	for (int i = 0; i < system->particles->sizeof_active; i++)
 	{
 		vrParticle* p = system->particles->data[i];
-		vrFloat min_dist = p->r * 2;
+		vrFloat min_dist = p->r*1.5;
 
 		//Correct particles if they are too close
 		for (int j = 0; j < system->particles->sizeof_active; j++)
@@ -153,31 +163,20 @@ void vrParticleSystemStep(vrParticleSystem * system, vrFloat dt)
 
 				if (dist < min_dist)
 				{
-					if (dist > system->epsilon)
-					{
-						vrVec2 move = vrScale(diff, 0.5f * (dist - min_dist) / dist);
-						move = vrVect(-move.x, -move.y);
-						p2->pos = vrSub(p2->pos, move);
-						p2->oldp = vrSub(p2->oldp, move);
-						p->pos = vrAdd(p->pos, move);
-						p->oldp = vrAdd(p->oldp, move);
-
-					}
-					else
-					{
-
-						vrFloat ndiff = 0.5 * min_dist;
-						p2->pos.y -= ndiff;
-						p2->oldp.y -= ndiff;
-						p->pos.y += ndiff;
-						p->oldp.y += ndiff;
-
-					}
+					if (dist < system->epsilon)
+						dist = system->epsilon;
+					vrVec2 move = vrScale(diff, 0.5f * (dist - min_dist) / dist);
+					move = vrVect(-move.x, -move.y);
+					p2->pos = vrSub(p2->pos, move);
+					p2->oldp = vrSub(p2->oldp, move);
+					p->pos = vrAdd(p->pos, move);
+					p->oldp = vrAdd(p->oldp, move);
 				}
 			}
 		}
 
 	}
+	*/
 }
 
 void vrParticleSystemBoundaries(vrParticleSystem * system)
@@ -186,21 +185,27 @@ void vrParticleSystemBoundaries(vrParticleSystem * system)
 	{
 		vrParticle* p = system->particles->data[i];
 
-		if (p->pos.x < lower_bound)
+		if (p->pos.x <= lower_bound)
 		{
-			p->pos.x = lower_bound;
+			p->pos.x = lower_bound + EPSILON;
+			p->vel.x = -0.2*p->vel.x;
+
 		}
-		else if (p->pos.x > upper_bound)
+		else if (p->pos.x >= upper_bound)
 		{
-			p->pos.x = upper_bound;
+			p->pos.x = upper_bound - EPSILON;
+			p->vel.x = -0.2*p->vel.x;
+
 		}
-		if (p->pos.y < lower_bound)
+		if (p->pos.y <= lower_bound)
 		{
-			p->pos.y = lower_bound;
+			p->pos.y = lower_bound + EPSILON;
+			p->vel.y = -0.2*p->vel.y;
 		}
-		else if (p->pos.y > upper_bound)
+		else if (p->pos.y >= upper_bound)
 		{
-			p->pos.y = upper_bound;
+			p->pos.y = upper_bound - EPSILON;
+			p->vel.y = -0.2*p->vel.y;
 		}
 	}
 }
@@ -209,22 +214,40 @@ void vrParticleSystemBoundaries(vrParticleSystem * system)
 
 vrFloat W(vrFloat x, vrFloat h)
 {
-	if (x*x <= 0 || x*x > h*h) return 0.0;
-	return (315.0 / (64.0 * VR_PI * VR_POWF(h, 9)))*VR_POWF((h*h - x*x), 3);
+
+	vrFloat lenSq = x*x;
+	if (lenSq > h*h)
+	{
+		return 0.0f;
+	}
+	if (lenSq < EPSILON)
+	{
+		lenSq = EPSILON;
+	}
+		
+	return (315.0 / (64.0 * VR_PI * VR_POWF(h, 9)))*VR_POWF((h*h - lenSq), 3);
 }
 
 vrVec2 GradW(vrVec2 d, vrFloat h)
 {
-	double kernelRad6 = VR_POWF((double)h, 6.0);
-	vrFloat m_factor = (float)(15.0 / (VR_PI * kernelRad6));
-	vrFloat dlen = vrLength(d);
-	vrFloat dlens = dlen * dlen;
-	if (dlens > h*h) return vrVect(0, 0);
-	if (dlens <= 0.0)
-		return vrVect(0, 0);
 
-	vrVec2 r =  vrScale(d, -m_factor * 3.0f * (h - dlen) * (h - dlen) / dlen);
-	return r;
+	vrFloat kr6 = VR_POW(h, 6);
+	vrFloat m_factor = (vrFloat)(15.0 / (VR_PI * kr6));
+
+	float lenSq = vrLengthSqr(d);
+	if (lenSq >h*h)
+	{
+		return vrVect(0.0f, 0.0f);
+	}
+	if (lenSq < EPSILON)
+	{
+		lenSq = EPSILON;
+	}
+	float len = VR_SQRT(lenSq);
+	vrFloat f = -m_factor * 3.0 * (h - len) * (h - len) / len;
+	vrVec2 result = vrScale(d, f);
+	return result;
+
 }
 
 vrFloat LaplacianW(vrFloat x, vrFloat h)

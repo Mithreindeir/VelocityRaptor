@@ -81,6 +81,8 @@ extern inline vrFloat vrMin(const vrFloat a, const vrFloat b);
 extern inline vrFloat vrDist(const vrVec2 a, const vrVec2 b);
 extern inline vrFloat vrDist_Sqr(const vrVec2 a, const vrVec2 b);
 extern inline vrFloat vrLength(const vrVec2 a);
+extern inline vrFloat vrLengthSqr(const vrVec2 a);
+void vrVec2Log(const vrVec2 v);
 
 extern inline vrVec2 vrNormalize(const vrVec2 a);
 extern inline vrFloat vrClamp(vrFloat a, vrFloat low, vrFloat high);

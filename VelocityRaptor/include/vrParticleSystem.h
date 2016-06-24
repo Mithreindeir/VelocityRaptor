@@ -21,8 +21,8 @@
 
 #include "vrParticle.h"
 #include "vrArray.h"
-static const vrFloat upper_bound = 3.6;
-static const vrFloat lower_bound = 0.4;
+static const vrFloat upper_bound = 5.8;
+static const vrFloat lower_bound = 0.2;
 
 typedef struct vrParticleSystem
 {

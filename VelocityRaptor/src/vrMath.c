@@ -112,6 +112,16 @@ inline vrFloat vrLength(const vrVec2 a)
 	return VR_SQRT(a.x*a.x + a.y*a.y);
 }
 
+inline vrFloat vrLengthSqr(const vrVec2 a)
+{
+	return (a.x*a.x + a.y*a.y);
+}
+
+void vrVec2Log(const vrVec2 v)
+{
+	printf("( %f, %f ) \t\n", v.x, v.y);
+}
+
 inline vrVec2 vrNormalize(const vrVec2 a)
 {
 	vrFloat len = vrDist(vrVect(0, 0), a);
