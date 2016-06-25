@@ -87,6 +87,10 @@ void vrWorldStep(vrWorld * world)
 
 void vrWorldAddBody(vrWorld* world, vrRigidBody * body)
 {
+	if (body->bodyMaterial.invMass == 0)
+	{
+		body->shape->updateOBB(body->shape->shape);
+	}
 	vrArrayPush(world->bodies, body);
 	world->num_bodies++;
 }
@@ -187,7 +191,7 @@ void vrWorldQueryCollisions(vrWorld * world)
 
 		}
 	}
-	printf("%d collision checks and %d actual collisions and %d bodies \n ", collision_checks, collisions, world->num_bodies);
+	//printf("%d collision checks and %d actual collisions and %d bodies \n ", collision_checks, collisions, world->num_bodies);
 }
 
 void vrWorldSolve(vrWorld * world, vrFloat dt)

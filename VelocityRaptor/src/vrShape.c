@@ -91,6 +91,7 @@ vrShape * vrShapePolyInit(vrShape * shape)
 	shape->move = &vrMovePolyShape;
 	shape->updateOBB = &vrPolyGetOBB;
 	shape->shapeType = VR_POLYGON;
+
 	return shape;
 }
 
@@ -210,6 +211,7 @@ vrVec2 vrPolyGetCenter(vrPolygonShape * shape)
 vrOrientedBoundingBox vrPolyGetOBB(vrPolygonShape * shape)
 {
 	vrNode* vertex = shape->vertices->head;
+	if (!vertex) return vrOBBCreate(vrVect(0, 0), vrVect(0, 0));
 	vrVertex* v = ((vrVertex*)vertex->data);
 	int least_x = v->vertex.x;
 	int farthest_x = v->vertex.x;
@@ -257,6 +259,7 @@ vrShape * vrShapeCircleInit(vrShape * shape)
 	shape->move = &vrMoveCircleShape;
 	shape->updateOBB = &vrCircleGetOBB;
 	shape->shapeType = VR_CIRCLE;
+
 	return shape;
 }
 

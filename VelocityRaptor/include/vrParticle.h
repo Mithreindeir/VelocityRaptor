@@ -35,10 +35,13 @@ typedef struct vrParticle
 	vrFloat r;//Radius
 	vrFloat damping;//Damping
 
-	//
+	//Handles clustering problem
 	vrFloat dNear;
 	vrFloat pNear;
-
+	//Color
+	vrFloat red;
+	vrFloat green;
+	vrFloat blue;
 } vrParticle;
 
 vrParticle* vrParticleAlloc();

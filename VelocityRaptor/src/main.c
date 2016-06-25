@@ -215,7 +215,7 @@ main(void)
 
 	while (!glfwWindowShouldClose(window))
 	{
-		/*
+		
 		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))
 		{
 			double x, y;
@@ -230,8 +230,8 @@ main(void)
 			timer = glfwGetTime();
 
 		}
-		*/
-		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))
+		
+		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))
 		{
 			if (psys->gravity.x == 0)
 			{
@@ -260,10 +260,11 @@ main(void)
 		glClearColor(1, 1, 1, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
 		vrFloat f = glfwGetTime();
-		//vrWorldStep(world);
+		vrWorldStep(world);
 		f = glfwGetTime() - f;
+		vrParticleSystemCollide(psys, world->bodies->data[1], 133.333);
 		//printf("Framerate: %f\n", 1 / f);
-		vrFloat ts = 0.01;
+		vrFloat ts = 1.0 / 60.0;
 		while (accumulator > ts)
 		{
 			vrParticleSystemStep(psys, ts);
@@ -272,26 +273,25 @@ main(void)
 
 		glPointSize(16);
 		glLineWidth(12);
-		glColor3f(0, 0.5, 1);
 
 		for (int i = 0; i < psys->particles->sizeof_active; i++)
 		{
 			vrParticle* p = psys->particles->data[i];
 			int vrMax_segs = 30;
+			glColor3f(p->red, p->green, p->blue);
+
 			glBegin(GL_POLYGON);
 			for (int i = 0; i < vrMax_segs; i++)
 			{
 				vrFloat theta = 2.0f * 3.1415926f * (vrFloat)i / vrMax_segs;
-			//	vrFloat radius = 0.05;
-				vrFloat radius = 0.2;
-
+				vrFloat radius = 0.25;
 				vrFloat x = (radius*133.333) * cos(theta);
 				vrFloat y = (radius*133.333) * sin(theta);
 				glVertex2f(x + p->pos.x *133.333, y + p->pos.y *133.333);
 			}
 			glEnd();
 		}
-		/*
+		
 
 		for (int i = 0; i < world->bodies->sizeof_active; i++)
 		{
@@ -329,16 +329,16 @@ main(void)
 
 			}
 			
-			vrOrientedBoundingBox obb = vbody->shape->obb;
-			glBegin(GL_LINE_LOOP);
-			glVertex2f(obb.position.x, obb.position.y);
-			glVertex2f(obb.position.x + obb.size.x, obb.position.y);
-			glVertex2f(obb.position.x + obb.size.x, obb.position.y + obb.size.y);
-			glVertex2f(obb.position.x, obb.position.y + obb.size.y);
-			glEnd();
+			//vrOrientedBoundingBox obb = vbody->shape->obb;
+			//glBegin(GL_LINE_LOOP);
+			//glVertex2f(obb.position.x, obb.position.y);
+			//glVertex2f(obb.position.x + obb.size.x, obb.position.y);
+			//glVertex2f(obb.position.x + obb.size.x, obb.position.y + obb.size.y);
+			//glVertex2f(obb.position.x, obb.position.y + obb.size.y);
+			//glEnd();
 			
 		}
-	*/
+	
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		glOrtho(0, 800, 800, 0 + 1.f, 1.f, -1.f);

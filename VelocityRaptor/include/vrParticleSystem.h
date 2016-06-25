@@ -21,7 +21,8 @@
 
 #include "vrParticle.h"
 #include "vrArray.h"
-#include "vrHashMap.h"
+#include "vrRigidBody.h"
+#include "vrCollision.h"
 
 static const vrFloat upper_bound = 5.8;
 static const vrFloat lower_bound = 0.2;
@@ -29,6 +30,7 @@ static const vrFloat lower_bound = 0.2;
 typedef struct vrParticleSystem
 {
 	vrArray* particles;
+
 
 	vrFloat resting_d;
 	vrFloat k_stiffN;
@@ -44,9 +46,5 @@ vrParticleSystem* vrParticleSystemAlloc();
 vrParticleSystem* vrParticleSystemInit(vrParticleSystem* psys);
 void vrParticleSystemStep(vrParticleSystem* system, vrFloat dt);
 void vrParticleSystemBoundaries(vrParticleSystem* system);
-//Smoothing functions
-vrFloat W(vrFloat x, vrFloat h);
-vrVec2 GradW(vrVec2 d, vrFloat h);
-vrFloat LaplacianW(vrFloat x, vrFloat h);
-
+void vrParticleSystemCollide(vrParticleSystem* system, vrRigidBody* body, vrFloat scale);
 #endif
