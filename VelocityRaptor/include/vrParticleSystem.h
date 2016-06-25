@@ -21,6 +21,8 @@
 
 #include "vrParticle.h"
 #include "vrArray.h"
+#include "vrHashMap.h"
+
 static const vrFloat upper_bound = 5.8;
 static const vrFloat lower_bound = 0.2;
 
@@ -30,11 +32,12 @@ typedef struct vrParticleSystem
 
 	vrFloat resting_d;
 	vrFloat k_stiffN;
-	vrFloat gamma;
 	vrFloat k_stiff;
 	vrFloat viscosity;
-	vrFloat epsilon;
+	vrFloat k_spring;
+	vrFloat restLen;
 	vrVec2 gravity;
+
 } vrParticleSystem;
 
 vrParticleSystem* vrParticleSystemAlloc();
@@ -46,7 +49,4 @@ vrFloat W(vrFloat x, vrFloat h);
 vrVec2 GradW(vrVec2 d, vrFloat h);
 vrFloat LaplacianW(vrFloat x, vrFloat h);
 
-/*
-
-*/
 #endif

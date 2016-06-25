@@ -56,4 +56,9 @@
 #define vrCalloc calloc
 #endif
 
+#ifndef COMBINE_INTS
+//Credit to Chipmunk2D for this hashing macro
+#define COMBINE_INTS(a, b) (((unsigned int)(a)*(3344921057ul) ^ (unsigned int)(b)*(3344921057ul)))
+#endif
+
 #endif

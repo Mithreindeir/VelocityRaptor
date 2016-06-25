@@ -36,7 +36,7 @@ void vrArrayDestroy(vrArray* arr);
 void vrArrayPush(vrArray* arr, void* object);
 void vrArrayPop(vrArray* arr);
 void vrArrayReserve(vrArray* arr, int size);
-void vrArrayErase(vrArray* arr, int index);
+int vrArrayErase(vrArray* arr, int index);
 void vrArrayCopy(vrArray* dest, vrArray* src);
 void vrArrayClear(vrArray* arr);
 

@@ -212,6 +212,7 @@ main(void)
 	psys = vrParticleSystemInit(vrParticleSystemAlloc());
 	
 	vrFloat timer = glfwGetTime();
+
 	while (!glfwWindowShouldClose(window))
 	{
 		/*
@@ -271,19 +272,21 @@ main(void)
 
 		glPointSize(16);
 		glLineWidth(12);
-		glColor3f(1, 0, 0);
+		glColor3f(0, 0.5, 1);
 
 		for (int i = 0; i < psys->particles->sizeof_active; i++)
 		{
 			vrParticle* p = psys->particles->data[i];
 			int vrMax_segs = 30;
-			glBegin(GL_LINE_LOOP);
+			glBegin(GL_POLYGON);
 			for (int i = 0; i < vrMax_segs; i++)
 			{
 				vrFloat theta = 2.0f * 3.1415926f * (vrFloat)i / vrMax_segs;
+			//	vrFloat radius = 0.05;
+				vrFloat radius = 0.2;
 
-				vrFloat x = (p->r*133.333) * cos(theta);
-				vrFloat y = (p->r *133.333) * sin(theta);
+				vrFloat x = (radius*133.333) * cos(theta);
+				vrFloat y = (radius*133.333) * sin(theta);
 				glVertex2f(x + p->pos.x *133.333, y + p->pos.y *133.333);
 			}
 			glEnd();

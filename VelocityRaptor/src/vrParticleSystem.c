@@ -27,20 +27,21 @@ vrParticleSystem * vrParticleSystemAlloc()
 vrParticleSystem * vrParticleSystemInit(vrParticleSystem * psys)
 {
 	psys->resting_d = 80;
-	psys->k_stiff = 0.1;
+	psys->k_stiff = 3.0;
+	psys->k_stiffN = 10.0;
 	psys->viscosity = 0.00;
-	psys->epsilon = 0.00001f;
-	psys->gamma = 2.0;
+	psys->k_spring = 3;
+	psys->restLen = 1.0;
 	psys->particles = vrArrayInit(vrArrayAlloc(), sizeof(vrParticle*));
 	psys->gravity = vrVect(0, 9.81);
 	srand(time(NULL));
-	int amount = 100;
+	int amount = 300;
 	vrFloat pw = VR_SQRT(amount);
 	vrFloat dist = 0.1;
 
 	vrVec2 opos = vrVect(lower_bound , lower_bound);
 	vrVec2 pos = opos;
-	for (int i = 0; i < pw; i++)
+	for (int i = 0; i < pw*2; i++)
 	{
 		if (i % 2 == 0)
 		{
@@ -50,8 +51,9 @@ vrParticleSystem * vrParticleSystemInit(vrParticleSystem * psys)
 		{
 			pw--;
 		}
-		for (int j = 0; j < pw; j++)
+		for (int j = 0; j < pw/2; j++)
 		{
+			
 			pos.x = lower_bound + (float)(rand()) / ((RAND_MAX / (upper_bound - lower_bound)));
 			pos.y = lower_bound + (float)(rand()) / ((RAND_MAX / (upper_bound - lower_bound)));
 			vrParticle* p = vrParticleInit(vrParticleAlloc(), pos);
@@ -67,6 +69,7 @@ vrParticleSystem * vrParticleSystemInit(vrParticleSystem * psys)
 		pos.x = opos.x;
 
 	}
+
 	return psys;
 }
 
@@ -76,7 +79,52 @@ void vrParticleSystemStep(vrParticleSystem * system, vrFloat dt)
 	for (int i = 0; i < system->particles->sizeof_active; i++)
 	{
 		vrParticle* p = system->particles->data[i];
+		p->vel = vrAdd(p->vel, vrScale(system->gravity, dt));
+	}
+
+	for (int i = 0; i < system->particles->sizeof_active; i++)
+	{
+		vrParticle* p = system->particles->data[i];
+		for (int j = 0; j < system->particles->sizeof_active; j++)
+		{
+			if (j > i) continue;
+
+			vrParticle* p2 = system->particles->data[j];
+
+			//Find distance
+			vrVec2 diff = vrSub(p2->pos, p->pos);
+			vrFloat dist = vrLength(diff);
+			vrFloat q = dist / p->r;
+			if (q < 1 && dist != 0)
+			{
+				vrVec2 norm = vrScale(diff, 1.0 / dist);
+				vrFloat u = vrDot(vrSub(p->vel, p2->vel), norm);
+				if (u > 0)
+				{
+					vrFloat Q = 25;
+					vrFloat B = 20.0;
+					vrVec2 I = vrScale(norm, dt * (1 - q)*(Q*u + B*(u*u)));
+					//vrVec2Log(I);
+					I = vrScale(I, 1.0 / 2.0);
+					p->vel = vrSub(p->vel, I);
+					p2->vel = vrAdd(p2->vel, I);
+				}
+			}
+		}
+	}
+	for (int i = 0; i < system->particles->sizeof_active; i++)
+	{
+		vrParticle* p = system->particles->data[i];
+
+		p->oldp = p->pos;
+		p->pos = vrAdd(p->pos, vrScale(p->vel, dt));
+	}
+
+	for (int i = 0; i < system->particles->sizeof_active; i++)
+	{
+		vrParticle* p = system->particles->data[i];
 		p->d = 0.0;
+		p->dNear = 0.0;
 		//Calculate densities
 		for (int j = 0; j < system->particles->sizeof_active; j++)
 		{
@@ -87,96 +135,61 @@ void vrParticleSystemStep(vrParticleSystem * system, vrFloat dt)
 			//Find distance
 			vrVec2 diff = vrSub(p->pos, p2->pos);
 			vrFloat dist = vrLength(diff);
-			if (dist <= p->r)
+			vrFloat q = dist / p->r;
+			if (q < 1)
 			{
-				p->d += p2->m * W(dist, p->r);		
+				//p->d += p2->m * W(dist, p->r);		
+				p->d += VR_POW(1 - q, 2);
+				p->dNear += VR_POW(1 - q, 3);
 			}
 		}
 		//Calculate pressure
-		p->p = system->k_stiff * (VR_POW(p->d / system->resting_d, system->gamma) - 1.0);
+		p->p = system->k_stiff * (p->d - system->resting_d);
+		p->pNear = system->k_stiffN*p->dNear;
+
 	}
 	for (int i = 0; i < system->particles->sizeof_active; i++)
 	{
 		vrParticle* p = system->particles->data[i];
+		vrVec2 dx = vrVect(0, 0);
 		//Calculate forces
 		//First add gravity
 		p->force = vrAdd(p->force, system->gravity);
 		for (int j = 0; j < system->particles->sizeof_active; j++)
 		{
 			//Remove duplicates
-			if (j > i) continue;
 			vrParticle* p2 = system->particles->data[j];
 
 			//Find distance
-			vrVec2 diff = vrSub(p->pos, p2->pos);
+			vrVec2 diff = vrSub(p2->pos, p->pos);
 			vrFloat dist = vrLength(diff);
+			vrFloat q = (1 - dist / p->r);
 			if (dist <= p->r)
 			{
-				//Calculate force due to pressure
-				vrVec2 gradient = GradW(diff, p->r);
-				// pressure = -(mj * (pi + pj) / ( 2.0 * dj) * W(r - rb, h))
-				// f = particles[nIdx].Mass * ((particles[nIdx].Velocity - particles[i].Velocity) / particles[nIdx].Density) * WViscosityLap(ref dist) * Constants.VISC0SITY;
 
-				vrVec2 pressure = vrScale(gradient, p2->m * (p->p + p2->p) / (2.0 * p2->d));
-				vrVec2 viscosity = vrScale((vrScale(vrScale(vrSub(p2->vel, p->vel), 1.0 / p2->d), LaplacianW(dist, p->r))), p2->m * system->viscosity);
+				vrFloat press = p->p + p2->p;
+				vrFloat pressN = p->pNear + p2->pNear;
+				vrFloat displace = (press*(q) + pressN*(q*q))*(dt*dt);
 
-				if (p2->d >= EPSILON)
+				if (dist != 0)
 				{
-
-					p2->force = vrAdd(p2->force, pressure);
-					p->force = vrSub(p->force, pressure);
-					p2->force = vrSub(p2->force, viscosity);
-					p->force = vrAdd(p->force, viscosity);
-
+					diff = vrScale(diff, 1.0 / dist);
+					//displace /= 2;
+					dx = vrAdd(dx, vrScale(diff, displace));
+					p2->pos = vrSub(p2->pos, vrScale(diff, displace));
 				}
-
 
 			}
 		}
+		p->pos = vrAdd(p->pos, dx);
 	}
 	for (int i = 0; i < system->particles->sizeof_active; i++)
 	{
 		vrParticle* p = system->particles->data[i];
-		p->acc = vrScale(p->force, 1.0 / p->m);
-
-		vrParticleIntegrate(p, dt);
+		p->vel = vrScale(vrSub(p->pos, p->oldp), 1.0 / dt);
 	}
 
 	vrParticleSystemBoundaries(system);
-	/*
-	for (int i = 0; i < system->particles->sizeof_active; i++)
-	{
-		vrParticle* p = system->particles->data[i];
-		vrFloat min_dist = p->r*1.5;
-
-		//Correct particles if they are too close
-		for (int j = 0; j < system->particles->sizeof_active; j++)
-		{
-			if (j > i) continue;
-			vrParticle* p2 = system->particles->data[j];
-
-			//Find distance
-			vrVec2 diff = vrSub(p->pos, p2->pos);
-			vrFloat dist = vrLength(diff);
-			//if (dist < p->r)
-			{
-
-				if (dist < min_dist)
-				{
-					if (dist < system->epsilon)
-						dist = system->epsilon;
-					vrVec2 move = vrScale(diff, 0.5f * (dist - min_dist) / dist);
-					move = vrVect(-move.x, -move.y);
-					p2->pos = vrSub(p2->pos, move);
-					p2->oldp = vrSub(p2->oldp, move);
-					p->pos = vrAdd(p->pos, move);
-					p->oldp = vrAdd(p->oldp, move);
-				}
-			}
-		}
-
-	}
-	*/
 }
 
 void vrParticleSystemBoundaries(vrParticleSystem * system)

@@ -34,7 +34,6 @@ vrHashTable * vrHashTableInit(vrHashTable * table, int size)
 	for (int i = 0; i < prime_size; i++)
 	{
 		vrArrayPush(table->buckets, vrLinkedListInit(vrLinkedListAlloc()));
-
 	}
 	table->hash = &vrHashFuncDefault;
 	table->deleteFunc = NULL;

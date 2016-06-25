@@ -110,7 +110,7 @@ void vrWorldQueryCollisions(vrWorld * world)
 			vrRigidBody* body = world->bodies->data[i];
 			vrRigidBody* body2 = world->bodies->data[j];
 
-			unsigned int key = COMBINE_PTR(body, body2);
+			unsigned int key = COMBINE_INTS(body, body2);
 
 			vrBOOL overlap = vrOBBOverlaps(body->shape->obb, body2->shape->obb);
 

@@ -19,8 +19,6 @@
 #ifndef HEADER_VRWORLD
 #define HEADER_VRWORLD
 
-//Credit to Chipmunk2D for this hashing macro
-#define COMBINE_PTR(a, b) (((unsigned int)(a)*(3344921057ul) ^ (unsigned int)(b)*(3344921057ul)))
 
 #include <time.h>
 #include "velocityraptor.h"

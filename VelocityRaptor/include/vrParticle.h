@@ -35,10 +35,13 @@ typedef struct vrParticle
 	vrFloat r;//Radius
 	vrFloat damping;//Damping
 
+	//
+	vrFloat dNear;
+	vrFloat pNear;
+
 } vrParticle;
 
 vrParticle* vrParticleAlloc();
 vrParticle* vrParticleInit(vrParticle* particle, vrVec2 p);
-void vrParticleIntegrate(vrParticle* particle, vrFloat dt);
 
 #endif

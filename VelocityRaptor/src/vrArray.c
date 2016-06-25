@@ -42,7 +42,7 @@ void vrArrayDestroy(vrArray * arr)
 
 void vrArrayPush(vrArray* arr, void * object)
 {
-	if (1)
+	if (arr->size_available <= 0)
 	{
 		arr->sizeof_array++;
 		void** buffer = realloc(arr->data, (arr->sizeof_array)*arr->sizeof_data);
@@ -58,7 +58,7 @@ void vrArrayPush(vrArray* arr, void * object)
 			printf("Meh\n");
 			abort();
 		}
-		VR_ASSERT((arr->sizeof_active + 1) < arr->sizeof_array, "Array failure");
+		//VR_ASSERT((arr->sizeof_active + 1) < arr->sizeof_array, "Array failure");
 		arr->data[arr->sizeof_active] = object;
 		arr->size_available--;
 		arr->sizeof_active++;
@@ -81,7 +81,7 @@ void vrArrayReserve(vrArray * arr, int size)
 	arr->data = buffer;
 }
 
-void vrArrayErase(vrArray* arr, int index)
+int vrArrayErase(vrArray* arr, int index)
 {
 	if (index > arr->sizeof_array || index < 0) return;
 
@@ -101,7 +101,9 @@ void vrArrayErase(vrArray* arr, int index)
 	arr->data = buffer;
 	arr->sizeof_active--;
 	arr->sizeof_array--;
-	
+	//Correct index if iterating
+	//Through data
+	return index - 1;
 }
 
 void vrArrayCopy(vrArray * dest, vrArray * src)
