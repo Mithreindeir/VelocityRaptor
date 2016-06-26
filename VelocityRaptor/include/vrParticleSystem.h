@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2009 Cormac Grindall (Mithreindeir)
+* Copyright (c) 2016 Cormac Grindall (Mithreindeir)
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -33,17 +33,28 @@ static const vrFloat lower_bound = 0.2;
 ///By Simon Clavet, Philippe Beaudoin, and Pierre Poulin
 typedef struct vrParticleSystem
 {
+	///Array holding all the particles
 	vrArray* particles;
 
-
+	///The resting density
 	vrFloat resting_d;
+	///Constant of stiffness for near pressure
 	vrFloat k_stiffN;
+	///Constant of stiffness for pressure
 	vrFloat k_stiff;
+	///Viscosity
 	vrFloat viscosity;
+	///Quadratic viscosity
+	vrFloat quadratic_viscosity;
+	///Constant for spring
 	vrFloat k_spring;
+	///Resting length of springs
 	vrFloat restLen;
+	///Gravity
 	vrVec2 gravity;
 
+	///Placeholder body for collisions
+	vrRigidBody* pBody;
 } vrParticleSystem;
 
 ///Allocated memory for particle system
@@ -55,5 +66,5 @@ void vrParticleSystemStep(vrParticleSystem* system, vrFloat dt);
 ///Makes sure particles don't go out of bounds
 void vrParticleSystemBoundaries(vrParticleSystem* system);
 ///Collides system with body
-void vrParticleSystemCollide(vrParticleSystem* system, vrRigidBody* body, vrFloat scale);
+void vrParticleSystemCollide(vrParticleSystem* system, vrRigidBody* body, vrFloat scale, vrFloat dt);
 #endif

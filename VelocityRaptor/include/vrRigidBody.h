@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2009 Cormac Grindall (Mithreindeir)
+* Copyright (c) 2016 Cormac Grindall (Mithreindeir)
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -21,21 +21,30 @@
 
 #include "vrShape.h"
 #include "vrArray.h"
+#include "vrColor.h"
 
 ///Holds data about the properties
 /// Of the body
 typedef struct vrMaterial
 {
+	///Bounciness 
 	vrFloat restitution;
+	///Friction
 	vrFloat friction;
 
+	///Mass of a object
 	vrFloat mass;
+	///Resistance to rotate
 	vrFloat momentInertia;
 
+	///1/mass
 	vrFloat invMass;
+	///1/momentInertia
 	vrFloat invMomentInertia;
 
+	///Linear velocity damping
 	vrFloat linearDamping;
+	///Angular velocity damping
 	vrFloat angularDamping;
 } vrMaterial;
 
@@ -77,6 +86,8 @@ typedef struct vrRigidBody
 	///The physical representation
 	///Of the body
 	vrShape* shape;
+	///Color
+	vrColor color;
 } vrRigidBody;
 
 ///Allocates a body

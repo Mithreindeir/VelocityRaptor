@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2009 Cormac Grindall (Mithreindeir)
+* Copyright (c) 2016 Cormac Grindall (Mithreindeir)
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -33,13 +33,11 @@ vrParticle * vrParticleInit(vrParticle * particle, vrVec2 p)
 
 	particle->d = 80;
 	particle->p = 0;
-	particle->r = 0.25;
-	particle->m = 5.8;
+	particle->r = 0.2;
+	particle->m = 0.8;
 	particle->damping = 0.01;
+	particle->color = vrColorCreate(0, 0.5, 1);
 
-	particle->red = 0;
-	particle->green = 0.5;
-	particle->blue = 1;
 
 	return particle;
 }

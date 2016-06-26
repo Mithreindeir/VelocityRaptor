@@ -49,7 +49,7 @@ main(void)
 	int frames = 0;
 	world = vrWorldInit(vrWorldAlloc());
 
-
+	/*
 	vrRigidBody* body = vrBodyInit(vrBodyAlloc());
 	body->shape = vrShapeInit(vrShapeAlloc());
 	//body->shape = vrShapePolyInit(body->shape);
@@ -79,6 +79,28 @@ main(void)
 		body2->bodyMaterial.invMomentInertia = 0;
 		vrWorldAddBody(world, body2);
 	}
+
+	if (1)
+	{
+		vrRigidBody* body2 = vrBodyInit(vrBodyAlloc());
+
+		body2->shape = vrShapeInit(vrShapeAlloc());
+		//body2->shape = vrShapeCircleInit(body2->shape);
+		body2->bodyMaterial.invMass = 0;
+
+		body2->bodyMaterial.invMomentInertia = 0;
+
+		//	((vrCircleShape*)body2->shape->shape)->center = vrVect(400, 600);
+		//	((vrCircleShape*)body2->shape->shape)->radius = 50;
+
+		body2->shape = vrShapePolyInit(body2->shape);
+
+		body2->shape->shape = vrPolyBoxInit(body2->shape->shape, 800, 0, 100, 8000);
+		body2->bodyMaterial.invMass = 0;
+		body2->bodyMaterial.invMomentInertia = 0;
+		vrWorldAddBody(world, body2);
+	}
+	*/
 	vrRigidBody* bodyt = vrBodyInit(vrBodyAlloc());
 
 	bodyt->shape = vrShapeInit(vrShapeAlloc());
@@ -92,29 +114,13 @@ main(void)
 	bodyt->shape = vrShapePolyInit(bodyt->shape);
 
 	bodyt->shape->shape = vrPolyBoxInit(bodyt->shape->shape, 0, 700, 800, 100);
+	((vrVertex*)(((vrNode*)((vrPolygonShape*)bodyt->shape->shape)->vertices->head)->data))->vertex = vrVect(0, 750);
+	//vrLinkedListRemove(((vrPolygonShape*)bodyt->shape->shape)->vertices, ((vrPolygonShape*)bodyt->shape->shape)->vertices->head);
+	
 	bodyt->bodyMaterial.invMass = 0;
 	bodyt->bodyMaterial.invMomentInertia = 0;
 	vrWorldAddBody(world, bodyt);
 
-	if (1)
-	{
-		vrRigidBody* body2 = vrBodyInit(vrBodyAlloc());
-
-		body2->shape = vrShapeInit(vrShapeAlloc());
-		//body2->shape = vrShapeCircleInit(body2->shape);
-		body2->bodyMaterial.invMass = 0;
-
-		body2->bodyMaterial.invMomentInertia = 0;
-		//	((vrCircleShape*)body2->shape->shape)->center = vrVect(400, 600);
-		//	((vrCircleShape*)body2->shape->shape)->radius = 50;
-
-		body2->shape = vrShapePolyInit(body2->shape);
-
-		body2->shape->shape = vrPolyBoxInit(body2->shape->shape, 800, 0, 100, 8000);
-		body2->bodyMaterial.invMass = 0;
-		body2->bodyMaterial.invMomentInertia = 0;
-		vrWorldAddBody(world, body2);
-	}
 	vrManifold* m = vrManifoldInit(vrManifoldAlloc());
 	
 	//vrPolyPoly(m, *((vrPolygonShape*)body->shape->shape), *((vrPolygonShape*)body2->shape->shape));
@@ -212,7 +218,7 @@ main(void)
 	psys = vrParticleSystemInit(vrParticleSystemAlloc());
 	
 	vrFloat timer = glfwGetTime();
-
+	int mass = 1;
 	while (!glfwWindowShouldClose(window))
 	{
 		
@@ -225,10 +231,12 @@ main(void)
 			body3->shape = vrShapePolyInit(body3->shape);
 			body3->shape->shape = vrPolyBoxInit(body3->shape->shape, x, y, 60, 60);
 			body3->bodyMaterial.restitution = 0.0;
-			body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForBox(60, 60, 1);
+			body3->bodyMaterial.mass = mass;
+			body3->bodyMaterial.invMass = 1.0/ body3->bodyMaterial.mass;
+			body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForBox(60, 60, body3->bodyMaterial.mass);
 			vrWorldAddBody(world, body3);
 			timer = glfwGetTime();
-
+			mass += 2;
 		}
 		
 		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))
@@ -262,15 +270,18 @@ main(void)
 		vrFloat f = glfwGetTime();
 		vrWorldStep(world);
 		f = glfwGetTime() - f;
-		vrParticleSystemCollide(psys, world->bodies->data[1], 133.333);
 		//printf("Framerate: %f\n", 1 / f);
 		vrFloat ts = 1.0 / 60.0;
+		
 		while (accumulator > ts)
 		{
 			vrParticleSystemStep(psys, ts);
+			for (int i = 0; i < world->bodies->sizeof_active; i++)
+				vrParticleSystemCollide(psys, world->bodies->data[i], 133.333, ts);
+
 			accumulator -= ts;
 		}
-
+		
 		glPointSize(16);
 		glLineWidth(12);
 
@@ -278,7 +289,7 @@ main(void)
 		{
 			vrParticle* p = psys->particles->data[i];
 			int vrMax_segs = 30;
-			glColor3f(p->red, p->green, p->blue);
+			glColor3f(p->color.r, p->color.g, p->color.b);
 
 			glBegin(GL_POLYGON);
 			for (int i = 0; i < vrMax_segs; i++)
@@ -314,6 +325,7 @@ main(void)
 			glLineWidth(4);
 			if (vbody->shape->shapeType == VR_POLYGON)
 			{
+				glColor3f(vbody->color.r, vbody->color.g, vbody->color.b);
 				vrDebugDrawPolygon(vbody->shape->shape);
 			}
 			else
@@ -321,7 +333,8 @@ main(void)
 				vrVec2 center = ((vrCircleShape*)vbody->shape->shape)->center;
 				vrFloat orientation = vbody->orientation;
 				vrFloat radius = ((vrCircleShape*)vbody->shape->shape)->radius;
-				glBegin(GL_LINES);
+				glColor3f(vbody->color.r, vbody->color.g, vbody->color.b);
+				glBegin(GL_POLYGON);
 				glVertex2f(center.x, center.y);
 				glVertex2f(center.x + cos(orientation)*radius, center.y + sin(orientation)*radius);
 				glEnd();
@@ -348,7 +361,6 @@ main(void)
 
 	}
 
-	vrBodyDestroy(body);
 	return 1;
 }
 
@@ -369,10 +381,17 @@ void vrDebugDrawCircle(vrCircleShape* circle)
 
 void vrDebugDrawPolygon(vrPolygonShape* shape)
 {
-	
 	vrNode* v = shape->vertices->head;
+	glBegin(GL_POLYGON);
+	while (v)
+	{
+		glVertex2f(((vrVertex*)v->data)->vertex.x, ((vrVertex*)v->data)->vertex.y);
+		v = v->next;
+	}
+	glEnd();
 	glBegin(GL_LINE_LOOP);
 	glColor3f(0, 0, 0);
+	v = shape->vertices->head;
 	while (v)
 	{
 		glVertex2f(((vrVertex*)v->data)->vertex.x, ((vrVertex*)v->data)->vertex.y);

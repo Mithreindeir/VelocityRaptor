@@ -16,37 +16,27 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef HEADER_VRPARTICLE
-#define HEADER_VRPARTICLE
-#include "vrMath.h"
+#ifndef HEADER_VRCOLOR
+#define HEADER_VRCOLOR
+
 #include "velocityraptor.h"
-#include "vrColor.h"
+#include "vrMath.h"
 
-///Particle data container
-typedef struct vrParticle
+///RGB Color struct normalized(values from 0 to 1)
+typedef struct vrColor
 {
-	vrVec2 pos;//Position
-	vrVec2 oldp;//Old position for leapfrog
-	vrVec2 vel;//Velocity
-	vrVec2 acc;//Acceleration
-	vrVec2 force; //Force
-
-	vrFloat d;//Density
-	vrFloat p;//Pressure
-	vrFloat m;//Mass
-	vrFloat r;//Radius
-	vrFloat damping;//Damping
-
-	//Handles clustering problem
-	vrFloat dNear;
-	vrFloat pNear;
-
-	vrColor color;
-} vrParticle;
-
-///Allocates a particle
-vrParticle* vrParticleAlloc();
-///Initializes a particle
-vrParticle* vrParticleInit(vrParticle* particle, vrVec2 p);
+	///Red
+	vrFloat r;
+	///Green
+	vrFloat g;
+	///Blue
+	vrFloat b;
+} vrColor;
+///Create color with 0-255 values
+vrColor vrColorCreateNormalized(vrFloat r, vrFloat g, vrFloat b);
+///Creates a color from rgb values
+vrColor vrColorCreate(vrFloat r, vrFloat g, vrFloat b);
+///Maps color from 0-255 to 0-1
+vrColor vrColorNormalize(vrColor color);
 
 #endif

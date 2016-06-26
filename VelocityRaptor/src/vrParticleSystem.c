@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2009 Cormac Grindall (Mithreindeir)
+* Copyright (c) 2016 Cormac Grindall (Mithreindeir)
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -26,16 +26,16 @@ vrParticleSystem * vrParticleSystemAlloc()
 
 vrParticleSystem * vrParticleSystemInit(vrParticleSystem * psys)
 {
-	psys->resting_d = 80;
-	psys->k_stiff = 3.0;
-	psys->k_stiffN = 10.0;
+	psys->resting_d = 20;
+	psys->k_stiff = 2.0;
+	psys->k_stiffN = 8.0;
 	psys->viscosity = 0.00;
 	psys->k_spring = 3;
 	psys->restLen = 1.0;
 	psys->particles = vrArrayInit(vrArrayAlloc(), sizeof(vrParticle*));
 	psys->gravity = vrVect(0, 9.81);
 	srand(time(NULL));
-	int amount = 250;
+	int amount = 400;
 	vrFloat pw = VR_SQRT(amount);
 	vrFloat dist = 0.1;
 
@@ -54,8 +54,8 @@ vrParticleSystem * vrParticleSystemInit(vrParticleSystem * psys)
 		for (int j = 0; j < pw/2; j++)
 		{
 			
-			pos.x = lower_bound + (float)(rand()) / ((RAND_MAX / (upper_bound - lower_bound)));
-			pos.y = lower_bound + (float)(rand()) / ((RAND_MAX / (upper_bound - lower_bound)));
+			//pos.x = lower_bound + (float)(rand()) / ((RAND_MAX / (upper_bound - lower_bound)));
+			//pos.y = lower_bound + (float)(rand()) / ((RAND_MAX / (upper_bound - lower_bound)));
 			vrParticle* p = vrParticleInit(vrParticleAlloc(), pos);
 			vrArrayPush(psys->particles, p);
 			pos.x = pos.x + dist;
@@ -69,6 +69,9 @@ vrParticleSystem * vrParticleSystemInit(vrParticleSystem * psys)
 		pos.x = opos.x;
 
 	}
+	psys->pBody = vrBodyInit(vrBodyAlloc());
+	psys->pBody->shape = vrShapeInit(vrShapeAlloc());
+	psys->pBody->shape = vrShapeCircleInit(psys->pBody->shape);
 
 	return psys;
 }
@@ -93,7 +96,10 @@ void vrParticleSystemStep(vrParticleSystem * system, vrFloat dt)
 
 			//Find distance
 			vrVec2 diff = vrSub(p2->pos, p->pos);
-			vrFloat dist = vrLength(diff);
+			vrFloat dist = vrLengthSqr(diff);
+			if (dist > p->r*p->r)
+				continue;
+			dist = VR_SQRT(dist);
 			vrFloat q = dist / p->r;
 			if (q < 1 && dist != 0)
 			{
@@ -101,13 +107,13 @@ void vrParticleSystemStep(vrParticleSystem * system, vrFloat dt)
 				vrFloat u = vrDot(vrSub(p->vel, p2->vel), norm);
 				if (u > 0)
 				{
-					vrFloat Q = 15;
+					vrFloat Q = 5;
 					vrFloat B = 12.0;
-					vrVec2 I = vrScale(norm, dt * (1 - q)*(Q*u + B*(u*u)));
+					vrVec2 I = vrScale(norm, dt * (1 - q)*(B*u + Q*(u*u)));
 					//vrVec2Log(I);
 					I = vrScale(I, 1.0 / 2.0);
-					p->vel = vrSub(p->vel, I);
-					p2->vel = vrAdd(p2->vel, I);
+					//p->vel = vrSub(p->vel, I);
+					//p2->vel = vrAdd(p2->vel, I);
 
 				}
 			}
@@ -133,7 +139,10 @@ void vrParticleSystemStep(vrParticleSystem * system, vrFloat dt)
 
 			//Find distance
 			vrVec2 diff = vrSub(p->pos, p2->pos);
-			vrFloat dist = vrLength(diff);
+			vrFloat dist = vrLengthSqr(diff);
+			if (dist > p->r*p->r)
+				continue;
+			dist = VR_SQRT(dist);
 			vrFloat q = dist / p->r;
 			if (q < 1)
 			{
@@ -141,8 +150,8 @@ void vrParticleSystemStep(vrParticleSystem * system, vrFloat dt)
 				p->dNear += VR_POW(1 - q, 3);
 			}
 		}
-		p->red = p->p;
-		//printf("%f and %f this \n", p->p, system->resting_d);
+		p->color.r = p->p;
+
 		//Calculate pressure
 		p->p = system->k_stiff * (p->d - system->resting_d);
 		p->pNear = system->k_stiffN*p->dNear;
@@ -157,7 +166,10 @@ void vrParticleSystemStep(vrParticleSystem * system, vrFloat dt)
 
 			//Find distance
 			vrVec2 diff = vrSub(p2->pos, p->pos);
-			vrFloat dist = vrLength(diff);
+			vrFloat dist = vrLengthSqr(diff);
+			if (dist > p->r*p->r)
+				continue;
+			dist = VR_SQRT(dist);
 			vrFloat q = (1 - dist / p->r);
 			if (dist <= p->r)
 			{
@@ -217,37 +229,74 @@ void vrParticleSystemBoundaries(vrParticleSystem * system)
 	}
 }
 
-void vrParticleSystemCollide(vrParticleSystem * system, vrRigidBody * body, vrFloat scale)
+void vrParticleSystemCollide(vrParticleSystem * system, vrRigidBody * body, vrFloat scale, vrFloat dt)
 {
-	return;
+	vrFloat r = 0;
+	vrFloat m = 0;
+	vrFloat displaced = 0;
 	for (int i = 0; i < system->particles->sizeof_active; i++)
 	{
 		vrParticle* p = system->particles->data[i];
 		vrOrientedBoundingBox b;
 		b.position = vrSub(vrScale(p->pos, scale), vrVect(p->r * scale, p->r* scale));
 		b.size = vrVect(p->r * 2 * scale, p->r * 2 * scale);
-
+		r = (p->r * scale);
 
 		if (vrOBBOverlaps(b, body->shape->obb))
 		{
-			vrCircleShape shape;
-			shape.center = p->pos;
-			shape.radius = p->r;
+
+			system->pBody->velocity = vrScale(p->vel, scale);
+			system->pBody->bodyMaterial.invMomentInertia = 0;
+			system->pBody->bodyMaterial.restitution = 0;
+			system->pBody->bodyMaterial.friction = 0;
+			system->pBody->bodyMaterial.invMass = 1.0 / 1.8;
+			m = system->pBody->bodyMaterial.mass;
+
+			((vrCircleShape*)system->pBody->shape->shape)->center = vrScale(p->pos, scale);
+			((vrCircleShape*)system->pBody->shape->shape)->radius = p->r * scale;
 
 			if (body->shape->shapeType == VR_POLYGON)
 			{
 				vrManifold* manifold = vrManifoldInit(vrManifoldAlloc());
-				vrCirclePoly(manifold, shape, *((vrPolygonShape*)body->shape->shape));
+				vrCirclePoly(manifold, *((vrCircleShape*)system->pBody->shape->shape), *((vrPolygonShape*)body->shape->shape));
+				vrManifoldSetBodies(manifold, system->pBody, body);
+				vrManifoldPreStep(manifold, dt);
+				vrManifoldSolveVelocity(manifold);
+				vrManifoldPostStep(manifold, dt);
+				vrManifoldSolvePosition(manifold, dt);
+				p->vel = vrScale(system->pBody->velocity, 1.0 / scale);
+				vrVec2 d = vrScale(system->pBody->velocity, 1.0 / scale);
+				displaced += vrLength(d) / r;
+				p->pos = vrAdd(p->pos, vrScale(system->pBody->vel_bias, 1.0/scale * dt));
+				system->pBody->vel_bias = vrVect(0, 0);
+
 				vrManifoldDestroy(manifold);
 			}
 			else if (body->shape->shapeType == VR_CIRCLE)
 			{
 				vrManifold* manifold = vrManifoldInit(vrManifoldAlloc());
-				vrCircleCircle(manifold, shape, *((vrCircleShape*)body->shape->shape));
-				
+				vrCircleCircle(manifold, *((vrCircleShape*)system->pBody->shape->shape), *((vrCircleShape*)body->shape->shape));
+				vrManifoldSetBodies(manifold, system->pBody, body);
+				vrManifoldPreStep(manifold, dt);
+				vrManifoldSolveVelocity(manifold);
+				vrManifoldPostStep(manifold, dt);
+				vrManifoldSolvePosition(manifold, dt);
+				p->vel = vrScale(system->pBody->velocity, 1.0 / scale);
+				p->pos = vrAdd(p->pos, vrScale(system->pBody->vel_bias, 1.0 / scale * dt));
+				system->pBody->vel_bias = vrVect(0, 0);
 				vrManifoldDestroy(manifold);
 
 			}
 		}
 	}
+	if (body->bodyMaterial.invMass == 0) return;
+	if (displaced < EPSILON) return;
+	vrVec2 gravity = vrVect(0, 98.1);
+	vrVec2 weight = vrScale(gravity, body->bodyMaterial.mass);
+	vrFloat area = VR_PI*(r*r);
+	vrFloat density = m / area;
+	vrVec2 buoyancy = vrScale(vrVect(-gravity.x, -gravity.y), density * displaced);
+	vrVec2 total = vrAdd(weight, buoyancy);
+	if (vrLength(total) < 1) return;
+	body->velocity = vrAdd(body->velocity, vrScale(total, body->bodyMaterial.invMass));
 }

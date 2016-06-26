@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2009 Cormac Grindall (Mithreindeir)
+* Copyright (c) 2016 Cormac Grindall (Mithreindeir)
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -94,7 +94,6 @@ void vrManifoldPreStep(vrManifold * manifold, vrFloat dt)
 		vrFloat rbn = vrCross(rb, manifold->normal);
 
 		manifold->contacts[i].effectiveMassN = manifold->A->bodyMaterial.invMass + manifold->B->bodyMaterial.invMass + (ran*ran) * manifold->A->bodyMaterial.invMomentInertia + (rbn*rbn) * manifold->B->bodyMaterial.invMomentInertia;
-
 		manifold->tangent = vrCrossScalar(-1.0, manifold->normal);
 
 		vrFloat rat = vrCross(ra, manifold->tangent);

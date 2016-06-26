@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2009 Cormac Grindall (Mithreindeir)
+* Copyright (c) 2016 Cormac Grindall (Mithreindeir)
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -17,8 +17,6 @@
 */
 
 #include "../include/vrRigidBody.h"
-#include "../include/velocityraptor.h"
-#include "../include/vrMath.h"
 
 
 vrRigidBody * vrBodyInit(vrRigidBody* body)
@@ -33,7 +31,7 @@ vrRigidBody * vrBodyInit(vrRigidBody* body)
 	body->torque = 0.0;
 
 	body->bodyMaterial = vrMaterialInit();
-
+	body->color = vrColorCreate(fmod(rand(), 0.8) + 0.2, fmod(rand(), 0.8) + 0.2, fmod(rand(), 0.8) + 0.2);
 	return body;
 }
 
