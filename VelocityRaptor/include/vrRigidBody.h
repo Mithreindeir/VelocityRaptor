@@ -22,7 +22,8 @@
 #include "vrShape.h"
 #include "vrArray.h"
 
-//A rigidbodies material values
+///Holds data about the properties
+/// Of the body
 typedef struct vrMaterial
 {
 	vrFloat restitution;
@@ -38,52 +39,65 @@ typedef struct vrMaterial
 	vrFloat angularDamping;
 } vrMaterial;
 
-//Holds data for collision marks
+///Holds data for collision masks
+///And other collision relevant details
 typedef struct vrCollisionGroup
 {
 	int maskBit;
 	int categoryMask;
 } vrCollisionGroup;
 
-//The rigidbody structure
+///The rigidbody structure
 typedef struct vrRigidBody
 {
 	//Linear components
+	///Position in world space
 	vrVec2 position;
+	///Linear velocity of the body
 	vrVec2 velocity;
+	///Force being applied to the body
 	vrVec2 force;
+	///Psuedo velocity for position solver
 	vrVec2 vel_bias;
 
 	//Angular components
+	///Current orientation of body
 	vrFloat orientation;
+	///The angular velocity of the body
 	vrFloat angularVelocity;
+	///Torque being applied the body
 	vrFloat torque;
+	///Psuedo angular velocity for position solver
 	vrFloat angv_bias;
 
+	///Collision data
 	vrCollisionGroup collisionData;
+	///Properties of body
 	vrMaterial bodyMaterial;
+	///The physical representation
+	///Of the body
 	vrShape* shape;
-
-
 } vrRigidBody;
 
-/* Body control functions */
-//Allocates a body
+///Allocates a body
 vrRigidBody* vrBodyAlloc();
-//Initializes a body
+///Initializes a body
 vrRigidBody* vrBodyInit(vrRigidBody* body);
-//Destroys a body
+///Destroys a body
 void vrBodyDestroy(vrRigidBody* body);
-/* Body control functions */
 
-//Initializes and returns a blank material
+///Initializes and returns default values
 vrMaterial vrMaterialInit();
 
-//Integration funtions
+///Integrates the forces being applied to a body
 void vrBodyIntegrateForces(vrRigidBody* body, vrFloat dt);
+///Integrates the velocity 
 void vrBodyIntegrateVelocity(vrRigidBody* body, vrFloat dt);
 
+///Returns the moment of inertia for a box
 vrFloat vrMomentForBox(vrFloat w, vrFloat h, vrFloat mass);
+///Returns the moment of inertia for a polygon
 vrFloat vrMomentForPoly(vrPolygonShape* shape, vrFloat mass);
+///Returns the moment of inertia for a circle
 vrFloat vrMomentForCircle(vrCircleShape* shape, vrFloat mass);
 #endif

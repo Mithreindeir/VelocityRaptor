@@ -27,6 +27,10 @@
 static const vrFloat upper_bound = 5.8;
 static const vrFloat lower_bound = 0.2;
 
+///Simple Smoothed Particle Hydrodynamics
+///Particle system based of paper called
+///"Particle-based Viscoelastic Fluid Simulation"
+///By Simon Clavet, Philippe Beaudoin, and Pierre Poulin
 typedef struct vrParticleSystem
 {
 	vrArray* particles;
@@ -42,9 +46,14 @@ typedef struct vrParticleSystem
 
 } vrParticleSystem;
 
+///Allocated memory for particle system
 vrParticleSystem* vrParticleSystemAlloc();
+///Initializes particle system
 vrParticleSystem* vrParticleSystemInit(vrParticleSystem* psys);
+///Steps particle system
 void vrParticleSystemStep(vrParticleSystem* system, vrFloat dt);
+///Makes sure particles don't go out of bounds
 void vrParticleSystemBoundaries(vrParticleSystem* system);
+///Collides system with body
 void vrParticleSystemCollide(vrParticleSystem* system, vrRigidBody* body, vrFloat scale);
 #endif

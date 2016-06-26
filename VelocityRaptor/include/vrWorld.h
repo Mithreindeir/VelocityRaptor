@@ -16,6 +16,16 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+/*
+*@file vrWorld.h
+*@author Mithreindeir
+*@date 25 June 2016
+*@brief World definition
+*
+*File containing definition of world
+*and functions controlling the world
+*/
+
 #ifndef HEADER_VRWORLD
 #define HEADER_VRWORLD
 
@@ -27,23 +37,35 @@
 #include "vrHashMap.h"
 #include "vrCollision.h"
 
+///Container of bodies that interact with each other
 typedef struct vrWorld
 {
-
+	///Array holding the bodies
 	vrArray* bodies;
+	///Number of bodies in this world
 	int num_bodies;
 
-	/* For Stepper */
+	///The last time vrWorldStep exited
 	vrFloat lastTime;
+	///Accumulator of time 
 	vrFloat accumulator;
+	///The timestep for the integrator
 	vrFloat timeStep;
 
-	/* Body controls */
+	///Number of global iterations
+	///Of solving manifold for velocity
 	int velIterations;
+	///Number of global iterations
+	///Of solving manifold for position
 	int posIterations;
+	///The gravity vector
 	vrVec2 gravity;
 
+	///Array holding keys of
+	///Manifods in hash table
 	vrArray* manifoldKeys;
+	///Hash table holding the 
+	/// Contact manifolds
 	vrHashTable* manifoldMap;
 } vrWorld;
 
@@ -53,12 +75,22 @@ typedef struct vrBodyPair
 	vrRigidBody* B;
 } vrBodyPair;
 
+///Allocates memory for a world
 vrWorld* vrWorldAlloc();
+///Initializes the world
 vrWorld* vrWorldInit(vrWorld* world);
+///Frees memory used by the world
 void vrWorldDestroy(vrWorld* world);
+///Steps the world, resolving collisions
+///And updating the bodies
 void vrWorldStep(vrWorld* world);
+///Adds a body to the world
 void vrWorldAddBody(vrWorld* world, vrRigidBody * body);
+///Function called from inside vrWorldStep
+///Which detects collisions
 void vrWorldQueryCollisions(vrWorld* world);
+///Solves the contact manifolds, using the number
+///Of velocity and position iterations
 void vrWorldSolve(vrWorld* world, vrFloat dt);
 
 #endif

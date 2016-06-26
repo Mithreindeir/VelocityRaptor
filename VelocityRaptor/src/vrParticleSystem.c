@@ -28,14 +28,14 @@ vrParticleSystem * vrParticleSystemInit(vrParticleSystem * psys)
 {
 	psys->resting_d = 80;
 	psys->k_stiff = 3.0;
-	psys->k_stiffN = 4.0;
+	psys->k_stiffN = 10.0;
 	psys->viscosity = 0.00;
 	psys->k_spring = 3;
 	psys->restLen = 1.0;
 	psys->particles = vrArrayInit(vrArrayAlloc(), sizeof(vrParticle*));
 	psys->gravity = vrVect(0, 9.81);
 	srand(time(NULL));
-	int amount = 50;
+	int amount = 250;
 	vrFloat pw = VR_SQRT(amount);
 	vrFloat dist = 0.1;
 
@@ -101,13 +101,14 @@ void vrParticleSystemStep(vrParticleSystem * system, vrFloat dt)
 				vrFloat u = vrDot(vrSub(p->vel, p2->vel), norm);
 				if (u > 0)
 				{
-					vrFloat Q = 0;
+					vrFloat Q = 15;
 					vrFloat B = 12.0;
 					vrVec2 I = vrScale(norm, dt * (1 - q)*(Q*u + B*(u*u)));
 					//vrVec2Log(I);
 					I = vrScale(I, 1.0 / 2.0);
 					p->vel = vrSub(p->vel, I);
 					p2->vel = vrAdd(p2->vel, I);
+
 				}
 			}
 		}
@@ -140,6 +141,8 @@ void vrParticleSystemStep(vrParticleSystem * system, vrFloat dt)
 				p->dNear += VR_POW(1 - q, 3);
 			}
 		}
+		p->red = p->p;
+		//printf("%f and %f this \n", p->p, system->resting_d);
 		//Calculate pressure
 		p->p = system->k_stiff * (p->d - system->resting_d);
 		p->pNear = system->k_stiffN*p->dNear;
@@ -160,7 +163,7 @@ void vrParticleSystemStep(vrParticleSystem * system, vrFloat dt)
 			{
 				vrFloat press = p->p + p2->p;
 				vrFloat pressN = p->pNear + p2->pNear;
-				vrFloat displace = (press*(q) + pressN*(q*q))*(dt*dt);
+				vrFloat displace = (press*(q*q) + pressN*(q*q*q))*(dt*dt);
 
 				if (dist != 0)
 				{
@@ -216,6 +219,7 @@ void vrParticleSystemBoundaries(vrParticleSystem * system)
 
 void vrParticleSystemCollide(vrParticleSystem * system, vrRigidBody * body, vrFloat scale)
 {
+	return;
 	for (int i = 0; i < system->particles->sizeof_active; i++)
 	{
 		vrParticle* p = system->particles->data[i];

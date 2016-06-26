@@ -21,6 +21,7 @@
 #include "../include/vrMath.h"
 #include "../include/velocityraptor.h"
 
+///Particle data container
 typedef struct vrParticle
 {
 	vrVec2 pos;//Position
@@ -44,7 +45,9 @@ typedef struct vrParticle
 	vrFloat blue;
 } vrParticle;
 
+///Allocates a particle
 vrParticle* vrParticleAlloc();
+///Initializes a particle
 vrParticle* vrParticleInit(vrParticle* particle, vrVec2 p);
 
 #endif

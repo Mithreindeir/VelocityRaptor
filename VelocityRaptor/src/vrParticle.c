@@ -33,7 +33,7 @@ vrParticle * vrParticleInit(vrParticle * particle, vrVec2 p)
 
 	particle->d = 80;
 	particle->p = 0;
-	particle->r = 0.2;
+	particle->r = 0.25;
 	particle->m = 5.8;
 	particle->damping = 0.01;
 

@@ -44,6 +44,10 @@ vrWorld * vrWorldInit(vrWorld * world)
 
 void vrWorldDestroy(vrWorld * world)
 {
+	for (int i = 0; i < world->bodies->sizeof_active; i++)
+	{
+		vrBodyDestroy(world->bodies->data[i]);
+	}
 }
 
 void vrWorldStep(vrWorld * world)
