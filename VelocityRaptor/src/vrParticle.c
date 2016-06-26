@@ -31,7 +31,7 @@ vrParticle * vrParticleInit(vrParticle * particle, vrVec2 p)
 	particle->acc = vrVect(0, 0);
 	particle->force = vrVect(0, 0);
 
-	particle->d = 80;
+	particle->d = 0;
 	particle->p = 0;
 	particle->r = 0.2;
 	particle->m = 0.8;
