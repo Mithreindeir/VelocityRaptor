@@ -127,6 +127,7 @@ void vrManifoldPostStep(vrManifold * manifold, vrFloat dt)
 		vrFloat rbn = vrCross(manifold->contacts[i].rb, manifold->normal);
 
 		manifold->contacts[i].effectiveMassN = manifold->A->bodyMaterial.invMass + manifold->B->bodyMaterial.invMass + (ran*ran) * manifold->A->bodyMaterial.invMomentInertia + (rbn*rbn) * manifold->B->bodyMaterial.invMomentInertia;
+		
 		//manifold->contacts[i].effectiveMassN = manifold->A->bodyMaterial.invMass + manifold->B->bodyMaterial.invMass;
 		manifold->contacts[i].bias = -k_bias * VR_MIN((vrFloat)0.0, manifold->contacts[i].depth + allowedPenetration) / dt;
 

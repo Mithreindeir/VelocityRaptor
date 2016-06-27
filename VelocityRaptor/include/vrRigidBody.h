@@ -110,5 +110,5 @@ vrFloat vrMomentForBox(vrFloat w, vrFloat h, vrFloat mass);
 ///Returns the moment of inertia for a polygon
 vrFloat vrMomentForPoly(vrPolygonShape* shape, vrFloat mass);
 ///Returns the moment of inertia for a circle
-vrFloat vrMomentForCircle(vrCircleShape* shape, vrFloat mass);
+vrFloat vrMomentForCircle(vrFloat radius, vrFloat mass);
 #endif

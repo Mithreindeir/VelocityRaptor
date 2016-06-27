@@ -210,6 +210,18 @@ main(void)
 	
 	vrFloat timer = glfwGetTime();
 	int mass = 3;
+	if (1)
+	{
+		vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
+		body3->shape = vrShapeInit(vrShapeAlloc());
+		body3->shape = vrShapePolyInit(body3->shape);
+		body3->shape->shape = vrPolyBoxInit(body3->shape->shape, 650, 300, 50, 400);
+		body3->bodyMaterial.restitution = 0.0;
+		body3->bodyMaterial.mass = mass;
+		body3->bodyMaterial.invMass = 0;
+		body3->bodyMaterial.invMomentInertia = 0;
+		vrWorldAddBody(world, body3);
+	}
 	while (!glfwWindowShouldClose(window))
 	{
 		
@@ -220,12 +232,17 @@ main(void)
 			glfwGetCursorPos(window, &x, &y);
 			vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
 			body3->shape = vrShapeInit(vrShapeAlloc());
+			
 			body3->shape = vrShapePolyInit(body3->shape);
 			body3->shape->shape = vrPolyBoxInit(body3->shape->shape, x, y, 60, 60);
+			
+			//body3->shape = vrShapeCircleInit(body3->shape);
+			//((vrCircleShape*)body3->shape->shape)->center = vrVect(x, y);
+			//((vrCircleShape*)body3->shape->shape)->radius = 50;
 			body3->bodyMaterial.restitution = 0.0;
 			body3->bodyMaterial.mass = mass;
 			body3->bodyMaterial.invMass = 1.0/ body3->bodyMaterial.mass;
-			body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForBox(60, 60, body3->bodyMaterial.mass);
+			body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForCircle(50, body3->bodyMaterial.mass);
 			vrWorldAddBody(world, body3);
 			
 			timer = glfwGetTime();
@@ -295,7 +312,7 @@ main(void)
 			for (int i = 0; i < vrMax_segs; i++)
 			{
 				vrFloat theta = 2.0f * 3.1415926f * (vrFloat)i / vrMax_segs;
-				vrFloat radius = 0.4;
+				vrFloat radius = 0.2;
 				vrFloat x = (radius*133.333) * cos(theta);
 				vrFloat y = (radius*133.333) * sin(theta);
 				glVertex2f(x + p->pos.x *133.333, y + p->pos.y *133.333);
@@ -334,12 +351,12 @@ main(void)
 				vrFloat orientation = vbody->orientation;
 				vrFloat radius = ((vrCircleShape*)vbody->shape->shape)->radius;
 				glColor3f(vbody->color.r, vbody->color.g, vbody->color.b);
-				glBegin(GL_POLYGON);
+				vrDebugDrawCircle(vbody->shape->shape);
+				glColor3f(0, 0, 0);
+				glBegin(GL_LINES);
 				glVertex2f(center.x, center.y);
 				glVertex2f(center.x + cos(orientation)*radius, center.y + sin(orientation)*radius);
 				glEnd();
-				vrDebugDrawCircle(vbody->shape->shape);
-
 			}
 			
 			//vrOrientedBoundingBox obb = vbody->shape->obb;
@@ -367,7 +384,7 @@ main(void)
 void vrDebugDrawCircle(vrCircleShape* circle)
 {
 	int vrMax_segs = circle->radius / 3;
-	glBegin(GL_LINE_LOOP);
+	glBegin(GL_POLYGON);
 	for (int i = 0; i < vrMax_segs; i++)
 	{
 		vrFloat theta = 2.0f * 3.1415926f * (vrFloat)i / vrMax_segs;
@@ -375,6 +392,17 @@ void vrDebugDrawCircle(vrCircleShape* circle)
 		vrFloat x = circle->radius * cos(theta);
 		vrFloat y = circle->radius * sin(theta);
 		glVertex2f(x + circle->center.x, y + circle->center.y );
+	}
+	glEnd();
+	glBegin(GL_LINE_LOOP);
+	glColor3f(0, 0, 0);
+	for (int i = 0; i < vrMax_segs; i++)
+	{
+		vrFloat theta = 2.0f * 3.1415926f * (vrFloat)i / vrMax_segs;
+
+		vrFloat x = circle->radius * cos(theta);
+		vrFloat y = circle->radius * sin(theta);
+		glVertex2f(x + circle->center.x, y + circle->center.y);
 	}
 	glEnd();
 }

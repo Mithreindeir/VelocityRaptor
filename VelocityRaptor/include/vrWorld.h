@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2016 Cormac Grindall (Mithreindeir)
+* Copyright (c) 2006-2009 Cormac Grindall (Mithreindeir)
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -28,6 +28,7 @@
 
 #ifndef HEADER_VRWORLD
 #define HEADER_VRWORLD
+
 
 #include <time.h>
 #include "velocityraptor.h"

@@ -229,16 +229,19 @@ void vrCircleCircle(vrManifold * manifold, const vrCircleShape A, const vrCircle
 {
 	manifold->normal = vrSub(A.center, B.center);
 	vrFloat r = A.radius + B.radius;
-	vrFloat nLen = sqrt(manifold->normal.x * manifold->normal.x + manifold->normal.y * manifold->normal.y);
+	vrFloat nLen = vrLengthSqr(manifold->normal);
 
-	if (nLen > r) return;
+	if (nLen > r*r) return;
+	nLen = VR_SQRT(nLen);
 
-	manifold->normal = vrNormalize(manifold->normal);
+	manifold->normal = vrScale(manifold->normal, 1.0 / nLen);
+
 	if (nLen == 0.0)
 	{
 		manifold->contacts[0].point = A.center;
 		manifold->contacts[0].depth = -(r - nLen);
 		manifold->penetration = -manifold->contacts[0].depth;
+		manifold->normal = vrVect(-1, 0);
 	}
 	else
 	{

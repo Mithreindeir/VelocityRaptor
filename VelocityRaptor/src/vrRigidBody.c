@@ -148,7 +148,7 @@ vrFloat vrMomentForPoly(vrPolygonShape * shape, vrFloat mass)
 	return (mass/6.0)*(sumT/sumB);
 }
 
-vrFloat vrMomentForCircle(vrCircleShape * shape, vrFloat mass)
+vrFloat vrMomentForCircle(vrFloat radius, vrFloat mass)
 {
-	return (mass*shape->radius*shape->radius)/2.0;
+	return (mass*radius*radius)/2.0;
 }
