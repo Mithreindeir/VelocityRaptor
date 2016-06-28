@@ -26,10 +26,12 @@ vrJoint * vrJointInit(vrJoint * joint)
 {
 	joint->A = NULL;
 	joint->B = NULL;
+	
 	joint->preSolve = NULL;
 	joint->postSolve = NULL;
 	joint->solveVelocity = NULL;
 	joint->solvePosition = NULL;
+	
 	return joint;
 }
 
@@ -38,7 +40,7 @@ vrLocalPoint vrLocalPointInit(vrRigidBody * body, vrVec2 point)
 	vrLocalPoint localPoint;
 	localPoint.body = body;
 	localPoint.initialOrientation = body->orientation;
-	localPoint.initialPoint = vrSub(point, body->shape->getCenter(body->shape->shape);
+	localPoint.initialPoint = vrSub(point, body->shape->getCenter(body->shape->shape));
 	return localPoint;
 }
 
@@ -47,8 +49,8 @@ vrVec2 vrGetLocalPoint(vrLocalPoint * localPoint)
 	vrFloat newO = localPoint->body->orientation;
 	vrFloat rotation = newO - localPoint->initialOrientation;
 	if (rotation == 0) return localPoint->initialPoint;
-	vrFloat ca = VR_COS(rotation);
-	vrFloat sa = VR_SIN(rotation);
+	vrFloat ca = VR_COSINE(rotation);
+	vrFloat sa = VR_SINE(rotation);
 	vrVec2 p = localPoint->initialPoint;
 	p = vrVect(p.x * ca - p.y * sa, p.x * sa + p.y * ca);
 	localPoint->initialPoint = p;

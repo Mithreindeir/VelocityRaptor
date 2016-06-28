@@ -67,4 +67,9 @@ void vrParticleSystemStep(vrParticleSystem* system, vrFloat dt);
 void vrParticleSystemBoundaries(vrParticleSystem* system);
 ///Collides system with body
 void vrParticleSystemCollide(vrParticleSystem* system, vrRigidBody* body, vrFloat scale, vrFloat dt);
+///Calculates viscous impulses
+void vrParticleSystemViscousity(vrParticleSystem* system, vrFloat dt);
+///Calculates double density
+void vrParticleSystemDoubleDensity(vrParticleSystem* system, vrFloat dt);
+
 #endif

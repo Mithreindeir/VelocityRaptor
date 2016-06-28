@@ -225,9 +225,9 @@ main(void)
 	while (!glfwWindowShouldClose(window))
 	{
 		
-		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))
+		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) && ((timer + 0.0) < glfwGetTime()))
 		{
-			
+			/*
 			double x, y;
 			glfwGetCursorPos(window, &x, &y);
 			vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
@@ -248,15 +248,48 @@ main(void)
 			timer = glfwGetTime();
 
 			//mass += 2;
+			*/
+			double x, y;
+			glfwGetCursorPos(window, &x, &y);
+			vrVec2 pos = vrVect(x / 133.333, y / 133.333);
+			vrParticle* p = vrParticleInit(vrParticleAlloc(), pos);
+			//p->color.b = 0;
+		//	p->color.g = 1;
+			p->v = 5;
+			vrArrayPush(psys->particles, p);
 		}
 		
-		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS) && ((timer + 0.01) < glfwGetTime()))
+		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))
 		{
+			
+			double x, y;
+			glfwGetCursorPos(window, &x, &y);
+			vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
+			body3->shape = vrShapeInit(vrShapeAlloc());
+
+			body3->shape = vrShapePolyInit(body3->shape);
+			body3->shape->shape = vrPolyBoxInit(body3->shape->shape, x, y, 60, 60);
+
+			//body3->shape = vrShapeCircleInit(body3->shape);
+			//((vrCircleShape*)body3->shape->shape)->center = vrVect(x, y);
+			//((vrCircleShape*)body3->shape->shape)->radius = 50;
+			body3->bodyMaterial.restitution = 0.0;
+			body3->bodyMaterial.mass = mass;
+			body3->bodyMaterial.invMass = 1.0/ body3->bodyMaterial.mass;
+			body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForCircle(50, body3->bodyMaterial.mass);
+			vrWorldAddBody(world, body3);
+
+			timer = glfwGetTime();
+
+			//mass += 2;
+			
+			/*
 			double x, y;
 			glfwGetCursorPos(window, &x, &y);
 			vrVec2 pos = vrVect(x / 133.333, y / 133.333);
 			vrParticle* p = vrParticleInit(vrParticleAlloc(), pos);
 			vrArrayPush(psys->particles, p);
+			*/
 			/*
 			if (psys->gravity.x == 0)
 			{
@@ -287,8 +320,6 @@ main(void)
 		glClear(GL_COLOR_BUFFER_BIT);
 		vrFloat f = glfwGetTime();
 		vrWorldStep(world);
-		f = glfwGetTime() - f;
-		//printf("Framerate: %f\n", 1 / f);
 		vrFloat ts = 1.0 / 60.0;
 		
 		while (accumulator > ts)
@@ -298,7 +329,10 @@ main(void)
 			vrParticleSystemStep(psys, ts);
 			accumulator -= ts;
 		}
-		
+		f = glfwGetTime() - f;
+
+		printf("Framerate: %f\n", 1 / f);
+
 		glPointSize(16);
 		glLineWidth(12);
 

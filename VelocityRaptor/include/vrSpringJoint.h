@@ -16,28 +16,25 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "../include/vrParticle.h"
+#ifndef HEADER_VRSPRINGJOINT
+#define HEADER_VRSPRINGJOINT
+#include "vrJoint.h"
+#include "vrMath.h"
 
-vrParticle * vrParticleAlloc()
+///Data structure for joint
+typedef struct vrSpringJoint
 {
-	return vrAlloc(sizeof(vrParticle));
-}
+	///Holds inverse mass
+	vrFloat invMass;
+	///Springs stiffness
+	vrFloat stiffness;
+	///Accumulates impulse
+	vrVec2 accumImpulse;
+} vrSpringJoint;
 
-vrParticle * vrParticleInit(vrParticle * particle, vrVec2 p)
-{
-	particle->pos = p;
-	particle->oldp = p;
-	particle->vel = vrVect(0, 0);
-	particle->acc = vrVect(0, 0);
-	particle->force = vrVect(0, 0);
+///Initializes a spring joint
+vrJoint* vrSpringJointInit(vrJoint* joint, vrRigidBody* A, vrRigidBody* B, vrVec2 pointA, vrVec2 pointB);
+///Velocity solve function for a spring joint
+void vrSpringJointSolve(vrJoint* joint);
 
-	particle->d = 1;
-	particle->p = 0;
-	particle->r = 0.2;
-	
-	particle->m = 0.8;
-	particle->color = vrColorCreate(0, 0.5, 1);
-	particle->v = 2;
-
-	return particle;
-}
+#endif

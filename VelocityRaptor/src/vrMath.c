@@ -36,6 +36,33 @@ inline vrVec2 vrMat2Mult(const vrMat2 a, const vrVec2 b)
 	return vrVect(a.m.x * b.x + a.m.y * b.y, a.n.x * b.x + a.n.y * b.y);
 }
 
+inline vrMat2 vrMat2Transpose(const vrMat2 a)
+{
+	return vrMat(vrVect(a.m.x, a.n.x), vrVect(a.m.y, a.n.y));
+}
+
+inline vrMat2 vrMat2Add(const vrMat2 a, const vrMat2 b)
+{
+	return vrMat(vrAdd(a.m, b.m), vrAdd(a.n, b.n));
+}
+
+inline vrMat2 vrMat2Invert(vrMat2 m)
+{
+	vrFloat a, b, c, d;
+	a = m.m.x;
+	b = m.m.y;
+	c = m.n.x;
+	d = m.n.y;
+	vrFloat determinant = a*d - b*c;
+	VR_ASSERT(determinant != 0, "DIVISION BY ZERO MAT2 INVERSE");
+	determinant = 1.0 / determinant;
+	m.m.x = d*determinant;
+	m.m.y = -b*determinant;
+	m.n.x = -c*determinant;
+	m.n.y = a*determinant;
+	return m;
+}
+
 inline vrVec2 vrVect(vrFloat x, vrFloat y)
 {
 	vrVec2 v;

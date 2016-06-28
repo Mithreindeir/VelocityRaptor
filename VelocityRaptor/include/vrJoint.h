@@ -20,10 +20,14 @@
 
 #include "vrMath.h"
 #include "vrRigidBody.h"
+
+typedef struct vrJoint vrJoint;
+
 typedef void(*vrJointPreSolveFunc)(vrJoint* joint);
 typedef void(*vrJointSolveVelocityFunc)(vrJoint* joint);
 typedef void(*vrJointPostSolveFunc)(vrJoint* joint);
 typedef void(*vrJointSolvePositionFunc)(vrJoint* joint);
+typedef void* vrJointData;
 
 ///Point relative to body's center, changes as body rotates
 typedef struct vrLocalPoint
@@ -37,7 +41,7 @@ typedef struct vrLocalPoint
 } vrLocalPoint;
 
 ///Empty Joint constraint
-typedef struct vrJoint
+struct vrJoint
 {
 	///One body in the joint
 	vrRigidBody* A;
@@ -48,7 +52,7 @@ typedef struct vrJoint
 	vrLocalPoint anchorA;
 	///Local point on body B
 	vrLocalPoint anchorB;
-
+	
 	///Function to pre solve constraint
 	vrJointPreSolveFunc preSolve;
 	///Function to solve velocity constraint
@@ -57,7 +61,9 @@ typedef struct vrJoint
 	vrJointPostSolveFunc postSolve;
 	///Function to solve position constraint
 	vrJointSolvePositionFunc solvePosition;
-} vrJoint;
+	///Void pointer to data for joint
+	vrJointData jointData;
+};
 
 ///Allocates memory for a joint
 vrJoint* vrJointAlloc();

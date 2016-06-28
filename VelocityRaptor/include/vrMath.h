@@ -23,6 +23,7 @@
 
 typedef float vrFloat;
 
+#define EPSILON 1.192092896e-07f
 #define NUM_PRIMES 26
 static unsigned int primes[] = 
 {
@@ -67,6 +68,9 @@ typedef struct vrMat2
 extern inline vrMat2 vrMat(const vrVec2 m, const vrVec2 n);
 extern inline vrMat2 vrMat2Scale(const vrMat2 a, const vrFloat b);
 extern inline vrVec2 vrMat2Mult( const vrMat2 a, const vrVec2 b);
+extern inline vrMat2 vrMat2Transpose(const vrMat2 a);
+extern inline vrMat2 vrMat2Add(const vrMat2 a, const vrMat2 b);
+extern inline vrMat2 vrMat2Invert(vrMat2 a);
 extern inline vrVec2 vrVect(vrFloat x, vrFloat y);
 extern inline vrVec2 vrAdd(const vrVec2 a, const vrVec2 b);
 extern inline vrVec2 vrSub(const vrVec2 a, const vrVec2 b);

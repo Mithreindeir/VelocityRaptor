@@ -35,11 +35,11 @@ typedef struct vrParticle
 	vrFloat p;//Pressure
 	vrFloat m;//Mass
 	vrFloat r;//Radius
-	vrFloat damping;//Damping
-
+	vrFloat v;//Viscosity
 	//Handles clustering problem
 	vrFloat dNear;
 	vrFloat pNear;
+
 
 	vrColor color;
 } vrParticle;
