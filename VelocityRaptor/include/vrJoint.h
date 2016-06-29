@@ -23,7 +23,7 @@
 
 typedef struct vrJoint vrJoint;
 
-typedef void(*vrJointPreSolveFunc)(vrJoint* joint);
+typedef void(*vrJointPreSolveFunc)(vrJoint* joint, vrFloat dt);
 typedef void(*vrJointSolveVelocityFunc)(vrJoint* joint);
 typedef void(*vrJointPostSolveFunc)(vrJoint* joint);
 typedef void(*vrJointSolvePositionFunc)(vrJoint* joint);

@@ -17,9 +17,12 @@
 */
 
 #include "../include/vrWorld.h"
+#include "../include/vrCollision.h"
+#include "../include/velocityraptor.h"
 #define GLEW_STATIC
 #include <glew.h>
 #include <glfw3.h>
+#include "../include/vrDistanceJoint.h"
 
 vrWorld * vrWorldAlloc()
 {
@@ -38,6 +41,7 @@ vrWorld * vrWorldInit(vrWorld * world)
 	world->manifoldMap = vrHashTableInit(vrHashTableAlloc(), 1000);
 	world->manifoldMap->deleteFunc = &vrManifoldDestroy;
 	world->manifoldKeys = vrArrayInit(vrArrayAlloc(), sizeof(unsigned int));
+	world->num_bodies = 0;
 
 	return world;
 }
@@ -49,7 +53,7 @@ void vrWorldDestroy(vrWorld * world)
 		vrBodyDestroy(world->bodies->data[i]);
 	}
 }
-
+vrBOOL b = vrFALSE;
 void vrWorldStep(vrWorld * world)
 {
 	vrFloat currentTime = clock();
@@ -61,6 +65,19 @@ void vrWorldStep(vrWorld * world)
 	int avg_checks = 0;
 	while (world->accumulator > world->timeStep)
 	{
+		if (!b && world->num_bodies > 5)
+		{
+			vrRigidBody* A = world->bodies->data[4];
+			vrRigidBody* B = world->bodies->data[5];
+			
+						vrVec2 ra = ((vrVertex*)((vrNode*)(((vrPolygonShape*)A->shape->shape)->vertices->head))->data)->vertex;
+			vrVec2 rb = ((vrVertex*)((vrNode*)(((vrPolygonShape*)B->shape->shape)->vertices->head))->data)->vertex;
+
+			world->joint = vrDistanceJointInit(vrJointAlloc(), A, B, ra, rb);
+			
+			//world->joint = vrDistanceJointInit(vrJointAlloc(), A, B, A->shape->getCenter(A->shape->shape), B->shape->getCenter(B->shape->shape));
+			b = vrTRUE;
+		}
 		/* Step Started */
 		//Integrate forces
 		for (int i = 0; i < world->bodies->sizeof_active; i++)
@@ -76,7 +93,14 @@ void vrWorldStep(vrWorld * world)
 		vrWorldQueryCollisions(world);
 		//Solve velocities and positions
 		vrWorldSolve(world, world->timeStep);
-		
+		if (b)
+		{
+			if (world->joint->preSolve)
+				world->joint->preSolve(world->joint, world->timeStep);
+			if (world->joint->solveVelocity)
+				world->joint->solveVelocity(world->joint);
+
+		}
 		//Integrate velocity
 		for (int i = 0; i < world->bodies->sizeof_active; i++)
 		{
@@ -85,7 +109,19 @@ void vrWorldStep(vrWorld * world)
 		/* Step Finished */
 		world->accumulator = world->accumulator - world->timeStep;
 	}
+	if (b)
+	{
+		vrVec2 pa, pb;
+		pa = ((vrDistanceJoint*)world->joint->jointData)->ra;
+		pb = ((vrDistanceJoint*)world->joint->jointData)->rb;
+		pa = vrAdd(pa, world->joint->A->shape->getCenter(world->joint->A->shape->shape));
+		pb = vrAdd(pb, world->joint->B->shape->getCenter(world->joint->B->shape->shape));
 
+		glBegin(GL_LINES);
+		glVertex2f(pa.x, pa.y);
+		glVertex2f(pb.x, pb.y);
+		glEnd();
+	}
 	world->lastTime = currentTime;
 }
 

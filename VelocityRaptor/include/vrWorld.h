@@ -29,13 +29,12 @@
 #ifndef HEADER_VRWORLD
 #define HEADER_VRWORLD
 
-
 #include <time.h>
-#include "velocityraptor.h"
 #include "vrRigidBody.h"
 #include "vrArray.h"
 #include "vrHashMap.h"
-#include "vrCollision.h"
+#include "vrJoint.h"
+
 
 ///Container of bodies that interact with each other
 typedef struct vrWorld
@@ -67,7 +66,9 @@ typedef struct vrWorld
 	///Hash table holding the 
 	/// Contact manifolds
 	vrHashTable* manifoldMap;
+	vrJoint* joint;
 } vrWorld;
+
 
 typedef struct vrBodyPair
 {
