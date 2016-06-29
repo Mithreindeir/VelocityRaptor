@@ -40,7 +40,7 @@ vrLocalPoint vrLocalPointInit(vrRigidBody * body, vrVec2 point)
 	vrLocalPoint localPoint;
 	localPoint.body = body;
 	localPoint.initialOrientation = body->orientation;
-	localPoint.initialPoint = vrSub(point, body->shape->getCenter(body->shape->shape));
+	localPoint.initialPoint = vrSub(point, body->center);
 	return localPoint;
 }
 

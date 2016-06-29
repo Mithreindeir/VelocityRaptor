@@ -24,7 +24,7 @@
 #include "vrBoundingBox.h"
 
 typedef void*(*vrShapeMoveFunc)(void* shape, vrVec2 move);
-typedef void*(*vrShapeRotateFunc)(void* shape, vrFloat angle);
+typedef void*(*vrShapeRotateFunc)(void* shape, vrFloat angle, vrVec2 center);
 typedef vrVec2(*vrShapeCenterFunc)(void* shape);
 typedef vrOrientedBoundingBox(*vrShapeOBBFunc)(void* shape);
 
@@ -92,7 +92,7 @@ vrPolygonShape* vrPolyBoxInitPoint(vrPolygonShape* shape, vrFloat x, vrFloat y, 
 void vrAddVertexToPolyShape(vrPolygonShape* shape, vrVec2 vertex);
 void vrAddNormalToPolyShape(vrPolygonShape* shape, vrVec2 axis);
 void vrMovePolyShape(vrPolygonShape* shape, vrVec2 move);
-void vrRotatePolyShape(vrPolygonShape* shape, vrFloat angle);
+void vrRotatePolyShape(vrPolygonShape* shape, vrFloat angle, vrVec2 center);
 void vrUpdatePolyCenter(vrPolygonShape* shape);
 void vrUpdatePolyAxes(vrPolygonShape* shape);
 vrVec2 vrPolyGetCenter(vrPolygonShape* shape);
@@ -105,7 +105,7 @@ void vrCircleDestroy(vrCircleShape* circle);
 //Misc:
 vrShape* vrShapeCircleInit(vrShape* shape);
 //Rotates a polygon by a given angle
-void vrRotateCircleShape(vrCircleShape* shape, vrFloat angle);
+void vrRotateCircleShape(vrCircleShape* shape, vrFloat angle, vrVec2 center);
 void vrMoveCircleShape(vrCircleShape* shape, vrVec2 move);
 vrVec2 vrCircleGetCenter(vrCircleShape* shape);
 vrOrientedBoundingBox vrCircleGetOBB(vrCircleShape* shape);

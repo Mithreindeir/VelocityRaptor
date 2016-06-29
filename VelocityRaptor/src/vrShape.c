@@ -142,11 +142,11 @@ vrPolygonShape * vrPolyBoxInitPoint(vrPolygonShape * shape, vrFloat x, vrFloat y
 	return shape;
 }
 
-void vrRotatePolyShape(vrPolygonShape * shape, vrFloat angle)
+void vrRotatePolyShape(vrPolygonShape * shape, vrFloat angle, vrVec2 center)
 {
 	vrFloat ca = VR_COSINE(angle);
 	vrFloat sa = VR_SINE(angle);
-	vrVec2 c = shape->center;
+	vrVec2 c = center;
 	vrNode* v = shape->vertices->head;
 	while(v)
 	{
@@ -263,7 +263,7 @@ vrShape * vrShapeCircleInit(vrShape * shape)
 	return shape;
 }
 
-void vrRotateCircleShape(vrCircleShape * shape, vrFloat angle)
+void vrRotateCircleShape(vrCircleShape * shape, vrFloat angle, vrVec2 center)
 {
 	//Circles rotation can be stored in body
 }

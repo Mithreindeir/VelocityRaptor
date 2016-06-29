@@ -83,11 +83,12 @@ typedef struct vrRigidBody
 	vrCollisionGroup collisionData;
 	///Properties of body
 	vrMaterial bodyMaterial;
-	///The physical representation
-	///Of the body
-	vrShape* shape;
+	///The physical representation of the body
+	vrArray* shape;
 	///Color
 	vrColor color;
+	///Center
+	vrVec2 center;
 } vrRigidBody;
 
 ///Allocates a body

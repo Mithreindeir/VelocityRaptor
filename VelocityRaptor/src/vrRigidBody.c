@@ -32,6 +32,7 @@ vrRigidBody * vrBodyInit(vrRigidBody* body)
 
 	body->bodyMaterial = vrMaterialInit();
 	body->color = vrColorCreate(fmod(rand(), 0.8) + 0.2, fmod(rand(), 0.8) + 0.2, fmod(rand(), 0.8) + 0.2);
+	body->shape = vrArrayInit(vrArrayAlloc(), sizeof(vrShape*));
 	return body;
 }
 
@@ -80,13 +81,35 @@ void vrBodyIntegrateVelocity(vrRigidBody * body, vrFloat dt)
 
 	//Integrate velocity
 	body->position = vrAdd(body->position, vrScale(vrAdd(body->velocity, body->vel_bias), dt));
-	body->shape->move(body->shape->shape, vrScale(vrAdd(body->velocity, body->vel_bias), dt));
+
+	for (int i = 0; i < body->shape->sizeof_active; i++)
+	{
+		vrShape* shape = body->shape->data[i];
+		shape->move(shape->shape, vrScale(vrAdd(body->velocity, body->vel_bias), dt));
+	}
 
 	body->orientation += ( body->angv_bias + body->angularVelocity )* dt;
-	body->shape->rotate(body->shape->shape, (body->angv_bias + body->angularVelocity)* dt);
-
+	//Get center
+	vrVec2 center = vrVect(0, 0);
+	for (int i = 0; i < body->shape->sizeof_active; i++)
+	{
+		vrShape* shape = body->shape->data[i];
+		center = vrAdd(center, shape->getCenter(shape->shape));
+	}
+	center = vrScale(center, 1.0 / body->shape->sizeof_active);
+	body->center = center;
+	//Rotate
+	for (int i = 0; i < body->shape->sizeof_active; i++)
+	{
+		vrShape* shape = body->shape->data[i];
+		shape->rotate(shape->shape, (body->angv_bias + body->angularVelocity)* dt, center);
+	}
 	//Update Oriented Bounding box
-	body->shape->obb = body->shape->updateOBB(body->shape->shape);
+	for (int i = 0; i < body->shape->sizeof_active; i++)
+	{
+		vrShape* shape = body->shape->data[i];
+		shape->obb = shape->updateOBB(shape->shape);
+	}
 
 	body->angv_bias = 0;
 	body->vel_bias = vrVect(0, 0);

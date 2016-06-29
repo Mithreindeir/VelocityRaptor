@@ -73,8 +73,8 @@ void vrManifoldPreStep(vrManifold * manifold, vrFloat dt)
 	for (int i = 0; i < manifold->contact_points; i++)
 	{
 		manifold->contacts->biasImpulseSum = 0;
-		vrVec2 aCenter = manifold->A->shape->getCenter(manifold->A->shape->shape);
-		vrVec2 bCenter = manifold->B->shape->getCenter(manifold->B->shape->shape);
+		vrVec2 aCenter = manifold->A->center;
+		vrVec2 bCenter = manifold->B->center;
 
 		vrVec2 ra = vrSub(manifold->contacts[i].point, aCenter);
 		vrVec2 rb = vrSub(manifold->contacts[i].point, bCenter);

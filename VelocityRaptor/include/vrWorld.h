@@ -63,10 +63,10 @@ typedef struct vrWorld
 	///Array holding keys of
 	///Manifods in hash table
 	vrArray* manifoldKeys;
-	///Hash table holding the 
-	/// Contact manifolds
+	///Hash table holding the Contact manifolds
 	vrHashTable* manifoldMap;
-	vrJoint* joint;
+	///Array holding all the joints
+	vrArray* joints;
 } vrWorld;
 
 

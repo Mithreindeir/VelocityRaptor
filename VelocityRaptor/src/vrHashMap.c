@@ -63,7 +63,6 @@ void vrHashTableInsert(vrHashTable * table, vrHashEntry * entry, unsigned int ke
 	vrHashValue hashv = table->hash(key);
 	int index = hashv%table->buckets->sizeof_active;
 
-
 	vrLinkedList* list = table->buckets->data[index];
 	list->deleteFunc = table->deleteFunc;
 	vrNode* node = list->head;
