@@ -27,11 +27,9 @@ vrTriangle * vrEarClip(vrVec2* polygon, int num_vertices, int* num_triangles)
 
 	if (num_vertices < 3)
 	{
-		printf("LESS THAN 3 POINTS\n");
 		return NULL;
 	}
-	vrBOOL impossible = vrFALSE;
-	vrBOOL earFound = vrTRUE;
+
 	vrVec2 left = polygon[0];
 	int index = 0;
 
@@ -48,7 +46,7 @@ vrTriangle * vrEarClip(vrVec2* polygon, int num_vertices, int* num_triangles)
 	//Use that to calculate farthest triangle which has to be convex
 	//Because it is the farthest in a direction
 	int l = (index > 0) ? index - 1 : num_vertices - 1;
-	int r = (index < num_vertices) ? index + 1 : 0;
+	int r = (index < num_vertices-1) ? index + 1 : 0;
 	vrTriangle triangle;
 	triangle.a = polygon[l];
 	triangle.b = polygon[index];
@@ -66,7 +64,6 @@ vrTriangle * vrEarClip(vrVec2* polygon, int num_vertices, int* num_triangles)
 		triangles = vrAlloc(sizeof(vrTriangle));
 		triangles[0] = tri;
 		*num_triangles += 1;
-		printf("One triangle\n");
 		return triangles;
 	}
 	while (num_vertices >= 3)
@@ -81,22 +78,22 @@ vrTriangle * vrEarClip(vrVec2* polygon, int num_vertices, int* num_triangles)
 			if (tip >= 0) break;
 
 			int p = index > 0 ? index - 1 : num_vertices - 1;
-			int n = index < num_vertices ? index + 1 : 0;
+			int n = index < num_vertices-1 ? index + 1 : 0;
+
 			vrTriangle tri;
 			tri.a = polygon[p];
-			tri.b = polygon[i];
+			tri.b = polygon[index];
 			tri.c = polygon[n];
 
 			if (vrTriangleCCW(tri) != countercw)
 			{
 
+				reflex = realloc(reflex, sizeof(int)*(reflex_size + 1));
+				reflex[reflex_size] = index;
 				reflex_size += 1;
-				reflex = realloc(reflex, sizeof(int)*(reflex_size));
-				reflex[reflex_size - 1] = index;
 
 				continue;
 			}
-
 			vrBOOL ear = vrTRUE;
 			for (int j = 0; j < reflex_size; j++)
 			{
@@ -106,21 +103,23 @@ vrTriangle * vrEarClip(vrVec2* polygon, int num_vertices, int* num_triangles)
 				t.a = polygon[p];
 				t.b = polygon[i];
 				t.c = polygon[n];
+
 				if (vrTrianglePoint(t, polygon[reflex[j]]))
 				{
 					ear = vrFALSE;
+
 					break;
 				}
 			}
 			if (ear)
 			{
-				int j = index + 1, k = num_vertices - 1;
-				for (; j != k; j++)
+
+				for (int j = index + 1; j < num_vertices; j++)
 				{
 					vrVec2 v = polygon[j];
 					if (vrVec2Equals(v, polygon[p]) ||
 						vrVec2Equals(v, polygon[n]) ||
-						vrVec2Equals(v, polygon[index])) continue;
+						vrVec2Equals(v, polygon[i])) continue;
 					vrTriangle t;
 					t.a = polygon[p];
 					t.b = polygon[i];
@@ -138,16 +137,18 @@ vrTriangle * vrEarClip(vrVec2* polygon, int num_vertices, int* num_triangles)
 		if (tip < 0) break;
 
 		int p = (tip > 0) ? tip - 1 : num_vertices - 1;
-		int n = (tip < num_vertices) ? tip + 1 : 0;
+		int n = (tip < num_vertices-1) ? tip + 1 : 0;
 
 		vrTriangle t;
 		t.a = polygon[p];
 		t.b = polygon[tip];
 		t.c = polygon[n];
-
+		//vrVec2Log(t.a);
+		//vrVec2Log(t.b);
+		//vrVec2Log(t.c);
+		triangles = realloc(triangles, sizeof(vrTriangle)*((*num_triangles)+1));
+		triangles[(*num_triangles)] = t;
 		(*num_triangles) += 1;
-		triangles = realloc(triangles, sizeof(vrTriangle)*(*num_triangles));
-		triangles[(*num_triangles) - 1] = t;
 
 		vrVec2* buffer = malloc(sizeof(vrVec2) * (num_vertices - 1));
 
@@ -183,7 +184,7 @@ vrBOOL vrTrianglePoint(vrTriangle triangle, vrVec2 point)
 	vrVec2 det3a = vrSub(triangle.a, triangle.c);
 	vrVec2 det3b = vrSub(point, triangle.c);
 
-	if (vrCross(det1a, det1b) && vrCross(det2a, det2b) && vrCross(det3a, det3b))
+	if (vrCross(det1a, det1b) < 0 && vrCross(det2a, det2b) < 0 && vrCross(det3a, det3b) < 0)
 	{
 		return vrTRUE;
 	}

@@ -22,6 +22,7 @@
 #include "vrLinkedList.h"
 #include "velocityraptor.h"
 #include "vrBoundingBox.h"
+#include "vrTriangulation.h"
 
 typedef void*(*vrShapeMoveFunc)(void* shape, vrVec2 move);
 typedef void*(*vrShapeRotateFunc)(void* shape, vrFloat angle, vrVec2 center);
@@ -89,6 +90,7 @@ void vrPolyDestroy(vrPolygonShape* polygon);
 vrShape* vrShapePolyInit(vrShape* shape);
 vrPolygonShape* vrPolyBoxInit(vrPolygonShape* shape, vrFloat x, vrFloat y, vrFloat w, vrFloat h);
 vrPolygonShape* vrPolyBoxInitPoint(vrPolygonShape* shape, vrFloat x, vrFloat y, vrFloat hw, vrFloat hh);
+vrPolygonShape* vrPolyTriangleInit(vrPolygonShape* shape, vrTriangle t);
 void vrAddVertexToPolyShape(vrPolygonShape* shape, vrVec2 vertex);
 void vrAddNormalToPolyShape(vrPolygonShape* shape, vrVec2 axis);
 void vrMovePolyShape(vrPolygonShape* shape, vrVec2 move);

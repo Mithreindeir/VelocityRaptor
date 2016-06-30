@@ -119,6 +119,7 @@ void vrPolyCircle(vrManifold * manifold, const vrPolygonShape A, const vrCircleS
 	vrNode* faceNormal;
 	vrEdge normalEdge;
 	vrNode* current = A.vertices->head;
+	vrNode* ax = A.axes->head;
 	while (current)
 	{
 		vrBOOL flip = vrFALSE;
@@ -140,6 +141,8 @@ void vrPolyCircle(vrManifold * manifold, const vrPolygonShape A, const vrCircleS
 			normal = vrNormalize(vrVect(p.y, -p.x));
 			s = vrDot(normal, vrSub(B.center, next));
 		}
+
+
 		if (s > B.radius)
 			return;
 			
@@ -160,6 +163,7 @@ void vrPolyCircle(vrManifold * manifold, const vrPolygonShape A, const vrCircleS
 			n = normal;
 		}
 		current = current->next;
+		ax = ax->next;
 	}
 	manifold->penetration = B.radius - separation;
 

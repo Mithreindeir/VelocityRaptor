@@ -106,7 +106,8 @@ main(void)
 	psys = vrParticleSystemInit(vrParticleSystemAlloc());
 	
 	vrFloat timer = glfwGetTime();
-
+	vrVec2* polygon = NULL;
+	int polygonSize = 0;
 	while (!glfwWindowShouldClose(window))
 	{		
 		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))
@@ -114,13 +115,19 @@ main(void)
 			
 			double x, y;
 			glfwGetCursorPos(window, &x, &y);
+			//vrVec2 pos = vrVect(x / 133.333, y / 133.333);
+			//vrParticle* p = vrParticleInit(vrParticleAlloc(), pos);
+			//vrArrayPush(psys->particles, p);
+			
 			vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
 
 			vrShape* s = vrShapeInit(vrShapeAlloc());
+			s = vrShapeCircleInit(s);
+			((vrCircleShape*)s->shape)->radius = 50;
+			((vrCircleShape*)s->shape)->center = vrVect(x, y);
+			//s = vrShapePolyInit(s);
 
-			s = vrShapePolyInit(s);
-
-			s->shape = vrPolyBoxInit(s->shape, x, y, 60, 60);
+			//s->shape = vrPolyBoxInit(s->shape, x, y, 60, 60);
 			vrArrayPush(body3->shape, s);
 
 			body3->bodyMaterial.restitution = 0.0;
@@ -128,9 +135,25 @@ main(void)
 			body3->bodyMaterial.invMass = 1.0/ body3->bodyMaterial.mass;
 			body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForCircle(50, body3->bodyMaterial.mass);
 			vrWorldAddBody(world, body3);
+			
+			timer = glfwGetTime();
+		}
+		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))
+		{
+			double x, y;
+			glfwGetCursorPos(window, &x, &y);
+			polygonSize += 1;
+			if (polygonSize > 1)
+				polygon = realloc(polygon, polygonSize*sizeof(vrVec2));
+			else
+				polygon = vrAlloc(sizeof(vrVec2));
+			polygon[polygonSize - 1] = vrVect(x, y);
 
 			timer = glfwGetTime();
 		}
+
+
+
 		lastTime = currentTime;
 		currentTime = glfwGetTime();
 		vrFloat deltaTime = currentTime - lastTime;
@@ -179,7 +202,68 @@ main(void)
 			}
 			glEnd();
 		}
-		
+		glBegin(GL_LINE_LOOP);
+		for (int i = 0; i < polygonSize; i++)
+		{
+			glVertex2f(polygon[i].x, polygon[i].y);
+		}
+		glEnd();
+		if (polygonSize >= 3)
+		{
+			glColor3f(0, 0, 0);
+
+			int size = 0;
+			vrVec2* p = vrAlloc(sizeof(vrVec2) * polygonSize);
+			for (int i = 0; i < polygonSize; i++)
+			{
+				p[i] = polygon[i];
+			}
+			vrTriangle * tri = vrEarClip(p, polygonSize, &size);
+			glColor3f(1, 0, 0);
+
+
+			for (int i = 0; i < size; i++)
+			{
+				glBegin(GL_LINE_LOOP);
+				glColor3f(1, 0, 0);
+				glLineWidth(8);
+				glVertex2f(tri[i].a.x, tri[i].a.y);
+				glVertex2f(tri[i].b.x, tri[i].b.y);
+				glVertex2f(tri[i].c.x, tri[i].c.y);
+				glEnd();
+
+			}
+			if (keys[GLFW_KEY_SPACE] && timer + 0.4 < glfwGetTime())
+			{
+				vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
+				vrFloat accumMoment = 0;
+				int mass = size * 2;
+				for (int i = 0; i < size; i++)
+				{
+					vrTriangle t = tri[i];
+					vrShape* s = vrShapeInit(vrShapeAlloc());
+
+					s = vrShapePolyInit(s);
+
+					s->shape = vrPolyTriangleInit(s->shape, t);
+
+					vrUpdatePolyAxes(s->shape);
+					vrArrayPush(body3->shape, s);
+					accumMoment += vrMomentForPoly(s->shape, mass);
+				}
+				accumMoment /= size;
+				body3->bodyMaterial.restitution = 0.0;
+				body3->bodyMaterial.mass = mass;
+				body3->bodyMaterial.invMass = 1.0 / body3->bodyMaterial.mass;
+				body3->bodyMaterial.invMomentInertia = 1.0 / accumMoment;
+				vrWorldAddBody(world, body3);
+
+				timer = glfwGetTime();
+				vrFree(polygon);
+				polygonSize = 0;
+			}
+			vrFree(tri);
+		}
 		/*
 		for (int i = 0; i < world->bodies->sizeof_active; i++)
 		{
@@ -209,6 +293,8 @@ main(void)
 				{
 					glColor3f(vbody->color.r, vbody->color.g, vbody->color.b);
 					vrDebugDrawPolygon(shape->shape);
+
+
 				}
 				else
 				{
@@ -224,52 +310,17 @@ main(void)
 					glEnd();
 				}
 
-				//vrOrientedBoundingBox obb = vbody->shape->obb;
-				//glBegin(GL_LINE_LOOP);
-				//glVertex2f(obb.position.x, obb.position.y);
-				//glVertex2f(obb.position.x + obb.size.x, obb.position.y);
-				//glVertex2f(obb.position.x + obb.size.x, obb.position.y + obb.size.y);
-				//glVertex2f(obb.position.x, obb.position.y + obb.size.y);
-				//glEnd();
+			//	vrOrientedBoundingBox obb = shape->obb;
+			//	glBegin(GL_LINE_LOOP);
+			//	glVertex2f(obb.position.x, obb.position.y);
+			//	glVertex2f(obb.position.x + obb.size.x, obb.position.y);
+			//	glVertex2f(obb.position.x + obb.size.x, obb.position.y + obb.size.y);
+			//	glVertex2f(obb.position.x, obb.position.y + obb.size.y);
+			//O	glEnd();
 			}
 		}
 	
-		vrVec2* polygon = vrAlloc(sizeof *polygon * 5);
-		int size = 0;
-		vrVec2 c = vrVect(400, 400);
-		vrVec2 l;
-		polygon[0] = vrVect(300, 300);
-		polygon[1] = vrVect(340, 360);
-		polygon[2] = vrVect(300, 440);
-		polygon[3] = vrVect(440, 440);
-		polygon[4] = vrVect(440, 300);
 
-		glBegin(GL_LINE_LOOP);
-		for (int i = 0; i < 4; i++)
-		{
-			glVertex2f(polygon[i].x, polygon[i].y);
-		}
-		glEnd();
-		vrTriangle * tri = vrEarClip(polygon, 5, &size);
-		printf("Size == %d \n", size);
-		glColor3f(1, 0, 0);
-
-
-		for (int i = 0; i < size; i++)
-		{
-			glBegin(GL_LINE_LOOP);
-			glColor3f(1, 0, 0);
-			glLineWidth(8);
-			glVertex2f(tri[i].a.x, tri[i].a.y);
-			glVertex2f(tri[i].b.x, tri[i].b.y);
-			glVertex2f(tri[i].c.x, tri[i].c.y);
-			glEnd();
-			printf("%f and %f \n", tri[i].a.x, tri[i].a.y);
-			printf("%f and %f \n", tri[i].b.x, tri[i].b.y);
-			printf("%f and %f \n", tri[i].c.x, tri[i].c.y);
-
-		}
-		vrFree(tri);
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
@@ -312,6 +363,7 @@ void vrDebugDrawCircle(vrCircleShape* circle)
 void vrDebugDrawPolygon(vrPolygonShape* shape)
 {
 	vrNode* v = shape->vertices->head;
+
 	glBegin(GL_POLYGON);
 	while (v)
 	{
@@ -319,6 +371,7 @@ void vrDebugDrawPolygon(vrPolygonShape* shape)
 		v = v->next;
 	}
 	glEnd();
+
 	glBegin(GL_LINE_LOOP);
 	glColor3f(0, 0, 0);
 	v = shape->vertices->head;

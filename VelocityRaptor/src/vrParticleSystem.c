@@ -36,7 +36,7 @@ vrParticleSystem * vrParticleSystemInit(vrParticleSystem * psys)
 	psys->particles = vrArrayInit(vrArrayAlloc(), sizeof(vrParticle*));
 	psys->gravity = vrVect(0, 9.81);
 	srand(time(NULL));
-	int amount = 200;
+	int amount = 0;
 	vrFloat pw = VR_SQRT(amount);
 	vrFloat dist = 0.1;
 

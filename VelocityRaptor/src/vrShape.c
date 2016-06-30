@@ -142,6 +142,15 @@ vrPolygonShape * vrPolyBoxInitPoint(vrPolygonShape * shape, vrFloat x, vrFloat y
 	return shape;
 }
 
+vrPolygonShape * vrPolyTriangleInit(vrPolygonShape * shape, vrTriangle t)
+{
+	vrAddVertexToPolyShape(shape, t.a);
+	vrAddVertexToPolyShape(shape, t.b);
+	vrAddVertexToPolyShape(shape, t.c);
+
+	return shape;
+}
+
 void vrRotatePolyShape(vrPolygonShape * shape, vrFloat angle, vrVec2 center)
 {
 	vrFloat ca = VR_COSINE(angle);
@@ -188,16 +197,19 @@ void vrUpdatePolyAxes(vrPolygonShape * shape)
 			vrLinkedListAddBack(shape->axes, a);
 			axes = a;
 		}
+		vrVec2 axis;
+		vrVec2 v1 = ((vrVertex*)vertex->data)->vertex;
+
+		vrVec2 v2;
 		if (vertex->next == NULL)
-		{
-			((vrVertex*)axes->data)->vertex = vrSub(((vrVertex*)vertex->data)->vertex, ((vrVertex*)shape->vertices->head->data)->vertex);
-			((vrVertex*)axes->data)->vertex = vrNormalize(vrVect(((vrVertex*)axes->data)->vertex.y, -((vrVertex*)axes->data)->vertex.x));
-		}
+			v2 = ((vrVertex*)shape->vertices->head->data)->vertex;
 		else
-		{
-			((vrVertex*)axes->data)->vertex = vrSub(((vrVertex*)vertex->data)->vertex, ((vrVertex*)vertex->next->data)->vertex);
-			((vrVertex*)axes->data)->vertex = vrNormalize(vrVect(((vrVertex*)axes->data)->vertex.y, -((vrVertex*)axes->data)->vertex.x));
-		}
+			v2 = ((vrVertex*)vertex->next->data)->vertex;
+		
+		axis = vrSub(v2, v1);
+		axis = vrNormalize(vrVect(axis.y, -axis.x));
+		((vrVertex*)axes->data)->vertex = axis;
+
 		axes = axes->next;
 		vertex = vertex->next;
 	}
