@@ -71,6 +71,7 @@ extern inline vrVec2 vrMat2Mult( const vrMat2 a, const vrVec2 b);
 extern inline vrMat2 vrMat2Transpose(const vrMat2 a);
 extern inline vrMat2 vrMat2Add(const vrMat2 a, const vrMat2 b);
 extern inline vrMat2 vrMat2Invert(vrMat2 a);
+extern inline vrBOOL vrVec2Equals(const vrVec2 a, const vrVec2 b);
 extern inline vrVec2 vrVect(vrFloat x, vrFloat y);
 extern inline vrVec2 vrAdd(const vrVec2 a, const vrVec2 b);
 extern inline vrVec2 vrSub(const vrVec2 a, const vrVec2 b);

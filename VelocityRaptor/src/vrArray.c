@@ -108,8 +108,11 @@ int vrArrayErase(vrArray* arr, int index)
 
 void vrArrayCopy(vrArray * dest, vrArray * src)
 {
-	free(dest->data);
-	dest->data = src->data;
+	dest->data = realloc(dest->data, src->sizeof_data * src->sizeof_array);
+	for (int i = 0; i < src->sizeof_array; i++)
+	{
+		dest->data[i] = src->data[i];
+	}
 	dest->sizeof_active = src->sizeof_active;
 	dest->sizeof_array = src->sizeof_array;
 	dest->sizeof_data = src->sizeof_data;

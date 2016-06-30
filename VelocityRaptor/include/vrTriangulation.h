@@ -16,28 +16,21 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "../include/vrParticle.h"
+#ifndef HEADER_VRTRIANGULATION
+#define HEADER_VRTRIANGULATION
 
-vrParticle * vrParticleAlloc()
+#include "vrMath.h"
+#include "vrArray.h"
+
+typedef struct vrTriangle
 {
-	return vrAlloc(sizeof(vrParticle));
-}
+	vrVec2 a;
+	vrVec2 b;
+	vrVec2 c;
+} vrTriangle;
 
-vrParticle * vrParticleInit(vrParticle * particle, vrVec2 p)
-{
-	particle->pos = p;
-	particle->oldp = p;
-	particle->vel = vrVect(0, 0);
-	particle->acc = vrVect(0, 0);
-	particle->force = vrVect(0, 0);
+vrTriangle* vrEarClip(vrVec2* polygon, int num_vertices, int* num_triangles);
+vrBOOL vrTrianglePoint(vrTriangle triangle, vrVec2 point);
+vrBOOL vrTriangleCCW(const vrTriangle triangle);
 
-	particle->d = 1;
-	particle->p = 0;
-	particle->r = 0.3;
-	
-	particle->m = 0.8;
-	particle->color = vrColorCreate(0, 0.5, 1);
-	particle->v = 2;
-
-	return particle;
-}
+#endif

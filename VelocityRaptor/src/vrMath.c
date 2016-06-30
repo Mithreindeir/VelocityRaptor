@@ -63,6 +63,11 @@ inline vrMat2 vrMat2Invert(vrMat2 m)
 	return m;
 }
 
+inline vrBOOL vrVec2Equals(const vrVec2 a, const vrVec2 b)
+{
+	return (a.x == b.x && a.y == b.y);
+}
+
 inline vrVec2 vrVect(vrFloat x, vrFloat y)
 {
 	vrVec2 v;

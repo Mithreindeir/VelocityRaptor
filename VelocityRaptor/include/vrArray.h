@@ -19,6 +19,8 @@
 #ifndef HEADER_VRARRAY
 #define HEADER_VRARRAY
 
+#include <memory.h>
+
 //Note: You must deallocate/free
 //all memory for objects yourself
 typedef struct vrArray

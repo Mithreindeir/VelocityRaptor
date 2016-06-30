@@ -36,7 +36,7 @@ vrParticleSystem * vrParticleSystemInit(vrParticleSystem * psys)
 	psys->particles = vrArrayInit(vrArrayAlloc(), sizeof(vrParticle*));
 	psys->gravity = vrVect(0, 9.81);
 	srand(time(NULL));
-	int amount = 0;
+	int amount = 200;
 	vrFloat pw = VR_SQRT(amount);
 	vrFloat dist = 0.1;
 
@@ -348,9 +348,9 @@ void vrParticleSystemDoubleDensity(vrParticleSystem * system, vrFloat dt)
 				if (dist != 0)
 				{
 					diff = vrScale(diff, 1.0 / dist);
-					displace /= -4;
-					dx = vrAdd(dx, vrScale(diff, displace));
-					p2->pos = vrSub(p2->pos, vrScale(diff, displace));
+					displace /= 2;
+					dx = vrSub(dx, vrScale(diff, displace));
+					p2->pos = vrAdd(p2->pos, vrScale(diff, displace));
 				}
 
 			}
