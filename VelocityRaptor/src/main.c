@@ -34,7 +34,7 @@ main(void)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-	window = glfwCreateWindow(800, 800, "Velocity Raptor: v0.0.3 C Revision", NULL, NULL);
+	window = glfwCreateWindow(800, 800, "Velocity Raptor", NULL, NULL);
 	//glViewport(0, 0, 80, 80);
 	glfwMakeContextCurrent(window);
 
@@ -111,15 +111,15 @@ main(void)
 	int polygonSize = 0;
 	while (!glfwWindowShouldClose(window))
 	{		
-		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))
+		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) && ((timer + 0.1) < glfwGetTime()))
 		{
 			
 			double x, y;
 			glfwGetCursorPos(window, &x, &y);
-			//vrVec2 pos = vrVect(x / 133.333, y / 133.333);
-		    //vrParticle* p = vrParticleInit(vrParticleAlloc(), pos);
-			//vrArrayPush(psys->particles, p);
-			
+			vrVec2 pos = vrVect(x / 133.333, y / 133.333);
+		    vrParticle* p = vrParticleInit(vrParticleAlloc(), pos);
+			vrArrayPush(psys->particles, p);
+			/*
 			vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
 
 			vrShape* s = vrShapeInit(vrShapeAlloc());
@@ -136,7 +136,7 @@ main(void)
 			body3->bodyMaterial.invMass = 1.0/ body3->bodyMaterial.mass;
 			body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForCircle(50, body3->bodyMaterial.mass);
 			vrWorldAddBody(world, body3);
-			
+			*/
 			timer = glfwGetTime();
 		}
 		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))
@@ -196,7 +196,7 @@ main(void)
 			for (int i = 0; i < vrMax_segs; i++)
 			{
 				vrFloat theta = 2.0f * 3.1415926f * (vrFloat)i / vrMax_segs;
-				vrFloat radius = 0.2;
+				vrFloat radius = 0.3;
 				vrFloat x = (radius*133.333) * cos(theta);
 				vrFloat y = (radius*133.333) * sin(theta);
 				glVertex2f(x + p->pos.x *133.333, y + p->pos.y *133.333);
@@ -313,6 +313,13 @@ main(void)
 				if (DEBUG)
 				{
 					vrOrientedBoundingBox obb = shape->obb;
+					glBegin(GL_LINE_LOOP);
+					glVertex2f(obb.position.x, obb.position.y);
+					glVertex2f(obb.position.x + obb.size.x, obb.position.y);
+					glVertex2f(obb.position.x + obb.size.x, obb.position.y + obb.size.y);
+					glVertex2f(obb.position.x, obb.position.y + obb.size.y);
+					glEnd();
+					obb = vbody->obb;
 					glBegin(GL_LINE_LOOP);
 					glVertex2f(obb.position.x, obb.position.y);
 					glVertex2f(obb.position.x + obb.size.x, obb.position.y);

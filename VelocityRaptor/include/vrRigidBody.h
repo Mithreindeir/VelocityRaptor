@@ -89,6 +89,8 @@ typedef struct vrRigidBody
 	vrColor color;
 	///Center
 	vrVec2 center;
+	///OBB that contains all the shapes
+	vrOrientedBoundingBox obb;
 } vrRigidBody;
 
 ///Allocates a body
@@ -105,7 +107,8 @@ vrMaterial vrMaterialInit();
 void vrBodyIntegrateForces(vrRigidBody* body, vrFloat dt);
 ///Integrates the velocity 
 void vrBodyIntegrateVelocity(vrRigidBody* body, vrFloat dt);
-
+///Updates the body's obb
+void vrBodyUpdateOBB(vrRigidBody* body);
 ///Returns the moment of inertia for a box
 vrFloat vrMomentForBox(vrFloat w, vrFloat h, vrFloat mass);
 ///Returns the moment of inertia for a polygon
@@ -113,3 +116,4 @@ vrFloat vrMomentForPoly(vrPolygonShape* shape, vrFloat mass);
 ///Returns the moment of inertia for a circle
 vrFloat vrMomentForCircle(vrFloat radius, vrFloat mass);
 #endif
+

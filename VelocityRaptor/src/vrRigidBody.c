@@ -110,11 +110,53 @@ void vrBodyIntegrateVelocity(vrRigidBody * body, vrFloat dt)
 		vrShape* shape = body->shape->data[i];
 		shape->obb = shape->updateOBB(shape->shape);
 	}
+	vrBodyUpdateOBB(body);
 
 	body->angv_bias = 0;
 	body->vel_bias = vrVect(0, 0);
 }
+void vrBodyUpdateOBB(vrRigidBody * body)
+{
+	//Update Oriented Bounding box
+	int min_x, max_x;
+	int min_y, max_y;
 
+	for (int i = 0; i < body->shape->sizeof_active; i++)
+	{
+		vrShape* shape = body->shape->data[i];
+		shape->obb = shape->updateOBB(shape->shape);
+		if (i == 0)
+		{
+			min_x = shape->obb.position.x;
+			max_x = min_x + shape->obb.size.x;
+			min_y = shape->obb.position.y;
+			max_y = min_y + shape->obb.size.y;
+		}
+		else
+		{
+			if (shape->obb.position.x < min_x)
+			{
+				min_x = shape->obb.position.x;
+			}
+			if ((shape->obb.position.x + shape->obb.size.x) > max_x)
+			{
+				max_x = (shape->obb.position.x + shape->obb.size.x);
+			}
+			if (shape->obb.position.y < min_y)
+			{
+				min_y = shape->obb.position.y;
+			}
+			if ((shape->obb.position.y + shape->obb.size.y) > max_y)
+			{
+				max_y = (shape->obb.position.y + shape->obb.size.y);
+			}
+		}
+	}
+	body->obb.position.x = min_x;
+	body->obb.position.y = min_y;
+	body->obb.size.x = max_x - min_x;
+	body->obb.size.y = max_y - min_y;
+}
 //Agorithms from https://en.wikipedia.org/wiki/List_of_moments_of_inertia
 vrFloat vrMomentForBox(vrFloat w, vrFloat h, vrFloat mass)
 {

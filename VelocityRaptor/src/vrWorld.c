@@ -34,7 +34,7 @@ vrWorld * vrWorldInit(vrWorld * world)
 	world->bodies = vrArrayInit(vrArrayAlloc(), sizeof(vrRigidBody*));
 	world->accumulator = 0;
 	world->lastTime = 0;
-	world->timeStep = (1.0f / 180.0f);
+	world->timeStep = (1.0f / 60.0f);
 	world->gravity = vrVect(0, 981);
 	world->velIterations = 15;
 	world->posIterations = 10;
@@ -155,8 +155,9 @@ void vrWorldQueryCollisions(vrWorld * world)
 				//Culls duplicate pairs
 				//By only colliding when i > j
 				if (i < j) continue;
-				vrRigidBody* body2 = world->bodies->data[j];
 
+				vrRigidBody* body2 = world->bodies->data[j];
+				if (!vrOBBOverlaps(body->obb, body2->obb)) continue;
 				for (int l = 0; l < body2->shape->sizeof_active; l++)
 				{
 					vrShape* shape2 = body2->shape->data[l];

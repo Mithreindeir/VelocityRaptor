@@ -262,7 +262,7 @@ vrFloat vrPolyGetLeastAxis(const vrPolygonShape a, const vrPolygonShape b, vrVec
 
 	while (current)
 	{
-		//if ((vrDot(((vrVertex*)current->data)->vertex, vrSub(a.center, b.center)) >= 0))
+		if ((vrDot(((vrVertex*)current->data)->vertex, vrSub(a.center, b.center)) <= 0))
 		{
 			p1 = vrProject(a, ((vrVertex*)current->data)->vertex);
 			p2 = vrProject(b, ((vrVertex*)current->data)->vertex);
