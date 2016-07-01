@@ -173,7 +173,7 @@ void vrUpdatePolyCenter(vrPolygonShape * shape)
 	int num_v = 0;
 	vrNode* vertex = shape->vertices->head;
 	while (vertex)
-	{
+	{ 
 		center = vrAdd(center, ((vrVertex*)vertex->data)->vertex);
 		num_v++;
 		vertex = vertex->next;
@@ -208,8 +208,10 @@ void vrUpdatePolyAxes(vrPolygonShape * shape)
 		
 		axis = vrSub(v2, v1);
 		axis = vrNormalize(vrVect(axis.y, -axis.x));
-		((vrVertex*)axes->data)->vertex = axis;
+		if (vrDot(axis, vrSub(shape->center, v1)) >= 0)
+			axis = vrVect(-axis.x, -axis.y);
 
+		((vrVertex*)axes->data)->vertex = axis;
 		axes = axes->next;
 		vertex = vertex->next;
 	}

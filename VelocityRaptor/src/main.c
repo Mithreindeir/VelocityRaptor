@@ -21,6 +21,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 vrArray* arr;
 vrWorld* world;
 vrParticleSystem* psys;
+#define DEBUG 0
 
 int
 main(void)
@@ -116,7 +117,7 @@ main(void)
 			double x, y;
 			glfwGetCursorPos(window, &x, &y);
 			//vrVec2 pos = vrVect(x / 133.333, y / 133.333);
-			//vrParticle* p = vrParticleInit(vrParticleAlloc(), pos);
+		    //vrParticle* p = vrParticleInit(vrParticleAlloc(), pos);
 			//vrArrayPush(psys->particles, p);
 			
 			vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
@@ -309,14 +310,16 @@ main(void)
 					glVertex2f(center.x + cos(orientation)*radius, center.y + sin(orientation)*radius);
 					glEnd();
 				}
-
-			//	vrOrientedBoundingBox obb = shape->obb;
-			//	glBegin(GL_LINE_LOOP);
-			//	glVertex2f(obb.position.x, obb.position.y);
-			//	glVertex2f(obb.position.x + obb.size.x, obb.position.y);
-			//	glVertex2f(obb.position.x + obb.size.x, obb.position.y + obb.size.y);
-			//	glVertex2f(obb.position.x, obb.position.y + obb.size.y);
-			//O	glEnd();
+				if (DEBUG)
+				{
+					vrOrientedBoundingBox obb = shape->obb;
+					glBegin(GL_LINE_LOOP);
+					glVertex2f(obb.position.x, obb.position.y);
+					glVertex2f(obb.position.x + obb.size.x, obb.position.y);
+					glVertex2f(obb.position.x + obb.size.x, obb.position.y + obb.size.y);
+					glVertex2f(obb.position.x, obb.position.y + obb.size.y);
+					glEnd();
+				}
 			}
 		}
 	
@@ -371,7 +374,32 @@ void vrDebugDrawPolygon(vrPolygonShape* shape)
 		v = v->next;
 	}
 	glEnd();
+	if (DEBUG)
+	{
+		vrNode* axes = shape->axes->head;
+		v = shape->vertices->head;
 
+		glColor3f(0, 0, 0);
+
+		while (axes)
+		{
+			vrVec2 v1 = ((vrVertex*)v->data)->vertex;
+			vrVec2 v2;
+			if (v->next)
+				v2 = ((vrVertex*)v->next->data)->vertex;
+			else
+				v2 = ((vrVertex*)shape->vertices->head->data)->vertex;
+
+			vrVec2 p = vrScale(vrAdd(v1, v2), 1.0 / 2.0);
+			vrVec2 axis = ((vrVertex*)axes->data)->vertex;
+			glBegin(GL_LINES);
+			glVertex2f(p.x, p.y);
+			glVertex2f(p.x + axis.x * 30, p.y + axis.y * 30);
+			glEnd();
+			axes = axes->next;
+			v = v->next;
+		}
+	}
 	glBegin(GL_LINE_LOOP);
 	glColor3f(0, 0, 0);
 	v = shape->vertices->head;

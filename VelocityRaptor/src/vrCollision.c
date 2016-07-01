@@ -118,53 +118,37 @@ void vrPolyCircle(vrManifold * manifold, const vrPolygonShape A, const vrCircleS
 	vrVec2 n;
 	vrNode* faceNormal;
 	vrEdge normalEdge;
-	vrNode* current = A.vertices->head;
-	vrNode* ax = A.axes->head;
+
+	//
+	vrVec2 axis;
+	vrEdge nE;
+	vrFloat pen2;
+
+	vrNode* current = A.axes->head;
 	while (current)
 	{
-		vrBOOL flip = vrFALSE;
-		vrVec2 p;
-		vrVec2 next;
-		if (current->next != NULL)
-			next = ((vrVertex*)current->next->data)->vertex;
-		else
-			next = ((vrVertex*)A.vertices->head->data)->vertex;
-		p = vrSub(next, ((vrVertex*)current->data)->vertex);
-
-		vrVec2 normal = vrNormalize(vrVect(p.y, -p.x));
-		vrFloat s = vrDot(normal, vrSub(B.center, ((vrVertex*)current->data)->vertex));
-		if (!(vrDot(normal, vrSub((((vrVertex*)current->data)->vertex), A.center))))
 		{
-			flip = vrTRUE;
-			p = vrSub(((vrVertex*)current->data)->vertex, next);
+			axis = ((vrVertex*)current->data)->vertex;
+		//	axis = vrVect(-axis.x, -axis.y);
+			nE = vrPolyBestEdge(A, vrPolyGetFarthestVertex(A, axis), axis);
 
-			normal = vrNormalize(vrVect(p.y, -p.x));
-			s = vrDot(normal, vrSub(B.center, next));
-		}
+			vrFloat pen = vrDot(axis, vrSub(B.center, nE.a));
+			pen2 = vrDot(axis, vrSub(B.center, nE.b));
+			if (pen2 > pen) pen = pen2;
 
-
-		if (s > B.radius)
-			return;
-			
-		if (s > separation)
-		{
-			if (flip)
+			if (pen > separation)
 			{
-				normalEdge.a = next;
-				normalEdge.b = ((vrVertex*)current->data)->vertex;
+				separation = pen;
+				if (separation > B.radius) return;
+				n = axis;
+				normalEdge = nE;
 			}
-			else
-			{
-				normalEdge.a = ((vrVertex*)current->data)->vertex;
-				normalEdge.b = next;
-			}
-			separation = s;
-			faceNormal = current;
-			n = normal;
 		}
 		current = current->next;
-		ax = ax->next;
 	}
+	//
+
+
 	manifold->penetration = B.radius - separation;
 
 	vrFloat dot1 = vrDot(vrSub(B.center, normalEdge.a), vrSub(normalEdge.b, normalEdge.a));
@@ -209,9 +193,11 @@ void vrPolyCircle(vrManifold * manifold, const vrPolygonShape A, const vrCircleS
 
 		}
 		else
+		{
 			return;
+		}
 	}
-	
+
 	manifold->contact_points = 1;
 	manifold->normal = (vrDot(manifold->normal, vrSub(B.center, A.center)) >= 0) ? vrVect(-manifold->normal.x, -manifold->normal.y) : manifold->normal;
 
