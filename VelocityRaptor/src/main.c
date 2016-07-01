@@ -153,7 +153,7 @@ main(void)
 			timer = glfwGetTime();
 		}
 
-
+		
 
 		lastTime = currentTime;
 		currentTime = glfwGetTime();

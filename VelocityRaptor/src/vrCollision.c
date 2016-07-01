@@ -129,8 +129,10 @@ void vrPolyCircle(vrManifold * manifold, const vrPolygonShape A, const vrCircleS
 	{
 		{
 			axis = ((vrVertex*)current->data)->vertex;
+
 		//	axis = vrVect(-axis.x, -axis.y);
 			nE = vrPolyBestEdge(A, vrPolyGetFarthestVertex(A, axis), axis);
+
 
 			vrFloat pen = vrDot(axis, vrSub(B.center, nE.a));
 			pen2 = vrDot(axis, vrSub(B.center, nE.b));
@@ -260,7 +262,7 @@ vrFloat vrPolyGetLeastAxis(const vrPolygonShape a, const vrPolygonShape b, vrVec
 
 	while (current)
 	{
-		if ((vrDot(((vrVertex*)current->data)->vertex, vrSub(a.center, b.center)) >= 0))
+		//if ((vrDot(((vrVertex*)current->data)->vertex, vrSub(a.center, b.center)) >= 0))
 		{
 			p1 = vrProject(a, ((vrVertex*)current->data)->vertex);
 			p2 = vrProject(b, ((vrVertex*)current->data)->vertex);
