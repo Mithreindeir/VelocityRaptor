@@ -40,7 +40,8 @@ typedef struct vrDistanceJoint
 	vrVec2 dir;
 	///Resting length
 	vrFloat restLength;
-
+	///Damping
+	vrFloat damping;
 } vrDistanceJoint;
 
 ///Allocates memory for spring joint data

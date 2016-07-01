@@ -30,7 +30,7 @@ typedef struct vrTriangle
 } vrTriangle;
 
 vrTriangle* vrEarClip(vrVec2* polygon, int num_vertices, int* num_triangles);
-vrBOOL vrTrianglePoint(vrTriangle triangle, vrVec2 point);
+vrBOOL vrTrianglePoint(vrTriangle triangle, vrVec2 point, vrBOOL ccw);
 vrBOOL vrTriangleCCW(const vrTriangle triangle);
 
 #endif

@@ -7,6 +7,7 @@
 #include "../include/vrHashMap.h"
 #include "../include/vrParticleSystem.h"
 #include "../include/vrTriangulation.h"
+#include "../include/vrDistanceJoint.h"
 #include <stdio.h>
 #include <conio.h>
 #define GLEW_STATIC
@@ -109,17 +110,18 @@ main(void)
 	vrFloat timer = glfwGetTime();
 	vrVec2* polygon = NULL;
 	int polygonSize = 0;
+	int b = 0;
 	while (!glfwWindowShouldClose(window))
 	{		
-		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) && ((timer + 0.1) < glfwGetTime()))
+		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))
 		{
 			
 			double x, y;
 			glfwGetCursorPos(window, &x, &y);
-			vrVec2 pos = vrVect(x / 133.333, y / 133.333);
-		    vrParticle* p = vrParticleInit(vrParticleAlloc(), pos);
-			vrArrayPush(psys->particles, p);
-			/*
+			//vrVec2 pos = vrVect(x / 133.333, y / 133.333);
+		    //vrParticle* p = vrParticleInit(vrParticleAlloc(), pos);
+			//vrArrayPush(psys->particles, p);
+			
 			vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
 
 			vrShape* s = vrShapeInit(vrShapeAlloc());
@@ -136,7 +138,25 @@ main(void)
 			body3->bodyMaterial.invMass = 1.0/ body3->bodyMaterial.mass;
 			body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForCircle(50, body3->bodyMaterial.mass);
 			vrWorldAddBody(world, body3);
-			*/
+			
+			if (b == 0)
+			{
+				body3->bodyMaterial.invMass = 0;
+				body3->bodyMaterial.invMomentInertia = 0;
+			}
+			else
+			{
+				vrRigidBody* A = body3;
+				vrRigidBody* B = world->bodies->data[world->bodies->sizeof_active - 2];
+
+				vrJoint* joint = vrDistanceJointInit(vrJointAlloc(), A, B, A->center, B->center);
+				joint->anchorA.initialOrientation = 0;
+				joint->anchorA.initialPoint = vrVect(0, 50);
+				joint->anchorB.initialOrientation = 0;
+				joint->anchorB.initialPoint = vrVect(0, -50);
+				vrArrayPush(world->joints, joint);
+			}
+			b++;
 			timer = glfwGetTime();
 		}
 		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))
@@ -238,7 +258,8 @@ main(void)
 			{
 				vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
 				vrFloat accumMoment = 0;
-				int mass = size * 2;
+				vrFloat mass = .0005;
+				vrFloat area = 0.0;
 				for (int i = 0; i < size; i++)
 				{
 					vrTriangle t = tri[i];
@@ -250,8 +271,18 @@ main(void)
 
 					vrUpdatePolyAxes(s->shape);
 					vrArrayPush(body3->shape, s);
-					accumMoment += vrMomentForPoly(s->shape, mass);
 				}
+
+				for (int i = 0; i < body3->shape->sizeof_active; i++)
+				{
+					area += vrAreaForPoly(((vrShape*)body3->shape->data[i])->shape);
+				}
+				mass *= area;
+				for (int i = 0; i < body3->shape->sizeof_active; i++)
+				{
+					accumMoment += vrMomentForPoly(((vrShape*)body3->shape->data[i])->shape, mass);
+				}
+				
 				accumMoment /= size;
 				body3->bodyMaterial.restitution = 0.0;
 				body3->bodyMaterial.mass = mass;

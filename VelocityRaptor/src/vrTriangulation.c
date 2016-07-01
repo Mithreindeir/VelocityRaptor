@@ -77,12 +77,12 @@ vrTriangle * vrEarClip(vrVec2* polygon, int num_vertices, int* num_triangles)
 
 			if (tip >= 0) break;
 
-			int p = index > 0 ? index - 1 : num_vertices - 1;
-			int n = index < num_vertices-1 ? index + 1 : 0;
+			int p = (index > 0) ? index - 1 : num_vertices - 1;
+			int n = (index < num_vertices-1) ? index + 1 : 0;
 
 			vrTriangle tri;
 			tri.a = polygon[p];
-			tri.b = polygon[index];
+			tri.b = polygon[i];
 			tri.c = polygon[n];
 
 			if (vrTriangleCCW(tri) != countercw)
@@ -104,10 +104,9 @@ vrTriangle * vrEarClip(vrVec2* polygon, int num_vertices, int* num_triangles)
 				t.b = polygon[i];
 				t.c = polygon[n];
 
-				if (vrTrianglePoint(t, polygon[reflex[j]]))
+				if (vrTrianglePoint(t, polygon[reflex[j]], vrTriangleCCW(t)))
 				{
 					ear = vrFALSE;
-
 					break;
 				}
 			}
@@ -119,12 +118,12 @@ vrTriangle * vrEarClip(vrVec2* polygon, int num_vertices, int* num_triangles)
 					vrVec2 v = polygon[j];
 					if (vrVec2Equals(v, polygon[p]) ||
 						vrVec2Equals(v, polygon[n]) ||
-						vrVec2Equals(v, polygon[i])) continue;
+						vrVec2Equals(v, polygon[index])) continue;
 					vrTriangle t;
 					t.a = polygon[p];
 					t.b = polygon[i];
 					t.c = polygon[n];
-					if (vrTrianglePoint(t, v))
+					if (vrTrianglePoint(t, v, vrTriangleCCW(t)))
 					{
 						ear = vrFALSE;
 						break;
@@ -173,8 +172,9 @@ vrTriangle * vrEarClip(vrVec2* polygon, int num_vertices, int* num_triangles)
 	return triangles;
 }
 
-vrBOOL vrTrianglePoint(vrTriangle triangle, vrVec2 point)
+vrBOOL vrTrianglePoint(vrTriangle triangle, vrVec2 point, vrBOOL ccw)
 {
+	
 	vrVec2 det1a = vrSub(triangle.b, triangle.a);
 	vrVec2 det1b = vrSub(point, triangle.a);
 
@@ -184,11 +184,18 @@ vrBOOL vrTrianglePoint(vrTriangle triangle, vrVec2 point)
 	vrVec2 det3a = vrSub(triangle.a, triangle.c);
 	vrVec2 det3b = vrSub(point, triangle.c);
 
-	if (vrCross(det1a, det1b) < 0 && vrCross(det2a, det2b) < 0 && vrCross(det3a, det3b) < 0)
+	if (!ccw)
 	{
-		return vrTRUE;
+		if (vrCross(det1a, det1b) < 0 && vrCross(det2a, det2b) < 0 && vrCross(det3a, det3b) < 0)
+			return vrTRUE;
+	}
+	else
+	{
+		if (vrCross(det1a, det1b) > 0 && vrCross(det2a, det2b) > 0 && vrCross(det3a, det3b) > 0)
+			return vrTRUE;
 	}
 	return vrFALSE;
+	
 }
 
 vrBOOL vrTriangleCCW(const vrTriangle t)

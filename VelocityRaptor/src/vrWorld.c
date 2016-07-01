@@ -34,10 +34,10 @@ vrWorld * vrWorldInit(vrWorld * world)
 	world->bodies = vrArrayInit(vrArrayAlloc(), sizeof(vrRigidBody*));
 	world->accumulator = 0;
 	world->lastTime = 0;
-	world->timeStep = (1.0f / 60.0f);
+	world->timeStep = (1.0f / 180.0f);
 	world->gravity = vrVect(0, 981);
-	world->velIterations = 15;
-	world->posIterations = 10;
+	world->velIterations = 20;
+	world->posIterations = 15;
 	world->manifoldMap = vrHashTableInit(vrHashTableAlloc(), 1000);
 	world->manifoldMap->deleteFunc = &vrManifoldDestroy;
 	world->manifoldKeys = vrArrayInit(vrArrayAlloc(), sizeof(unsigned int));
@@ -157,14 +157,13 @@ void vrWorldQueryCollisions(vrWorld * world)
 				if (i < j) continue;
 
 				vrRigidBody* body2 = world->bodies->data[j];
-				if (!vrOBBOverlaps(body->obb, body2->obb)) continue;
 				for (int l = 0; l < body2->shape->sizeof_active; l++)
 				{
 					vrShape* shape2 = body2->shape->data[l];
 					unsigned int key = COMBINE_INTS(shape, shape2);
 
 					vrBOOL overlap = vrOBBOverlaps(shape->obb, shape2->obb);
-
+					overlap = overlap && vrOBBOverlaps(body->obb, body2->obb);
 					vrHashEntry* manifold = NULL;
 					if (overlap)
 					{

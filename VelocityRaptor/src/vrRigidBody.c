@@ -217,3 +217,22 @@ vrFloat vrMomentForCircle(vrFloat radius, vrFloat mass)
 {
 	return (mass*radius*radius)/2.0;
 }
+
+vrFloat vrAreaForPoly(vrPolygonShape * shape)
+{
+	vrFloat cp = 0.0;
+	vrFloat cp2 = 0.0;
+	vrNode* n = shape->vertices->head;
+
+	while (n)
+	{
+		vrVec2 v1 = ((vrVertex*)n->data)->vertex;
+		vrVec2 v2 = (n->next) ? ((vrVertex*)n->next->data)->vertex : ((vrVertex*)shape->vertices->head->data)->vertex;
+		cp += v1.x * v2.y;
+		cp2 += v1.y * v2.x;
+
+		n = n->next;
+	}
+
+	return abs((cp - cp2) / 2.0);
+}
