@@ -55,6 +55,9 @@
 #ifndef vrCalloc
 #define vrCalloc calloc
 #endif
+#ifndef vrRealloc
+#define vrRealloc realloc
+#endif
 
 #ifndef COMBINE_INTS
 //Credit to Chipmunk2D for this hashing macro

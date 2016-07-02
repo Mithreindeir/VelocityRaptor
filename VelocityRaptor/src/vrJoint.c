@@ -35,6 +35,12 @@ vrJoint * vrJointInit(vrJoint * joint)
 	return joint;
 }
 
+void vrJointDestroy(vrJoint * joint)
+{
+	vrFree(joint->jointData);
+	vrFree(joint);
+}
+
 vrLocalPoint vrLocalPointInit(vrRigidBody * body, vrVec2 point)
 {
 	vrLocalPoint localPoint;

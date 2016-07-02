@@ -7,6 +7,7 @@
 #include "../include/vrHashMap.h"
 #include "../include/vrParticleSystem.h"
 #include "../include/vrTriangulation.h"
+#include "../include/vrShapeCreate.h"
 #include "../include/vrDistanceJoint.h"
 #include <stdio.h>
 #include <conio.h>
@@ -98,10 +99,25 @@ main(void)
 	vrRigidBody* bodyt = vrBodyInit(vrBodyAlloc());
 	bodyt->bodyMaterial.invMass = 0;
 	bodyt->bodyMaterial.invMomentInertia = 0;
+	/*
+	
 	vrShape* sh = vrShapeInit(vrShapeAlloc());
 	sh = vrShapePolyInit(sh);
 	sh->shape = vrPolyBoxInit(sh->shape, 0, 700, 800, 100);
 	vrArrayPush(bodyt->shape, sh);	
+	*/
+	vrShapeMold mold = vrShapeMoldInit();
+	vrShapeMoldBind(&mold);
+	vrPolyBegin(VR_CONVEX_POLYGON);
+	vrAddVertex(vrVect(0, 700));
+	vrAddVertex(vrVect(800, 700));
+	vrAddVertex(vrVect(800, 800));
+	vrAddVertex(vrVect(0, 800));
+	vrPolyEnd();
+	vrArray* arr = vrShapeMoldGetShape(&mold);
+	vrArrayCopy(bodyt->shape, arr);
+	vrArrayDestroy(arr);
+	//bodyt->shape = vrShapeMoldGetShape(&mold);
 	bodyt->bodyMaterial.invMass = 0;
 	bodyt->bodyMaterial.invMomentInertia = 0;
 	vrWorldAddBody(world, bodyt);

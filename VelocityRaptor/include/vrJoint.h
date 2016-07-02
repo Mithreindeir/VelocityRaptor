@@ -69,7 +69,8 @@ struct vrJoint
 vrJoint* vrJointAlloc();
 ///Initializes joint
 vrJoint* vrJointInit(vrJoint* joint);
-
+///Destroys a joint
+void vrJointDestroy(vrJoint* joint);
 ///Returns a local point
 vrLocalPoint vrLocalPointInit(vrRigidBody* body, vrVec2 point);
 ///Updates the local point and returns it

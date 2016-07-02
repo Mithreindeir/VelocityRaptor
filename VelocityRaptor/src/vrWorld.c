@@ -53,7 +53,11 @@ void vrWorldDestroy(vrWorld * world)
 	{
 		vrBodyDestroy(world->bodies->data[i]);
 	}
-
+	for (int i = 0; i < world->joints->sizeof_active; i++)
+	{
+		
+	}
+	vrFree(world);
 }
 vrBOOL b = vrFALSE;
 void vrWorldStep(vrWorld * world)
