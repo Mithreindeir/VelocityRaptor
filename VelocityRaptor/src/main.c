@@ -159,7 +159,7 @@ main(void)
 		vrShape* s = vrShapeInit(vrShapeAlloc());
 		s = vrShapePolyInit(s);
 
-		s->shape = vrPolyBoxInit(s->shape, 350 + rand() % 10, -i * 100 + 600, 100, 100);
+		s->shape = vrPolyBoxInit(s->shape, 350 + rand() % 10, -i * 100 + 00, 100, 100);
 		vrArrayPush(body3->shape, s);
 
 		body3->bodyMaterial.restitution = 0.0;

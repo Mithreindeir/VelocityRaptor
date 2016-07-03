@@ -208,13 +208,20 @@ void vrWorldQueryCollisions(vrWorld * world)
 						}
 						glPointSize(8.0);
 						glColor3f(1, 0, 0);
-						glBegin(GL_POINTS);
 						vrManifold* t = vrHashTableLookup(world->manifoldMap, key)->data;
 						for (int i = 0; i < t->contact_points; i++)
 						{
+							glColor3f(0, 0, 0);
+							glPointSize(10);
+							glBegin(GL_POINTS);
+							glVertex2f(t->contacts[i].point.x,t->contacts[i].point.y);
+							glEnd();
+							glColor3f(1, 0, 0);
+							glPointSize(5);
+							glBegin(GL_POINTS);
 							glVertex2f(t->contacts[i].point.x, t->contacts[i].point.y);
+							glEnd();
 						}
-						glEnd();
 					}
 					else
 					{

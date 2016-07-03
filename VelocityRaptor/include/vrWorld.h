@@ -69,7 +69,6 @@ typedef struct vrWorld
 	vrArray* joints;
 } vrWorld;
 
-
 typedef struct vrBodyPair
 {
 	vrRigidBody* A;
