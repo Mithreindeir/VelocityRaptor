@@ -31,7 +31,7 @@ main(void)
 
 	GLFWwindow* window;
 	glfwInit();
-		
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
@@ -95,16 +95,16 @@ main(void)
 		body2->bodyMaterial.invMomentInertia = 0;
 		vrWorldAddBody(world, body2);
 	}
-	
+
 	vrRigidBody* bodyt = vrBodyInit(vrBodyAlloc());
 	bodyt->bodyMaterial.invMass = 0;
 	bodyt->bodyMaterial.invMomentInertia = 0;
 	/*
-	
+
 	vrShape* sh = vrShapeInit(vrShapeAlloc());
 	sh = vrShapePolyInit(sh);
 	sh->shape = vrPolyBoxInit(sh->shape, 0, 700, 800, 100);
-	vrArrayPush(bodyt->shape, sh);	
+	vrArrayPush(bodyt->shape, sh);
 	*/
 	vrShapeMold mold = vrShapeMoldInit();
 	vrShapeMoldBind(&mold);
@@ -122,22 +122,63 @@ main(void)
 	bodyt->bodyMaterial.invMomentInertia = 0;
 	vrWorldAddBody(world, bodyt);
 	psys = vrParticleSystemInit(vrParticleSystemAlloc());
-	
+
 	vrFloat timer = glfwGetTime();
 	vrVec2* polygon = NULL;
 	int polygonSize = 0;
 	int b = 0;
+	int x = 10;
+	int sp = 0;
+	/*
+	for (int i = 0; i < 10; i++)
+	{
+	for (int j = 0; j < x - sp; j++)
+	{
+	vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
+
+	vrShape* s = vrShapeInit(vrShapeAlloc());
+	s = vrShapePolyInit(s);
+
+	s->shape = vrPolyBoxInit(s->shape, 100 + sp*30.5 + j*61, -i*61 + 700, 60, 60);
+	vrArrayPush(body3->shape, s);
+
+	body3->bodyMaterial.restitution = 0.0;
+	body3->bodyMaterial.mass = 1;
+	body3->bodyMaterial.invMass = 1.0 / body3->bodyMaterial.mass;
+	body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForCircle(50, body3->bodyMaterial.mass);
+	vrWorldAddBody(world, body3);
+	}
+	sp++;
+	}
+
+	*/
+	for (int i = 0; i < 5; i++)
+	{
+		vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
+
+		vrShape* s = vrShapeInit(vrShapeAlloc());
+		s = vrShapePolyInit(s);
+
+		s->shape = vrPolyBoxInit(s->shape, 350 + rand() % 10, -i * 100 + 600, 100, 100);
+		vrArrayPush(body3->shape, s);
+
+		body3->bodyMaterial.restitution = 0.0;
+		body3->bodyMaterial.mass = 1;
+		body3->bodyMaterial.invMass = 1.0 / body3->bodyMaterial.mass;
+		body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForCircle(50, body3->bodyMaterial.mass);
+		vrWorldAddBody(world, body3);
+	}
 	while (!glfwWindowShouldClose(window))
-	{		
+	{
 		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))
 		{
-			
+
 			double x, y;
 			glfwGetCursorPos(window, &x, &y);
 			//vrVec2 pos = vrVect(x / 133.333, y / 133.333);
-		    //vrParticle* p = vrParticleInit(vrParticleAlloc(), pos);
+			//vrParticle* p = vrParticleInit(vrParticleAlloc(), pos);
 			//vrArrayPush(psys->particles, p);
-			
+
 			vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
 
 			vrShape* s = vrShapeInit(vrShapeAlloc());
@@ -151,10 +192,10 @@ main(void)
 
 			body3->bodyMaterial.restitution = 0.0;
 			body3->bodyMaterial.mass = 5;
-			body3->bodyMaterial.invMass = 1.0/ body3->bodyMaterial.mass;
+			body3->bodyMaterial.invMass = 1.0 / body3->bodyMaterial.mass;
 			body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForCircle(50, body3->bodyMaterial.mass);
 			vrWorldAddBody(world, body3);
-			
+
 			if (b == 0)
 			{
 				body3->bodyMaterial.invMass = 0;
@@ -189,7 +230,7 @@ main(void)
 			timer = glfwGetTime();
 		}
 
-		
+
 
 		lastTime = currentTime;
 		currentTime = glfwGetTime();
@@ -204,20 +245,6 @@ main(void)
 		glViewport(0, 0, display_w, display_h);
 		glClearColor(1, 1, 1, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
-		vrFloat f = glfwGetTime();
-		vrWorldStep(world);
-		vrFloat ts = 1.0 / 60.0;
-		
-		while (accumulator > ts)
-		{
-			for (int i = 0; i < world->bodies->sizeof_active; i++)
-				vrParticleSystemCollide(psys, world->bodies->data[i], 133.333, ts);
-			vrParticleSystemStep(psys, ts);
-			accumulator -= ts;
-		}
-		f = glfwGetTime() - f;
-
-		printf("Framerate: %f\n", 1 / f);
 
 		glPointSize(16);
 		glLineWidth(12);
@@ -298,7 +325,7 @@ main(void)
 				{
 					accumMoment += vrMomentForPoly(((vrShape*)body3->shape->data[i])->shape, mass);
 				}
-				
+
 				accumMoment /= size;
 				body3->bodyMaterial.restitution = 0.0;
 				body3->bodyMaterial.mass = mass;
@@ -315,15 +342,15 @@ main(void)
 		/*
 		for (int i = 0; i < world->bodies->sizeof_active; i++)
 		{
-			vrRigidBody* b = world->bodies->data[i];
-			vrVec2 center = b->shape->getCenter(b->shape->shape);
-			if (center.y > 900)
-			{
-				vrFloat move = -200 - center.y;
-				vrVec2 mov = vrVect(0, move);
-				b->shape->move(b->shape->shape, mov);
-				b->position = vrAdd(b->position, mov);
-			}
+		vrRigidBody* b = world->bodies->data[i];
+		vrVec2 center = b->shape->getCenter(b->shape->shape);
+		if (center.y > 900)
+		{
+		vrFloat move = -200 - center.y;
+		vrVec2 mov = vrVect(0, move);
+		b->shape->move(b->shape->shape, mov);
+		b->position = vrAdd(b->position, mov);
+		}
 
 		}
 		*/
@@ -376,9 +403,23 @@ main(void)
 				}
 			}
 		}
-	
 
 
+
+		vrFloat f = glfwGetTime();
+		vrWorldStep(world);
+		vrFloat ts = 1.0 / 60.0;
+
+		while (accumulator > ts)
+		{
+			for (int i = 0; i < world->bodies->sizeof_active; i++)
+				vrParticleSystemCollide(psys, world->bodies->data[i], 133.333, ts);
+			vrParticleSystemStep(psys, ts);
+			accumulator -= ts;
+		}
+		f = glfwGetTime() - f;
+
+		printf("Framerate: %f\n", 1 / f);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		glOrtho(0, 800, 800, 0 + 1.f, 1.f, -1.f);
@@ -401,7 +442,7 @@ void vrDebugDrawCircle(vrCircleShape* circle)
 
 		vrFloat x = circle->radius * cos(theta);
 		vrFloat y = circle->radius * sin(theta);
-		glVertex2f(x + circle->center.x, y + circle->center.y );
+		glVertex2f(x + circle->center.x, y + circle->center.y);
 	}
 	glEnd();
 	glBegin(GL_LINE_LOOP);
