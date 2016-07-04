@@ -187,7 +187,7 @@ void vrPolyCircle(vrManifold * manifold, const vrPolygonShape A, const vrCircleS
 		point = normalEdge.a;
 		manifold->normal = vrNormalize(vrSub(B.center, normalEdge.a));
 		manifold->penetration = vrDist(B.center, normalEdge.a) - B.radius;
-
+		manifold->penetration = -manifold->penetration;
 	}
 	else if (dot2 <= 0)
 	{
@@ -197,6 +197,7 @@ void vrPolyCircle(vrManifold * manifold, const vrPolygonShape A, const vrCircleS
 		point = normalEdge.b;
 		manifold->normal = vrNormalize(vrSub(B.center, normalEdge.b));
 		manifold->penetration = vrDist(B.center, normalEdge.b) - B.radius;
+		manifold->penetration = -manifold->penetration;
 	}
 	else
 	{

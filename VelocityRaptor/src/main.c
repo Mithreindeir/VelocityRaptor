@@ -196,6 +196,7 @@ main(void)
 			body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForCircle(50, body3->bodyMaterial.mass);
 			vrWorldAddBody(world, body3);
 
+			/*
 			if (b == 0)
 			{
 				body3->bodyMaterial.invMass = 0;
@@ -214,6 +215,7 @@ main(void)
 				vrArrayPush(world->joints, joint);
 			}
 			b++;
+			*/
 			timer = glfwGetTime();
 		}
 		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))
@@ -229,8 +231,6 @@ main(void)
 
 			timer = glfwGetTime();
 		}
-
-
 
 		lastTime = currentTime;
 		currentTime = glfwGetTime();
