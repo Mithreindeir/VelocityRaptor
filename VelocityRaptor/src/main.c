@@ -127,10 +127,10 @@ main(void)
 	vrVec2* polygon = NULL;
 	int polygonSize = 0;
 	int b = 0;
-	int x = 10;
+	int x = 20;
 	int sp = 0;
-	/*
-	for (int i = 0; i < 10; i++)
+	
+	for (int i = 0; i < 20; i++)
 	{
 	for (int j = 0; j < x - sp; j++)
 	{
@@ -139,7 +139,7 @@ main(void)
 	vrShape* s = vrShapeInit(vrShapeAlloc());
 	s = vrShapePolyInit(s);
 
-	s->shape = vrPolyBoxInit(s->shape, 100 + sp*30.5 + j*61, -i*61 + 700, 60, 60);
+	s->shape = vrPolyBoxInit(s->shape, 100 + sp*10 + j*20, -i*20 + 600, 20, 20);
 	vrArrayPush(body3->shape, s);
 
 	body3->bodyMaterial.restitution = 0.0;
@@ -147,11 +147,12 @@ main(void)
 	body3->bodyMaterial.invMass = 1.0 / body3->bodyMaterial.mass;
 	body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForCircle(50, body3->bodyMaterial.mass);
 	vrWorldAddBody(world, body3);
+	vrUpdatePolyAxes(s->shape);
 	}
 	sp++;
 	}
 
-	*/
+	/*
 	for (int i = 0; i < 5; i++)
 	{
 		vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
@@ -166,8 +167,10 @@ main(void)
 		body3->bodyMaterial.mass = 1;
 		body3->bodyMaterial.invMass = 1.0 / body3->bodyMaterial.mass;
 		body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForCircle(50, body3->bodyMaterial.mass);
-		vrWorldAddBody(world, body3);
+		vrWorldAddBody(world, body3
+		);
 	}
+	*/
 	while (!glfwWindowShouldClose(window))
 	{
 		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))
@@ -196,7 +199,7 @@ main(void)
 			body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForCircle(50, body3->bodyMaterial.mass);
 			vrWorldAddBody(world, body3);
 
-			/*
+			
 			if (b == 0)
 			{
 				body3->bodyMaterial.invMass = 0;
@@ -215,7 +218,7 @@ main(void)
 				vrArrayPush(world->joints, joint);
 			}
 			b++;
-			*/
+			
 			timer = glfwGetTime();
 		}
 		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))

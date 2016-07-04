@@ -21,7 +21,7 @@
 #include "vrJoint.h"
 #include "vrMath.h"
 
-///Data structure for joint
+///Data structure for distance joint
 typedef struct vrDistanceJoint
 {
 	///Holds inverse mass

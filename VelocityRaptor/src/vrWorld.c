@@ -34,10 +34,10 @@ vrWorld * vrWorldInit(vrWorld * world)
 	world->bodies = vrArrayInit(vrArrayAlloc(), sizeof(vrRigidBody*));
 	world->accumulator = 0;
 	world->lastTime = 0;
-	world->timeStep = (1.0f / 180.0f);
+	world->timeStep = (1.0f / 60.0f);
 	world->gravity = vrVect(0, 981);
-	world->velIterations = 20;
-	world->posIterations = 15;
+	world->velIterations = 10;
+	world->posIterations = 5;
 	world->manifoldMap = vrHashTableInit(vrHashTableAlloc(), 1000);
 	world->manifoldMap->deleteFunc = &vrManifoldDestroy;
 	world->manifoldKeys = vrArrayInit(vrArrayAlloc(), sizeof(unsigned int));

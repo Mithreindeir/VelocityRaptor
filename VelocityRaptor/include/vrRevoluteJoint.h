@@ -24,8 +24,13 @@
 ///Data structure for revolute joint
 typedef struct vrRevoluteConstraint
 {
-	///Holds inverse mass
-	vrFloat invMass;
+	///Holds inverse mass matrix
+	vrMat2 K;
+	///Relative point on A
+	vrVec2 ra;
+	///Relative point on B
+	vrVec2 rb;
+	vrVec2 b;
 } vrRevoluteConstraint;
 
 ///Allocates memory for revolute joint data
