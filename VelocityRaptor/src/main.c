@@ -127,10 +127,10 @@ main(void)
 	vrVec2* polygon = NULL;
 	int polygonSize = 0;
 	int b = 0;
-	int x = 20;
+	int x = 10;
 	int sp = 0;
 	
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < 10; i++)
 	{
 	for (int j = 0; j < x - sp; j++)
 	{
@@ -139,7 +139,7 @@ main(void)
 	vrShape* s = vrShapeInit(vrShapeAlloc());
 	s = vrShapePolyInit(s);
 
-	s->shape = vrPolyBoxInit(s->shape, 100 + sp*10 + j*20, -i*20 + 600, 20, 20);
+	s->shape = vrPolyBoxInit(s->shape, 100 + sp*30 + j*60, -i*60 + 600, 60, 60);
 	vrArrayPush(body3->shape, s);
 
 	body3->bodyMaterial.restitution = 0.0;
@@ -227,7 +227,7 @@ main(void)
 			glfwGetCursorPos(window, &x, &y);
 			polygonSize += 1;
 			if (polygonSize > 1)
-				polygon = realloc(polygon, polygonSize*sizeof(vrVec2));
+				polygon = vrRealloc(polygon, polygonSize*sizeof(vrVec2));
 			else
 				polygon = vrAlloc(sizeof(vrVec2));
 			polygon[polygonSize - 1] = vrVect(x, y);

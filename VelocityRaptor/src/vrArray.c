@@ -6,7 +6,7 @@
 * arising from the use of this software.
 * Permission is granted to anyone to use this software for any purpose,
 * including commercial applications, and to alter it and redistribute it
-* freely, subject to the following restrictions:
+* vrFreely, subject to the following restrictions:
 * 1. The origin of this software must not be misrepresented; you must not
 * claim that you wrote the original software. If you use this software
 * in a product, an acknowledgment in the product documentation would be
@@ -31,13 +31,14 @@ vrArray * vrArrayInit(vrArray * arr, int sizeofdata)
 	arr->data = NULL;
 	arr->sizeof_array = 0;
 	arr->size_available = 0;
+
 	return arr;
 }
 
 void vrArrayDestroy(vrArray * arr)
 {
-	free(arr->data);
-	free(arr);
+	vrFree(arr->data);
+	vrFree(arr);
 }
 
 void vrArrayPush(vrArray* arr, void * object)
@@ -45,7 +46,7 @@ void vrArrayPush(vrArray* arr, void * object)
 	if (arr->size_available <= 0)
 	{
 		arr->sizeof_array++;
-		void** buffer = realloc(arr->data, (arr->sizeof_array)*arr->sizeof_data);
+		void** buffer = vrRealloc(arr->data, (arr->sizeof_array)*arr->sizeof_data);
 		VR_ASSERT(buffer != NULL, "REALLOC RETURNED NULL.");
 		arr->data = buffer;
 		arr->data[arr->sizeof_active] = object;
@@ -74,7 +75,7 @@ void vrArrayPop(vrArray* arr)
 
 void vrArrayReserve(vrArray * arr, int size)
 {
-	void** buffer = realloc(arr->data, arr->sizeof_data * ( arr->sizeof_array + size));
+	void** buffer = vrRealloc(arr->data, arr->sizeof_data * ( arr->sizeof_array + size));
 	arr->sizeof_array += size;
 	arr->size_available += size;
 	VR_ASSERT(buffer != NULL, "REALLOC RETURNED NULL.");
@@ -85,7 +86,7 @@ int vrArrayErase(vrArray* arr, int index)
 {
 	if (index > arr->sizeof_array || index < 0) return;
 
-	void** buffer = calloc(arr->sizeof_data, arr->sizeof_array - 1);
+	void** buffer = vrCalloc(arr->sizeof_data, arr->sizeof_array - 1);
 
 	int c = 0;
 	for (int i = 0; i < arr->sizeof_active; i++)
@@ -108,7 +109,7 @@ int vrArrayErase(vrArray* arr, int index)
 
 void vrArrayCopy(vrArray * dest, vrArray * src)
 {
-	dest->data = realloc(dest->data, src->sizeof_data * src->sizeof_array);
+	dest->data = vrRealloc(dest->data, src->sizeof_data * src->sizeof_array);
 	for (int i = 0; i < src->sizeof_array; i++)
 	{
 		dest->data[i] = src->data[i];

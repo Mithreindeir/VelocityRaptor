@@ -56,7 +56,7 @@ vrArray * vrShapeMoldGetShape(vrShapeMold * shapemold)
 	{
 		if (shapemold->polyMold.polyType == VR_CONCAVE_POLYGON)
 		{
-			//Use a buffer, because ear clip frees the arrays memory
+			//Use a buffer, because ear clip vrFrees the arrays memory
 			int size = 0;
 			vrVec2* polygon_buffer = vrAlloc(sizeof(vrVec2) * shapemold->polyMold.num_vertices);
 			for (int i = 0; i < shapemold->polyMold.num_vertices; i++)

@@ -6,7 +6,7 @@
 * arising from the use of this software.
 * Permission is granted to anyone to use this software for any purpose,
 * including commercial applications, and to alter it and redistribute it
-* freely, subject to the following restrictions:
+* vrFreely, subject to the following restrictions:
 * 1. The origin of this software must not be misrepresented; you must not
 * claim that you wrote the original software. If you use this software
 * in a product, an acknowledgment in the product documentation would be
@@ -34,13 +34,12 @@ vrWorld * vrWorldInit(vrWorld * world)
 	world->bodies = vrArrayInit(vrArrayAlloc(), sizeof(vrRigidBody*));
 	world->accumulator = 0;
 	world->lastTime = 0;
-	world->timeStep = (1.0f / 60.0f);
+	world->timeStep = (1.0f / 180.0f);
 	world->gravity = vrVect(0, 981);
-	world->velIterations = 10;
-	world->posIterations = 5;
+	world->velIterations = 20;
+	world->posIterations = 15;
 	world->manifoldMap = vrHashTableInit(vrHashTableAlloc(), 1000);
 	world->manifoldMap->deleteFunc = &vrManifoldDestroy;
-	world->manifoldKeys = vrArrayInit(vrArrayAlloc(), sizeof(unsigned int));
 	world->num_bodies = 0;
 	world->joints = vrArrayInit(vrArrayAlloc(), sizeof(vrJoint*));
 	
@@ -127,13 +126,11 @@ void vrWorldStep(vrWorld * world)
 
 void vrWorldAddBody(vrWorld* world, vrRigidBody * body)
 {
-	if (body->bodyMaterial.invMass == 0)
+	for (int i = 0; i < body->shape->sizeof_active; i++)
 	{
-		for (int i = 0; i < body->shape->sizeof_active; i++)
-		{
-			vrShape* shape = body->shape->data[i];
-			shape->updateOBB(shape->shape);
-		}
+		vrShape* shape = body->shape->data[i];
+		shape->updateOBB(shape->shape);
+		if(shape->shapeType == VR_POLYGON) vrUpdatePolyAxes(shape->shape);
 	}
 	vrArrayPush(world->bodies, body);
 	world->num_bodies++;
@@ -141,6 +138,23 @@ void vrWorldAddBody(vrWorld* world, vrRigidBody * body)
 
 void vrWorldQueryCollisions(vrWorld * world)
 {
+	for (int i = 0; i < world->manifoldMap->buckets->sizeof_active; i++)
+	{
+		if (world->manifoldMap->buckets->data[i])
+		{
+
+			vrLinkedList* list = world->manifoldMap->buckets->data[i];
+			vrNode* node = list->head;
+			while (node)
+			{
+				vrHashEntry* m = ((vrHashEntry*)node->data);
+				vrManifold* manifold = m->data;
+				manifold->active = vrFALSE;
+
+				node = node->next;
+			}
+		}
+	}
 	//Get collisions and solve
 	//O^2 Broadphase for now
 	vrFloat dt = world->timeStep;
@@ -150,24 +164,26 @@ void vrWorldQueryCollisions(vrWorld * world)
 	for (int i = 0; i < world->bodies->sizeof_active; i++)
 	{
 		vrRigidBody* body = world->bodies->data[i];
-		for (int k = 0; k < body->shape->sizeof_active; k++)
+		for (int j = 0; j < world->bodies->sizeof_active; j++)
 		{
-			vrShape* shape = body->shape->data[k];
-			for (int j = 0; j < world->bodies->sizeof_active; j++)
-			{
-				if (i == j) continue;
-				//Culls duplicate pairs
-				//By only colliding when i > j
-				if (i < j) continue;
+			vrRigidBody* body2 = world->bodies->data[j];
+			if (i == j) continue;
+			//Culls duplicate pairs
+			//By only colliding when i > j
+			if (i < j) continue;
+			if (!vrOBBOverlaps(body->obb, body2->obb)) continue;
 
-				vrRigidBody* body2 = world->bodies->data[j];
+			for (int k = 0; k < body->shape->sizeof_active; k++)
+			{
+				vrShape* shape = body->shape->data[k];
+
 				for (int l = 0; l < body2->shape->sizeof_active; l++)
 				{
 					vrShape* shape2 = body2->shape->data[l];
 					unsigned int key = COMBINE_INTS(shape, shape2);
 
 					vrBOOL overlap = vrOBBOverlaps(shape->obb, shape2->obb);
-					overlap = overlap && vrOBBOverlaps(body->obb, body2->obb);
+
 					vrHashEntry* manifold = NULL;
 					if (overlap)
 					{
@@ -177,7 +193,7 @@ void vrWorldQueryCollisions(vrWorld * world)
 						collision_checks++;
 
 						manifold->data = vrManifoldInit(vrManifoldAlloc());
-
+						((vrManifold*)manifold->data)->active = vrTRUE;
 						if (shape->shapeType == VR_POLYGON && shape2->shapeType == VR_POLYGON)
 							vrPolyPoly(manifold->data, *((vrPolygonShape*)shape->shape), *((vrPolygonShape*)shape2->shape));
 						else if (shape->shapeType == VR_POLYGON && shape2->shapeType == VR_CIRCLE)
@@ -197,6 +213,7 @@ void vrWorldQueryCollisions(vrWorld * world)
 
 						if (m)
 						{
+							((vrManifold*)m->data)->active = vrTRUE;
 							vrManifoldAddContactPoints(((vrManifold*)m->data), *((vrManifold*)manifold->data));
 							if (manifold->data) vrManifoldDestroy(manifold->data);
 							if (manifold) vrFree(manifold);
@@ -204,7 +221,6 @@ void vrWorldQueryCollisions(vrWorld * world)
 						else
 						{
 							vrHashTableInsert(world->manifoldMap, manifold, key);
-							vrArrayPush(world->manifoldKeys, key);
 						}
 						glPointSize(8.0);
 						glColor3f(1, 0, 0);
@@ -214,7 +230,7 @@ void vrWorldQueryCollisions(vrWorld * world)
 							glColor3f(0, 0, 0);
 							glPointSize(10);
 							glBegin(GL_POINTS);
-							glVertex2f(t->contacts[i].point.x,t->contacts[i].point.y);
+							glVertex2f(t->contacts[i].point.x, t->contacts[i].point.y);
 							glEnd();
 							glColor3f(1, 0, 0);
 							glPointSize(5);
@@ -223,33 +239,38 @@ void vrWorldQueryCollisions(vrWorld * world)
 							glEnd();
 						}
 					}
-					else
+					else if (manifold)
 					{
-						vrHashEntry* m = vrHashTableLookup(world->manifoldMap, key);
-						if (m)
-						{
-							vrHashTableRemove(world->manifoldMap, key);
-
-							//Linear search for key
-							for (int i = 0; i < world->manifoldKeys->sizeof_array; i++)
-							{
-								if (world->manifoldKeys->data[i] == key)
-								{
-									vrArrayErase(world->manifoldKeys, i);
-								}
-							}
-						}
-						if (overlap)
-						{
-							if (manifold->data) vrManifoldDestroy(manifold->data);
-							if (manifold) vrFree(manifold);
-						}
+						if (manifold->data) vrManifoldDestroy(manifold->data);
+						if (manifold) vrFree(manifold);
 					}
 				}
 			}
 		}
 	}
-	//printf("%d collision checks and %d actual collisions and %d bodies \n ", collision_checks, collisions, world->num_bodies);
+	for (int i = 0; i < world->manifoldMap->buckets->sizeof_active; i++)
+	{
+		if (world->manifoldMap->buckets->data[i])
+		{
+
+			vrLinkedList* list = world->manifoldMap->buckets->data[i];
+			vrNode* node = list->head;
+			while (node)
+			{
+				vrHashEntry* m = ((vrHashEntry*)node->data);
+				vrManifold* manifold = m->data;
+				vrNode* next = node->next;
+				if (!manifold->active)
+				{
+					vrManifoldDestroy(manifold);
+					if (((vrHashEntry*)node->data)) vrFree(((vrHashEntry*)node->data));
+					vrLinkedListRemove(world->manifoldMap->buckets->data[i], node);
+				}
+				node = next;
+			}
+		}
+	}
+
 }
 
 void vrWorldSolve(vrWorld * world, vrFloat dt)

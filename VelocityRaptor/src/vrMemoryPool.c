@@ -6,7 +6,7 @@
 * arising from the use of this software.
 * Permission is granted to anyone to use this software for any purpose,
 * including commercial applications, and to alter it and redistribute it
-* freely, subject to the following restrictions:
+* vrFreely, subject to the following restrictions:
 * 1. The origin of this software must not be misrepresented; you must not
 * claim that you wrote the original software. If you use this software
 * in a product, an acknowledgment in the product documentation would be
@@ -27,7 +27,7 @@ vrMemoryPool * vrMemoryPoolInit(vrMemoryPool * pool, int sizeofdata, int sizeofp
 {
 	pool->sizeof_data = sizeofdata;
 	pool->sizeof_pool = sizeofpool;
-	pool->memory = calloc(sizeof(vrMemoryResource), sizeofpool);
+	pool->memory = vrCalloc(sizeof(vrMemoryResource), sizeofpool);
 
 
 	for (int i = 0; i < sizeofpool; i++)

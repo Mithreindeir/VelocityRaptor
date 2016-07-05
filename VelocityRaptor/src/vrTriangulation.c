@@ -6,7 +6,7 @@
 * arising from the use of this software.
 * Permission is granted to anyone to use this software for any purpose,
 * including commercial applications, and to alter it and redistribute it
-* freely, subject to the following restrictions:
+* vrFreely, subject to the following restrictions:
 * 1. The origin of this software must not be misrepresented; you must not
 * claim that you wrote the original software. If you use this software
 * in a product, an acknowledgment in the product documentation would be
@@ -88,7 +88,7 @@ vrTriangle * vrEarClip(vrVec2* polygon, int num_vertices, int* num_triangles)
 			if (vrTriangleCCW(tri) != countercw)
 			{
 
-				reflex = realloc(reflex, sizeof(int)*(reflex_size + 1));
+				reflex = vrRealloc(reflex, sizeof(int)*(reflex_size + 1));
 				reflex[reflex_size] = index;
 				reflex_size += 1;
 
@@ -145,11 +145,11 @@ vrTriangle * vrEarClip(vrVec2* polygon, int num_vertices, int* num_triangles)
 		//vrVec2Log(t.a);
 		//vrVec2Log(t.b);
 		//vrVec2Log(t.c);
-		triangles = realloc(triangles, sizeof(vrTriangle)*((*num_triangles)+1));
+		triangles = vrRealloc(triangles, sizeof(vrTriangle)*((*num_triangles)+1));
 		triangles[(*num_triangles)] = t;
 		(*num_triangles) += 1;
 
-		vrVec2* buffer = malloc(sizeof(vrVec2) * (num_vertices - 1));
+		vrVec2* buffer = vrAlloc(sizeof(vrVec2) * (num_vertices - 1));
 
 		int c = 0;
 		for (int i = 0; i < num_vertices; i++)
