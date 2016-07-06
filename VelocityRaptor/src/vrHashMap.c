@@ -28,57 +28,75 @@ vrHashTable * vrHashTableAlloc()
 
 vrHashTable * vrHashTableInit(vrHashTable * table, int size)
 {
-	table->buckets = vrArrayInit(vrArrayAlloc(), sizeof(vrLinkedList));
+	table->buckets = vrArrayInit(vrArrayAlloc(), sizeof(vrHashEntry*));
 	int prime_size = getPrime(size);
 	
 	for (int i = 0; i < prime_size; i++)
 	{
-		vrArrayPush(table->buckets, vrLinkedListInit(vrLinkedListAlloc()));
+		vrArrayPush(table->buckets, NULL);
 	}
 	table->hash = &vrHashFuncDefault;
 	table->deleteFunc = NULL;
+	table->hashPool = vrArrayInit(vrArrayAlloc(), sizeof(vrHashEntry*));
+
+	for (int i = 0; i < 100; i++)
+	{
+		vrArrayPush(table->hashPool, vrAlloc(sizeof(vrHashEntry)));
+	}
 	return table;
 }
 
-vrHashEntry * vrHashTableLookup(vrHashTable * table, unsigned int key)
+void * vrHashTableLookup(vrHashTable * table, unsigned int key)
 {
 	vrHashValue hashv = table->hash(key);
 	int index = hashv%table->buckets->sizeof_active;
 
-	vrLinkedList* list = table->buckets->data[index];
-	vrNode* node = list->head;
-	while(node)
+	vrHashEntry* head = table->buckets->data[index];
+	while(head)
 	{
-		if (key == ((vrHashEntry*)node->data)->key)
-			return ((vrHashEntry*)node->data);
-		node = node->next;
+		if (key == head->key)
+			return head->data;
+		head = head->next;
 	}
 	return NULL;
-
 }
 
-void vrHashTableInsert(vrHashTable * table, vrHashEntry * entry, unsigned int key)
+void vrHashTableInsert(vrHashTable * table, void* data, unsigned int key)
 {
+	vrHashEntry* entry;
+	if (table->hashPool->sizeof_active > 0)
+	{
+		entry = table->hashPool->data[table->hashPool->sizeof_active - 1];
+		vrArrayPop(table->hashPool);
+	}
+	else
+	{
+		entry = vrAlloc(sizeof(vrHashEntry));
+	}
+	entry->key = key;
+	entry->data = data;
+	entry->next = NULL;
 
 	vrHashValue hashv = table->hash(key);
 	int index = hashv%table->buckets->sizeof_active;
 
-	vrLinkedList* list = table->buckets->data[index];
-	list->deleteFunc = table->deleteFunc;
-	vrNode* node = list->head;
-	while (node)
+	vrHashEntry* head = table->buckets->data[index];
+	if (table->buckets->data[index] == NULL)
+		table->buckets->data[index] = entry;
+	else
 	{
-		if (((vrHashEntry*)node->data)->key == key)
+		vrHashEntry* current = table->buckets->data[index];
+		while (current)
 		{
-			vrFree(((vrHashEntry*)node->data)->data);
-			vrFree(((vrHashEntry*)node->data));
-			vrLinkedListRemove(table->buckets->data[index], node);
+			if (current->next == NULL)
+			{
+				current->next = entry;
+				break;
+			}
+			current = current->next;
 		}
-		node = node->next;
 	}
-	vrNode* nnode = vrAlloc(sizeof(vrNode));
-	nnode->data = entry;
-	vrLinkedListAddBack(table->buckets->data[index], nnode);
+
 }
 
 void vrHashTableRemove(vrHashTable * table, unsigned int key)
@@ -86,18 +104,35 @@ void vrHashTableRemove(vrHashTable * table, unsigned int key)
 	vrHashValue hashv = table->hash(key);
 	int index = hashv%table->buckets->sizeof_active;
 
-	vrLinkedList* list = table->buckets->data[index];
-	vrNode* node = list->head;
-	while (node)
+	vrHashEntry** current = &table->buckets->data[index];
+	vrHashEntry** prev = NULL;
+	while (*current)
 	{
-		if (((vrHashEntry*)node->data)->key == key)
+		if ((*current)->key == key)
 		{
-			if(((vrHashEntry*)node->data)->data) vrFree(((vrHashEntry*)node->data)->data);
-			if(((vrHashEntry*)node->data)) vrFree(((vrHashEntry*)node->data));
-			vrLinkedListRemove(table->buckets->data[index], node);
-			return;
+			if (prev == NULL)
+			{
+				//Removing the first node
+				vrHashEntry* n = ((vrHashEntry*)table->buckets->data[index])->next;
+				//vrFree(((vrHashEntry*)table->buckets->data[index])->data);
+				vrArrayPush(table->hashPool, table->buckets->data[index]);
+				table->buckets->data[index] = n;
+				*current = n;
+			}
+			else
+			{
+				vrHashEntry* n = (*current)->next;
+				(*prev)->next = (*current)->next;
+				//vrFree((*current)->data);
+				vrArrayPush(table->hashPool, *current);
+				*current = n;
+			}
 		}
-		node = node->next;
+		else
+		{
+			*current = (*current)->next;
+			prev = current;
+		}
 	}
 }
 

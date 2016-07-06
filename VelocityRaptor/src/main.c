@@ -127,10 +127,10 @@ main(void)
 	vrVec2* polygon = NULL;
 	int polygonSize = 0;
 	int b = 0;
-	int x = 10;
+	int x = 20;
 	int sp = 0;
 	
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 20; i++)
 	{
 	for (int j = 0; j < x - sp; j++)
 	{
@@ -139,7 +139,7 @@ main(void)
 	vrShape* s = vrShapeInit(vrShapeAlloc());
 	s = vrShapePolyInit(s);
 
-	s->shape = vrPolyBoxInit(s->shape, 100 + sp*30 + j*60, -i*60 + 600, 60, 60);
+	s->shape = vrPolyBoxInit(s->shape, 100 + sp*15 + j*30, -i*30 + 670, 30, 30);
 	vrArrayPush(body3->shape, s);
 
 	body3->bodyMaterial.restitution = 0.0;

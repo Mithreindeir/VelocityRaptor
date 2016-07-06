@@ -33,6 +33,7 @@ typedef struct vrHashEntry
 {
 	void* data;
 	unsigned int key;
+	vrHashEntry* next;
 } vrHashEntry;
 
 typedef struct vrHashTable
@@ -40,12 +41,13 @@ typedef struct vrHashTable
 	vrHashFunc hash;
 	vrArray* buckets;
 	vrDataDeleteFunc deleteFunc;
+	vrArray* hashPool;
 } vrHashTable;
 
 vrHashTable* vrHashTableAlloc();
 vrHashTable* vrHashTableInit(vrHashTable* table, int size);
-vrHashEntry* vrHashTableLookup(vrHashTable* table, unsigned int key);
-void vrHashTableInsert(vrHashTable* table, vrHashEntry* entry,  unsigned int key);
+void* vrHashTableLookup(vrHashTable* table, unsigned int key);
+void vrHashTableInsert(vrHashTable* table, void* data,  unsigned int key);
 void vrHashTableRemove(vrHashTable* table, const unsigned int key);
 vrHashValue vrHashFuncDefault(unsigned int key);
 void vrHashTableResize(vrHashTable* table);

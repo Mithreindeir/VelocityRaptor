@@ -36,13 +36,17 @@ vrWorld * vrWorldInit(vrWorld * world)
 	world->lastTime = 0;
 	world->timeStep = (1.0f / 180.0f);
 	world->gravity = vrVect(0, 981);
-	world->velIterations = 10;
-	world->posIterations = 5;
+	world->velIterations = 25;
+	world->posIterations = 10;
 	world->manifoldMap = vrHashTableInit(vrHashTableAlloc(), 1000);
 	world->manifoldMap->deleteFunc = &vrManifoldDestroy;
 	world->num_bodies = 0;
 	world->joints = vrArrayInit(vrArrayAlloc(), sizeof(vrJoint*));
-	
+	world->manifoldPool = vrArrayInit(vrArrayAlloc(), sizeof(vrManifold*));
+	for (int i = 0; i < 100; i++)
+	{
+		vrArrayPush(world->manifoldPool, vrAlloc(sizeof(vrManifold)));
+	}
 	return world;
 }
 
@@ -143,15 +147,15 @@ void vrWorldQueryCollisions(vrWorld * world)
 		if (world->manifoldMap->buckets->data[i])
 		{
 
-			vrLinkedList* list = world->manifoldMap->buckets->data[i];
-			vrNode* node = list->head;
-			while (node)
+			vrHashEntry* head = world->manifoldMap->buckets->data[i];
+			while (head)
 			{
-				vrHashEntry* m = ((vrHashEntry*)node->data);
-				vrManifold* manifold = m->data;
-				manifold->active = vrFALSE;
-
-				node = node->next;
+				if (head && head->data)
+				{
+					vrManifold* manifold = head->data;
+					manifold->active = vrFALSE;
+				}
+				head = head->next;
 			}
 		}
 	}
@@ -185,65 +189,53 @@ void vrWorldQueryCollisions(vrWorld * world)
 					if(body->shape->sizeof_active > 1 || body2->shape->sizeof_active > 1)
 						overlap = vrOBBOverlaps(shape->obb, shape2->obb);
 
-					vrHashEntry* manifold = NULL;
+					vrManifold* manifold = NULL;
 					if (overlap)
 					{
-						manifold = vrAlloc(sizeof(vrHashEntry));
 
-						manifold->key = key;
 						collision_checks++;
-
-						manifold->data = vrManifoldInit(vrManifoldAlloc());
-						((vrManifold*)manifold->data)->active = vrTRUE;
+						if (world->manifoldPool->sizeof_active > 0)
+						{
+							manifold = vrManifoldInit(world->manifoldPool->data[world->manifoldPool->sizeof_active - 1]);
+							vrArrayPop(world->manifoldPool);
+						}
+						else
+						{
+							manifold = vrManifoldInit(vrManifoldAlloc());
+						}
+						manifold->active = vrTRUE;
 						if (shape->shapeType == VR_POLYGON && shape2->shapeType == VR_POLYGON)
-							vrPolyPoly(manifold->data, *((vrPolygonShape*)shape->shape), *((vrPolygonShape*)shape2->shape));
+							vrPolyPoly(manifold, *((vrPolygonShape*)shape->shape), *((vrPolygonShape*)shape2->shape));
 						else if (shape->shapeType == VR_POLYGON && shape2->shapeType == VR_CIRCLE)
-							vrPolyCircle(manifold->data, *((vrPolygonShape*)shape->shape), *((vrCircleShape*)shape2->shape));
+							vrPolyCircle(manifold, *((vrPolygonShape*)shape->shape), *((vrCircleShape*)shape2->shape));
 						else if (shape->shapeType == VR_CIRCLE && shape2->shapeType == VR_POLYGON)
-							vrCirclePoly(manifold->data, *((vrCircleShape*)shape->shape), *((vrPolygonShape*)shape2->shape));
+							vrCirclePoly(manifold, *((vrCircleShape*)shape->shape), *((vrPolygonShape*)shape2->shape));
 						else if (shape->shapeType == VR_CIRCLE && shape2->shapeType == VR_CIRCLE)
-							vrCircleCircle(manifold->data, *((vrCircleShape*)shape->shape), *((vrCircleShape*)shape2->shape));
+							vrCircleCircle(manifold, *((vrCircleShape*)shape->shape), *((vrCircleShape*)shape2->shape));
 					}
-					if (manifold && ((vrManifold*)manifold->data)->contact_points > 0)
+					if (manifold && manifold->contact_points > 0)
 					{
 
 						collisions++;
-						vrManifoldSetBodies(manifold->data, body, body2);
+						vrManifoldSetBodies(manifold, body, body2);
 
-						vrHashEntry* m = vrHashTableLookup(world->manifoldMap, key);
+						vrManifold* m = vrHashTableLookup(world->manifoldMap, key);
 
 						if (m)
 						{
-							((vrManifold*)m->data)->active = vrTRUE;
-							vrManifoldAddContactPoints(((vrManifold*)m->data), *((vrManifold*)manifold->data));
-							if (manifold->data) vrManifoldDestroy(manifold->data);
-							if (manifold) vrFree(manifold);
+							m->active = vrTRUE;
+							vrManifoldAddContactPoints(m, *manifold);
+							if (manifold) vrArrayPush(world->manifoldPool, manifold);
+
 						}
 						else
 						{
 							vrHashTableInsert(world->manifoldMap, manifold, key);
 						}
-						glPointSize(8.0);
-						glColor3f(1, 0, 0);
-						vrManifold* t = vrHashTableLookup(world->manifoldMap, key)->data;
-						for (int i = 0; i < t->contact_points; i++)
-						{
-							glColor3f(0, 0, 0);
-							glPointSize(10);
-							glBegin(GL_POINTS);
-							glVertex2f(t->contacts[i].point.x, t->contacts[i].point.y);
-							glEnd();
-							glColor3f(1, 0, 0);
-							glPointSize(5);
-							glBegin(GL_POINTS);
-							glVertex2f(t->contacts[i].point.x, t->contacts[i].point.y);
-							glEnd();
-						}
 					}
 					else if (manifold)
 					{
-						if (manifold->data) vrManifoldDestroy(manifold->data);
-						if (manifold) vrFree(manifold);
+						vrArrayPush(world->manifoldPool, manifold);
 					}
 				}
 			}
@@ -254,20 +246,20 @@ void vrWorldQueryCollisions(vrWorld * world)
 		if (world->manifoldMap->buckets->data[i])
 		{
 
-			vrLinkedList* list = world->manifoldMap->buckets->data[i];
-			vrNode* node = list->head;
-			while (node)
+			vrHashEntry* head = world->manifoldMap->buckets->data[i];
+			vrHashEntry* prev = NULL;
+			while (head)
 			{
-				vrHashEntry* m = ((vrHashEntry*)node->data);
-				vrManifold* manifold = m->data;
-				vrNode* next = node->next;
-				if (!manifold->active)
+				if (head && head->data)
 				{
-					vrManifoldDestroy(manifold);
-					if (((vrHashEntry*)node->data)) vrFree(((vrHashEntry*)node->data));
-					vrLinkedListRemove(world->manifoldMap->buckets->data[i], node);
+					vrManifold* manifold = head->data;
+					if (!manifold->active)
+					{
+						vrArrayPush(world->manifoldPool, manifold);
+						vrHashTableRemove(world->manifoldMap, head->key);
+					}
 				}
-				node = next;
+				head = head->next;
 			}
 		}
 	}
@@ -281,15 +273,14 @@ void vrWorldSolve(vrWorld * world, vrFloat dt)
 		if (world->manifoldMap->buckets->data[i])
 		{
 
-			vrLinkedList* list = world->manifoldMap->buckets->data[i];
-			vrNode* node = list->head;
-			while (node)
+			vrHashEntry* m = world->manifoldMap->buckets->data[i];
+			vrHashEntry* prev = NULL;
+			while (m)
 			{
-				vrHashEntry* m = ((vrHashEntry*)node->data);
 				vrManifold* manifold = m->data;
 				vrManifoldPreStep(manifold, dt);
 				manifold->firstTime = vrFALSE;
-				node = node->next;
+				m = m->next;
 			}
 		}
 	}
@@ -301,15 +292,14 @@ void vrWorldSolve(vrWorld * world, vrFloat dt)
 			if (world->manifoldMap->buckets->data[i])
 			{
 
-				vrLinkedList* list = world->manifoldMap->buckets->data[i];
-				vrNode* node = list->head;
-				while (node)
+				vrHashEntry* m = world->manifoldMap->buckets->data[i];
+				vrHashEntry* prev = NULL;
+				while (m)
 				{
-					vrHashEntry* m = ((vrHashEntry*)node->data);
 					vrManifold* manifold = m->data;
 					vrManifoldSolveVelocity(manifold);
 					manifold->firstTime = vrFALSE;
-					node = node->next;
+					m = m->next;
 				}
 			}
 		}
@@ -320,15 +310,14 @@ void vrWorldSolve(vrWorld * world, vrFloat dt)
 		if (world->manifoldMap->buckets->data[i])
 		{
 
-			vrLinkedList* list = world->manifoldMap->buckets->data[i];
-			vrNode* node = list->head;
-			while (node)
+			vrHashEntry* m = world->manifoldMap->buckets->data[i];
+			vrHashEntry* prev = NULL;
+			while (m)
 			{
-				vrHashEntry* m = ((vrHashEntry*)node->data);
 				vrManifold* manifold = m->data;
 				vrManifoldPostStep(manifold, dt);
 				manifold->firstTime = vrFALSE;
-				node = node->next;
+				m = m->next;
 			}
 		}
 	}
@@ -340,15 +329,14 @@ void vrWorldSolve(vrWorld * world, vrFloat dt)
 			if (world->manifoldMap->buckets->data[i])
 			{
 
-				vrLinkedList* list = world->manifoldMap->buckets->data[i];
-				vrNode* node = list->head;
-				while (node)
+				vrHashEntry* m = world->manifoldMap->buckets->data[i];
+				vrHashEntry* prev = NULL;
+				while (m)
 				{
-					vrHashEntry* m = ((vrHashEntry*)node->data);
 					vrManifold* manifold = m->data;
 					vrManifoldSolvePosition(manifold, dt);
 					manifold->firstTime = vrFALSE;
-					node = node->next;
+					m = m->next;
 				}
 			}
 		}

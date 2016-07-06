@@ -63,6 +63,8 @@ typedef struct vrWorld
 	vrHashTable* manifoldMap;
 	///Array holding all the joints
 	vrArray* joints;
+	///Array holding manifolds to recycle
+	vrArray* manifoldPool;
 } vrWorld;
 
 typedef struct vrBodyPair
