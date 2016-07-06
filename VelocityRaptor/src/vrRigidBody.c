@@ -6,7 +6,7 @@
 * arising from the use of this software.
 * Permission is granted to anyone to use this software for any purpose,
 * including commercial applications, and to alter it and redistribute it
-* vrFreely, subject to the following restrictions:
+* freely, subject to the following restrictions:
 * 1. The origin of this software must not be misrepresented; you must not
 * claim that you wrote the original software. If you use this software
 * in a product, an acknowledgment in the product documentation would be
@@ -172,12 +172,13 @@ vrFloat vrMomentForPoly(vrPolygonShape * shape, vrFloat mass)
 	{
 		vrVec2 P, Q;
 		//First point is at origin
-		vrNode* n = shape->vertices->head;
-		vrVec2 o = ((vrVertex*)n->data)->vertex;
-		n = n->next;
-		P = vrSub(((vrVertex*)n->data)->vertex, o);
-		n = n->next;
-		Q = vrSub(((vrVertex*)n->data)->vertex, o);
+		vrVec2 v, v1, v2;
+		v = shape->vertices[0];
+		v1 = shape->vertices[1];
+		v2 = shape->vertices[2];
+		
+		P = vrSub(v1, v);
+		Q = vrSub(v2, v);
 		return (mass / 6.0)*(vrDot(P, P) + vrDot(P, Q) + vrDot(Q, Q));
 	}
 	//Otherwise use polygon moment formula
@@ -186,26 +187,24 @@ vrFloat vrMomentForPoly(vrPolygonShape * shape, vrFloat mass)
 	I = m/6 | -----------------------------------------------------------------|
 			\						En||Pn+1 x Pn||							   /
 	*/
-	vrNode* n = shape->vertices->head;
 	vrFloat sumT = 0;
 	vrFloat sumB = 0;
 	vrVec2 center = vrPolyGetCenter(shape);
 
-	while (n)
+	for (int i = 0; i > shape->num_vertices; i++)
 	{
-		vrVec2 P = ((vrVertex*)n->data)->vertex;
+		vrVec2 P = shape->vertices[i];
 		P = vrSub(P,center);
 		vrVec2 N = vrVect(0, 0);
-		if (n->next && n->next->data)
+		if ((i + 1) < shape->num_vertices)
 		{
-			N = ((vrVertex*)n->next->data)->vertex;
+			N = shape->vertices[i + 1];
 			N = vrSub(N, center);
 		}
 
 		vrFloat cross = (vrCross(N, P));
 		sumT += cross * (vrDot(P, P) + vrDot(P, N) + vrDot(N, N));
 		sumB += cross;
-		n = n->next;
 		//printf("P (%f, %f) and N (%f and %f) and C (%f, %f)\n", P.x, P.y, N.x, N.y, center.x, center.y);
 
 	}
@@ -222,16 +221,13 @@ vrFloat vrAreaForPoly(vrPolygonShape * shape)
 {
 	vrFloat cp = 0.0;
 	vrFloat cp2 = 0.0;
-	vrNode* n = shape->vertices->head;
 
-	while (n)
+	for (int i = 0; i < shape->num_vertices; i++)
 	{
-		vrVec2 v1 = ((vrVertex*)n->data)->vertex;
-		vrVec2 v2 = (n->next) ? ((vrVertex*)n->next->data)->vertex : ((vrVertex*)shape->vertices->head->data)->vertex;
+		vrVec2 v1 = shape->vertices[i];
+		vrVec2 v2 = (i < (shape->num_vertices-1)) ? shape->vertices[i + 1] : shape->vertices[0];
 		cp += v1.x * v2.y;
 		cp2 += v1.y * v2.x;
-
-		n = n->next;
 	}
 
 	return abs((cp - cp2) / 2.0);

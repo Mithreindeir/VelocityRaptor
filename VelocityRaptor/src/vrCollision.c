@@ -147,32 +147,24 @@ void vrPolyCircle(vrManifold * manifold, const vrPolygonShape A, const vrCircleS
 	vrEdge nE;
 	vrFloat pen2;
 
-	vrNode* current = A.axes->head;
-	while (current)
+	for (int i = 0; i < A.num_axes; i++)
 	{
+		axis = A.axes[i];
+		nE = vrPolyBestEdge(A, vrPolyGetFarthestVertex(A, axis), axis);
+
+
+		vrFloat pen = vrDot(axis, vrSub(B.center, nE.a));
+		pen2 = vrDot(axis, vrSub(B.center, nE.b));
+		if (pen2 > pen) pen = pen2;
+
+		if (pen > separation)
 		{
-			axis = ((vrVertex*)current->data)->vertex;
-
-			//	axis = vrVect(-axis.x, -axis.y);
-			nE = vrPolyBestEdge(A, vrPolyGetFarthestVertex(A, axis), axis);
-
-
-			vrFloat pen = vrDot(axis, vrSub(B.center, nE.a));
-			pen2 = vrDot(axis, vrSub(B.center, nE.b));
-			if (pen2 > pen) pen = pen2;
-
-			if (pen > separation)
-			{
-				separation = pen;
-				if (separation > B.radius) return;
-				n = axis;
-				normalEdge = nE;
-			}
+			separation = pen;
+			if (separation > B.radius) return;
+			n = axis;
+			normalEdge = nE;
 		}
-		current = current->next;
 	}
-	//
-
 
 	manifold->penetration = B.radius - separation;
 
@@ -273,26 +265,21 @@ void vrCircleCircle(vrManifold * manifold, const vrCircleShape A, const vrCircle
 
 vrFloat vrPolyGetLeastAxis(const vrPolygonShape a, const vrPolygonShape b, vrVec2 * least_axis, vrEdge* pedge, vrVec2 dir)
 {
+	if (a.num_axes != a.num_vertices) return 0.0;
 	vrFloat penetration = 1000000;
-	vrNode* vertex = a.vertices->head;
-	vrNode* axes = a.axes->head;
+
 	vrEdge edge;
 	vrVec2 la;
-	while (vertex)
+
+	for (int i = 0; i < a.num_vertices; i++)
 	{
 		vrVec2 axis;
-		vrVec2 v1 = ((vrVertex*)vertex->data)->vertex;
-
-		vrVec2 v2;
-		if (vertex->next == NULL)
-			v2 = ((vrVertex*)a.vertices->head->data)->vertex;
-		else
-			v2 = ((vrVertex*)vertex->next->data)->vertex;
-
+		vrVec2 v1 = a.vertices[i];
+		vrVec2 v2 = (i < (a.num_vertices - 1)) ? a.vertices[i + 1] : a.vertices[0];
 		axis = vrSub(v2, v1);
 		axis = vrNormalize(vrVect(axis.y, -axis.x));
-		vrVec2 axes_test = ((vrVertex*)axes->data)->vertex;
 
+		vrVec2 axes_test = a.axes[i];
 
 		if ((vrDot(axes_test, dir) >= 0))
 		{
@@ -320,8 +307,6 @@ vrFloat vrPolyGetLeastAxis(const vrPolygonShape a, const vrPolygonShape b, vrVec
 				}
 			}
 		}
-		axes = axes->next;
-		vertex = vertex->next;
 	}
 	*pedge = edge;
 	*least_axis = la;
@@ -329,42 +314,33 @@ vrFloat vrPolyGetLeastAxis(const vrPolygonShape a, const vrPolygonShape b, vrVec
 
 }
 
-vrNode* vrPolyGetFarthestVertex(const vrPolygonShape shape, const vrVec2 normal)
+int vrPolyGetFarthestVertex(const vrPolygonShape shape, const vrVec2 normal)
 {
-	vrNode* f = shape.vertices->head;
-	vrVec2 fv = ((vrVertex*)shape.vertices->head->data)->vertex;
+	if (shape.num_vertices == 0) return;
+	int f = 0;
+	vrVec2 fv = shape.vertices[0];
 	vrFloat max = vrDot(normal, fv);
-	vrNode* current = shape.vertices->head->next;
-	while (current)
+	for (int i = 1; i < shape.num_vertices; i++)
 	{
-		vrVec2 v = ((vrVertex*)current->data)->vertex;
+		vrVec2 v = shape.vertices[i];
 		vrFloat projection = vrDot(normal, v);
 		if (projection > max)
 		{
-			f = current;
+			f = i;
 			max = projection;
 		}
-		current = current->next;
 	}
 	return f;
-
 }
 
-vrEdge vrPolyBestEdge(const vrPolygonShape shape, vrNode* vert, const vrVec2 normal)
+vrEdge vrPolyBestEdge(const vrPolygonShape shape, int index, const vrVec2 normal)
 {
+	if (shape.num_vertices == 0) return;
 	vrEdge edge;
-	vrVec2 v = ((vrVertex*)vert->data)->vertex;
-	vrVec2 v1;
-	vrVec2 v2;
-	if (vert->next != NULL)
-		v1 = ((vrVertex*)vert->next->data)->vertex;
-	else
-		v1 = ((vrVertex*)shape.vertices->head->data)->vertex;
+	vrVec2 v = shape.vertices[index];
+	vrVec2 	v1 = (index < (shape.num_vertices - 1)) ? shape.vertices[index + 1] : shape.vertices[0];
+	vrVec2 	v2 = (index > 0) ? shape.vertices[index - 1] : shape.vertices[shape.num_vertices - 1];
 
-	if (vert->prev != NULL)
-		v2 = ((vrVertex*)vert->prev->data)->vertex;
-	else
-		v2 = ((vrVertex*)shape.vertices->head->prev->data)->vertex;
 	vrVec2 l = vrSub(v, v1);
 	vrVec2 r = vrSub(v, v2);
 	vrVec2 le = l;
@@ -392,18 +368,17 @@ vrEdge vrPolyBestEdge(const vrPolygonShape shape, vrNode* vert, const vrVec2 nor
 }
 vrProjection vrProject(const vrPolygonShape a, const vrVec2 axis)
 {
-	vrFloat c = vrDot(((vrVertex*)a.vertices->head->data)->vertex, axis);
+	if (a.num_vertices == 0) return;
+	vrFloat c = vrDot(a.vertices[0], axis);
 	//returns the min and the max
 	vrProjection p = vrInitProjection(c, c);
-	vrNode* vertex = a.vertices->head->next;
-	while (vertex)
+	for (int i = 1; i < a.num_vertices; i++)
 	{
-		c = vrDot(((vrVertex*)vertex->data)->vertex, axis);
+		c = vrDot(a.vertices[i], axis);
 		if (c < p.min) p.min = c;
 		else if (c > p.max) p.max = c;
-
-		vertex = vertex->next;
 	}
+
 	return p;
 }
 

@@ -463,48 +463,37 @@ void vrDebugDrawCircle(vrCircleShape* circle)
 
 void vrDebugDrawPolygon(vrPolygonShape* shape)
 {
-	vrNode* v = shape->vertices->head;
 
 	glBegin(GL_POLYGON);
-	while (v)
+	for (int i = 0; i < shape->num_vertices; i++)
 	{
-		glVertex2f(((vrVertex*)v->data)->vertex.x, ((vrVertex*)v->data)->vertex.y);
-		v = v->next;
+		glVertex2f(shape->vertices[i].x, shape->vertices[i].y);
 	}
 	glEnd();
-	if (DEBUG)
+	if (DEBUG && shape->num_axes == shape->num_vertices)
 	{
-		vrNode* axes = shape->axes->head;
-		v = shape->vertices->head;
-
 		glColor3f(0, 0, 0);
 
-		while (axes)
+		for (int i = 0; i < shape->num_axes; i++)
 		{
-			vrVec2 v1 = ((vrVertex*)v->data)->vertex;
-			vrVec2 v2;
-			if (v->next)
-				v2 = ((vrVertex*)v->next->data)->vertex;
-			else
-				v2 = ((vrVertex*)shape->vertices->head->data)->vertex;
+			vrVec2 v1 = shape->vertices[i];
+			vrVec2 v2 = (i < (shape->num_vertices-1)) ? shape->vertices[i + 1] : shape->vertices[0];
+
 
 			vrVec2 p = vrScale(vrAdd(v1, v2), 1.0 / 2.0);
-			vrVec2 axis = ((vrVertex*)axes->data)->vertex;
+			vrVec2 axis = shape->axes[i];
 			glBegin(GL_LINES);
 			glVertex2f(p.x, p.y);
 			glVertex2f(p.x + axis.x * 30, p.y + axis.y * 30);
 			glEnd();
-			axes = axes->next;
-			v = v->next;
 		}
+
 	}
 	glBegin(GL_LINE_LOOP);
 	glColor3f(0, 0, 0);
-	v = shape->vertices->head;
-	while (v)
+	for (int i = 0; i < shape->num_vertices; i++)
 	{
-		glVertex2f(((vrVertex*)v->data)->vertex.x, ((vrVertex*)v->data)->vertex.y);
-		v = v->next;
+		glVertex2f(shape->vertices[i].x, shape->vertices[i].y);
 	}
 	glEnd();
 }

@@ -19,10 +19,6 @@
 #include "..\include\vrShape.h"
 #include <stdio.h>
 
-void vrVertexDestroy(vrVertex * vertex)
-{
-	vrFree(vertex);
-}
 
 vrShape * vrShapeAlloc()
 {
@@ -67,8 +63,6 @@ vrPolygonShape * vrPolyInit(vrPolygonShape * polygon)
 	polygon->num_vertices = 0;
 	polygon->vertices = vrLinkedListInit(vrLinkedListAlloc());
 	polygon->axes = vrLinkedListInit(vrLinkedListAlloc());
-	polygon->vertices->deleteFunc = vrVertexDestroy;
-	polygon->axes->deleteFunc = vrVertexDestroy;
 	return polygon;
 }
 
@@ -97,11 +91,9 @@ vrShape * vrShapePolyInit(vrShape * shape)
 
 void vrAddVertexToPolyShape(vrPolygonShape * shape, vrVec2 vertex)
 {
-	vrNode* new_vertex = vrAlloc(sizeof(vrNode));
-	new_vertex->data = vrAlloc(sizeof(vrVertex));
-	((vrVertex*)new_vertex->data)->vertex = vertex;
-	shape->num_vertices++;
-	vrLinkedListAddBack(shape->vertices, new_vertex);
+	shape->vertices = vrRealloc(shape->vertices, sizeof(vrVec2) * (1  + shape->num_vertices));
+	shape->vertices[shape->num_vertices] = vertex;
+	shape->num_vertices += 1;
 	vrUpdatePolyCenter(shape);
 }
 
@@ -111,12 +103,9 @@ void vrAddNormalToPolyShape(vrPolygonShape * shape, vrVec2 axis)
 
 void vrMovePolyShape(vrPolygonShape * shape, vrVec2 move)
 {
-	vrNode* v = shape->vertices->head;
-	while (v)
-	{
-		((vrVertex*)v->data)->vertex = vrAdd(((vrVertex*)v->data)->vertex, move);
-		v = v->next;
-	}
+	for (int i = 0; i < shape->num_vertices; i++)
+		shape->vertices[i] = vrAdd(shape->vertices[i], move);
+
 	vrUpdatePolyCenter(shape);
 }
 
@@ -156,64 +145,44 @@ void vrRotatePolyShape(vrPolygonShape * shape, vrFloat angle, vrVec2 center)
 	vrFloat ca = VR_COSINE(angle);
 	vrFloat sa = VR_SINE(angle);
 	vrVec2 c = center;
-	vrNode* v = shape->vertices->head;
-	while(v)
+	for (int i = 0; i < shape->num_vertices; i++)
 	{
-		((vrVertex*)v->data)->vertex = vrSub(((vrVertex*)v->data)->vertex, c);
-		((vrVertex*)v->data)->vertex = vrVect(((vrVertex*)v->data)->vertex.x * ca - ((vrVertex*)v->data)->vertex.y * sa, ((vrVertex*)v->data)->vertex.x *sa + ((vrVertex*)v->data)->vertex.y * ca);
-		((vrVertex*)v->data)->vertex = vrAdd(((vrVertex*)v->data)->vertex, c);
-		v = v->next;
+		shape->vertices[i] = vrSub(shape->vertices[i], c);
+		shape->vertices[i] = vrVect(shape->vertices[i].x * ca - shape->vertices[i].y * sa, shape->vertices[i].x * sa + shape->vertices[i].y * ca);
+		shape->vertices[i] = vrAdd(shape->vertices[i], c);
 	}
+
 	vrUpdatePolyAxes(shape);
 }
 
 void vrUpdatePolyCenter(vrPolygonShape * shape)
 {
 	vrVec2 center = vrVect(0, 0);
-	int num_v = 0;
-	vrNode* vertex = shape->vertices->head;
-	while (vertex)
-	{ 
-		center = vrAdd(center, ((vrVertex*)vertex->data)->vertex);
-		num_v++;
-		vertex = vertex->next;
+	for (int i = 0; i < shape->num_vertices; i++)
+	{
+		center = vrAdd(center, shape->vertices[i]);
 	}
-	center = vrVect(center.x / num_v, center.y / num_v);
-
+	center = vrScale(center, 1.0 / shape->num_vertices);
 	shape->center = center;
 }
 
 void vrUpdatePolyAxes(vrPolygonShape * shape)
 {
-	vrNode* vertex = shape->vertices->head;
-	vrNode* axes = shape->axes->head;
-	while (vertex)
+	if (shape->num_axes != shape->num_vertices)
 	{
-		if (axes == NULL)
-		{
-			vrNode* a = vrAlloc(sizeof(vrNode));
-			a->data = vrAlloc(sizeof(vrVertex));
-			((vrVertex*)a->data)->vertex = vrVect(0, 0);
-			vrLinkedListAddBack(shape->axes, a);
-			axes = a;
-		}
+		shape->axes = vrRealloc(shape->axes, sizeof(vrVec2) * shape->num_vertices);
+		shape->num_axes = shape->num_vertices;
+	}
+	for (int i = 0; i < shape->num_vertices; i++)
+	{
 		vrVec2 axis;
-		vrVec2 v1 = ((vrVertex*)vertex->data)->vertex;
-
-		vrVec2 v2;
-		if (vertex->next == NULL)
-			v2 = ((vrVertex*)shape->vertices->head->data)->vertex;
-		else
-			v2 = ((vrVertex*)vertex->next->data)->vertex;
-		
+		vrVec2 v1 = shape->vertices[i];
+		vrVec2 v2 = (i < (shape->num_vertices - 1)) ? shape->vertices[i + 1] : shape->vertices[0];
 		axis = vrSub(v2, v1);
 		axis = vrNormalize(vrVect(axis.y, -axis.x));
 		if (vrDot(axis, vrSub(shape->center, v1)) >= 0)
 			axis = vrVect(-axis.x, -axis.y);
-
-		((vrVertex*)axes->data)->vertex = axis;
-		axes = axes->next;
-		vertex = vertex->next;
+		shape->axes[i] = axis;
 	}
 }
 
@@ -224,23 +193,21 @@ vrVec2 vrPolyGetCenter(vrPolygonShape * shape)
 
 vrOrientedBoundingBox vrPolyGetOBB(vrPolygonShape * shape)
 {
-	vrNode* vertex = shape->vertices->head;
-	if (!vertex) return vrOBBCreate(vrVect(0, 0), vrVect(0, 0));
-	vrVertex* v = ((vrVertex*)vertex->data);
-	int least_x = v->vertex.x;
-	int farthest_x = v->vertex.x;
-	int least_y = v->vertex.y;
-	int farthest_y = v->vertex.y;
-	while (vertex)
+	if (shape->num_vertices == 0) return  vrOBBCreate(vrVect(0, 0), vrVect(0, 0));
+	
+	int least_x = shape->vertices[0].x;
+	int farthest_x = shape->vertices[0].x;
+	int least_y = shape->vertices[0].y;
+	int farthest_y = shape->vertices[0].y;
+	for (int i = 1; i < shape->num_vertices; i++)
 	{
-		v = ((vrVertex*)vertex->data);
-		vrVec2 vert = v->vertex;
+		
+		vrVec2 vert = shape->vertices[i];
 		if (vert.x < least_x) least_x = vert.x;
 		if (vert.x > farthest_x) farthest_x = vert.x;
 		if (vert.y < least_y) least_y = vert.y;
 		if (vert.y > farthest_y) farthest_y = vert.y;
 
-		vertex = vertex->next;
 	}
 	return vrOBBCreate(vrVect(least_x-1, least_y-1), vrVect(farthest_x - least_x + 1, farthest_y - least_y + 1));
 }

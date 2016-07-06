@@ -37,15 +37,6 @@ typedef enum
 	VR_NOSHAPE
 } vrShapeType;
 
-//Vertex in linked list structure
-typedef struct vrVertex
-{
-	vrVec2 vertex;
-} vrVertex;
-
-void vrVertexDestroy(vrVertex* vertex);
-
-
 //Holds shape
 typedef struct vrShape
 {
@@ -63,9 +54,10 @@ typedef struct vrShape
 
 typedef struct vrPolygonShape
 {
-	vrLinkedList* vertices;
-	vrLinkedList* axes;
+	vrVec2* vertices;
 	int num_vertices;
+	vrVec2* axes;
+	int num_axes;
 	vrVec2 center;
 
 } vrPolygonShape;

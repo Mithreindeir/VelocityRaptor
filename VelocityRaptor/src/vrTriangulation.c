@@ -46,7 +46,7 @@ vrTriangle * vrEarClip(vrVec2* polygon, int num_vertices, int* num_triangles)
 	//Use that to calculate farthest triangle which has to be convex
 	//Because it is the farthest in a direction
 	int l = (index > 0) ? index - 1 : num_vertices - 1;
-	int r = (index < num_vertices-1) ? index + 1 : 0;
+	int r = (index < num_vertices) ? index + 1 : 0;
 	vrTriangle triangle;
 	triangle.a = polygon[l];
 	triangle.b = polygon[index];
@@ -78,7 +78,7 @@ vrTriangle * vrEarClip(vrVec2* polygon, int num_vertices, int* num_triangles)
 			if (tip >= 0) break;
 
 			int p = (index > 0) ? index - 1 : num_vertices - 1;
-			int n = (index < num_vertices-1) ? index + 1 : 0;
+			int n = (index < num_vertices) ? index + 1 : 0;
 
 			vrTriangle tri;
 			tri.a = polygon[p];
@@ -136,7 +136,7 @@ vrTriangle * vrEarClip(vrVec2* polygon, int num_vertices, int* num_triangles)
 		if (tip < 0) break;
 
 		int p = (tip > 0) ? tip - 1 : num_vertices - 1;
-		int n = (tip < num_vertices-1) ? tip + 1 : 0;
+		int n = (tip < num_vertices) ? tip + 1 : 0;
 
 		vrTriangle t;
 		t.a = polygon[p];
@@ -149,7 +149,7 @@ vrTriangle * vrEarClip(vrVec2* polygon, int num_vertices, int* num_triangles)
 		triangles[(*num_triangles)] = t;
 		(*num_triangles) += 1;
 
-		vrVec2* buffer = vrAlloc(sizeof(vrVec2) * (num_vertices - 1));
+		vrVec2* buffer = vrAlloc(sizeof(vrVec2) * (num_vertices));
 
 		int c = 0;
 		for (int i = 0; i < num_vertices; i++)
