@@ -133,7 +133,7 @@ void vrManifoldPreStep(vrManifold* manifold, vrFloat dt);
 ///Re calculated each iteration for position
 void vrManifoldPostStep(vrManifold* manifold, vrFloat dt);
 ///Calculates relative velocity between points on two bodies
-vrVec2 vrManifoldRelativeVelocity(vrRigidBody* a, vrRigidBody* b, vrVec2 ra, vrVec2 rb);
+extern inline vrVec2 vrManifoldRelativeVelocity(vrRigidBody* a, vrRigidBody* b, vrVec2 ra, vrVec2 rb);
 ///Solves the local velocity
 void vrManifoldSolveVelocity(vrManifold* manifold);
 ///Solves the local position
@@ -151,6 +151,6 @@ void vrManifoldAddContactPoints(vrManifold* old_manifold, const vrManifold new_m
 ///Sets bodies
 void vrManifoldSetBodies(vrManifold* manifold, vrRigidBody* b1, vrRigidBody* b2);
 ///The relative velocity along the normal
-vrFloat vrManifoldGetContactVel(vrManifold* manifold, int index);
+extern inline vrFloat vrManifoldGetContactVel(vrManifold* manifold, int index);
 
 #endif

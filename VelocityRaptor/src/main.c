@@ -151,7 +151,7 @@ main(void)
 	}
 	sp++;
 	}
-
+	
 	/*
 	for (int i = 0; i < 5; i++)
 	{
@@ -160,7 +160,7 @@ main(void)
 		vrShape* s = vrShapeInit(vrShapeAlloc());
 		s = vrShapePolyInit(s);
 
-		s->shape = vrPolyBoxInit(s->shape, 350 + rand() % 10, -i * 100 + 00, 100, 100);
+		s->shape = vrPolyBoxInit(s->shape, 350 , -i * 60 + 00, 60, 60);
 		vrArrayPush(body3->shape, s);
 
 		body3->bodyMaterial.restitution = 0.0;
@@ -171,6 +171,7 @@ main(void)
 		);
 	}
 	*/
+	
 	while (!glfwWindowShouldClose(window))
 	{
 		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))

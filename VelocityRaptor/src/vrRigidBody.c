@@ -56,6 +56,12 @@ vrMaterial vrMaterialInit()
 	return material;
 }
 
+inline void vrBodyApplyImpulse(vrRigidBody * body, const vrVec2 impulse, const vrVec2 point)
+{
+	body->velocity = vrAdd(body->velocity, vrScale(impulse, body->bodyMaterial.invMass));
+	body->angularVelocity += body->bodyMaterial.invMomentInertia * vrCross(point, impulse);
+}
+
 void vrBodyDestroy(vrRigidBody * body)
 {
 	vrShapeDestroy(body->shape);

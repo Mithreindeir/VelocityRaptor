@@ -67,12 +67,6 @@ typedef struct vrWorld
 	vrArray* manifoldPool;
 } vrWorld;
 
-typedef struct vrBodyPair
-{
-	vrRigidBody* A;
-	vrRigidBody* B;
-} vrBodyPair;
-
 ///Allocates memory for a world
 vrWorld* vrWorldAlloc();
 ///Initializes the world

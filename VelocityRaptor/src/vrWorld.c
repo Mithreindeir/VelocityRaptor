@@ -36,7 +36,7 @@ vrWorld * vrWorldInit(vrWorld * world)
 	world->lastTime = 0;
 	world->timeStep = (1.0f / 180.0f);
 	world->gravity = vrVect(0, 981);
-	world->velIterations = 25;
+	world->velIterations = 20;
 	world->posIterations = 10;
 	world->manifoldMap = vrHashTableInit(vrHashTableAlloc(), 1000);
 	world->manifoldMap->deleteFunc = &vrManifoldDestroy;

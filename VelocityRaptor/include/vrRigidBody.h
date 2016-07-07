@@ -102,7 +102,8 @@ void vrBodyDestroy(vrRigidBody* body);
 
 ///Initializes and returns default values
 vrMaterial vrMaterialInit();
-
+///Applies an impulse
+extern inline void vrBodyApplyImpulse(vrRigidBody* body, const vrVec2 impulse, const vrVec2 point);
 ///Integrates the forces being applied to a body
 void vrBodyIntegrateForces(vrRigidBody* body, vrFloat dt);
 ///Integrates the velocity 

@@ -21,7 +21,7 @@
 #include <math.h>
 #include "velocityraptor.h"
 
-typedef float vrFloat;
+typedef double vrFloat;
 
 #define EPSILON 1.192092896e-07f
 #define NUM_PRIMES 26
