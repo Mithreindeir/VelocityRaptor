@@ -79,6 +79,7 @@ void vrHashTableInsert(vrHashTable * table, void* data, unsigned int key)
 
 	vrHashValue hashv = table->hash(key);
 	int index = hashv%table->buckets->sizeof_active;
+	vrHashTableRemove(table, key);
 
 	vrHashEntry* head = table->buckets->data[index];
 	if (table->buckets->data[index] == NULL)
@@ -104,36 +105,26 @@ void vrHashTableRemove(vrHashTable * table, unsigned int key)
 	vrHashValue hashv = table->hash(key);
 	int index = hashv%table->buckets->sizeof_active;
 
-	vrHashEntry** current = &table->buckets->data[index];
-	vrHashEntry** prev = NULL;
-	while (*current)
+	while(1)
 	{
-		if ((*current)->key == key)
+		vrHashEntry* current = table->buckets->data[index];
+		vrHashEntry** prev = &table->buckets->data[index];
+
+		while (current && current->key != key)
 		{
-			if (prev == NULL)
-			{
-				//Removing the first node
-				vrHashEntry* n = ((vrHashEntry*)table->buckets->data[index])->next;
-				//vrFree(((vrHashEntry*)table->buckets->data[index])->data);
-				vrArrayPush(table->hashPool, table->buckets->data[index]);
-				table->buckets->data[index] = n;
-				*current = n;
-			}
-			else
-			{
-				vrHashEntry* n = (*current)->next;
-				(*prev)->next = (*current)->next;
-				//vrFree((*current)->data);
-				vrArrayPush(table->hashPool, *current);
-				*current = n;
-			}
+			prev = &current->next;
+			current = current->next;
 		}
-		else
+
+		if (current)
 		{
-			*current = (*current)->next;
-			prev = current;
+			*prev = current->next;
+			vrArrayPush(table->hashPool, current);
 		}
+		if (!current)
+			break;
 	}
+
 }
 
 vrHashValue vrHashFuncDefault(unsigned int key)
@@ -146,6 +137,7 @@ vrHashValue vrHashFuncDefault(unsigned int key)
 
 void vrHashTableResize(vrHashTable * table)
 {
+	/*
 	int newPrime = getPrime(table->buckets->sizeof_array);
 
 	vrHashEntry** buckets = (vrLinkedList**)vrCalloc(sizeof(vrLinkedList*), newPrime);
@@ -181,7 +173,7 @@ void vrHashTableResize(vrHashTable * table)
 	table->buckets->data = buckets;
 	table->buckets->sizeof_array = newPrime;
 	table->buckets->sizeof_active = newPrime;
-
+	*/
 }
 
 unsigned int getPrime(int current_prime)

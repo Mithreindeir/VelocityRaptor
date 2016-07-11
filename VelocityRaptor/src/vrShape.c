@@ -61,15 +61,15 @@ vrPolygonShape * vrPolyInit(vrPolygonShape * polygon)
 {
 	polygon->center = vrVect(0, 0);
 	polygon->num_vertices = 0;
-	polygon->vertices = vrLinkedListInit(vrLinkedListAlloc());
-	polygon->axes = vrLinkedListInit(vrLinkedListAlloc());
+	polygon->vertices = NULL;
+	polygon->axes = NULL;
 	return polygon;
 }
 
 void vrPolyDestroy(vrPolygonShape * polygon)
 {
-	vrLinkedListClear(polygon->vertices);
-	vrLinkedListClear(polygon->axes);
+	vrFree(polygon->vertices);
+	vrFree(polygon->axes);
 
 	vrFree(polygon);
 }
