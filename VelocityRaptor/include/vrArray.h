@@ -35,7 +35,7 @@ typedef struct vrArray
 vrArray* vrArrayAlloc();
 vrArray* vrArrayInit(vrArray* arr, int sizeofdata);
 void vrArrayDestroy(vrArray* arr);
-void vrArrayPush(vrArray* arr, void* object);
+void vrArrayPush(vrArray* arr, void*  object);
 void vrArrayPop(vrArray* arr);
 void vrArrayReserve(vrArray* arr, int size);
 int vrArrayErase(vrArray* arr, int index);

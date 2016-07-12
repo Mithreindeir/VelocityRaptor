@@ -23,7 +23,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 vrArray* arr;
 vrWorld* world;
 vrParticleSystem* psys;
-#define DEBUG 0
 
 int
 main(void)
@@ -143,7 +142,7 @@ main(void)
 	vrArrayPush(body3->shape, s);
 
 	body3->bodyMaterial.restitution = 0.0;
-	body3->bodyMaterial.mass = 1;
+	body3->bodyMaterial.mass = 5;
 	body3->bodyMaterial.invMass = 1.0 / body3->bodyMaterial.mass;
 	body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForCircle(50, body3->bodyMaterial.mass);
 	vrWorldAddBody(world, body3);
@@ -171,7 +170,7 @@ main(void)
 		);
 	}
 	*/
-	
+
 	while (!glfwWindowShouldClose(window))
 	{
 		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))
@@ -388,7 +387,7 @@ main(void)
 					glVertex2f(center.x + cos(orientation)*radius, center.y + sin(orientation)*radius);
 					glEnd();
 				}
-				if (DEBUG)
+				if (DEBUG_DRAW_SHAPE)
 				{
 					vrOrientedBoundingBox obb = shape->obb;
 					glBegin(GL_LINE_LOOP);
@@ -471,7 +470,7 @@ void vrDebugDrawPolygon(vrPolygonShape* shape)
 		glVertex2f(shape->vertices[i].x, shape->vertices[i].y);
 	}
 	glEnd();
-	if (DEBUG && shape->num_axes == shape->num_vertices)
+	if (DEBUG_DRAW_SHAPE && shape->num_axes == shape->num_vertices)
 	{
 		glColor3f(0, 0, 0);
 

@@ -19,7 +19,7 @@
 #ifndef HEADER_VRSHAPE
 #define HEADER_VRSHAPE
 #include "vrMath.h"
-#include "vrLinkedList.h"
+
 #include "velocityraptor.h"
 #include "vrBoundingBox.h"
 #include "vrTriangulation.h"

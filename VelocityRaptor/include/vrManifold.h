@@ -20,6 +20,7 @@
 #define HEADER_VRMANIFOLD
 #include "vrRigidBody.h"
 #include "velocityraptor.h"
+#include "vrJoint.h"
 
 #define MAX_IMPULSE 10000
 #define VR_VELOCITYTHRESHOLD 2
@@ -28,10 +29,6 @@
 ///Holds point and solver data for the point
 typedef struct vrContactPoint
 {
-	///Orientation on contact body
-	vrFloat oCB;
-	///Orientation on reference body
-	vrFloat oRB;
 	///To redo penetration
 	vrVec2 best_Ref;
 	///World coordinates of the contact point
@@ -60,6 +57,8 @@ typedef struct vrContactPoint
 	vrFloat bias;
 	///Velocity bias for restitution
 	vrFloat velocityBias;
+	///Relative position
+	vrLocalPoint contactAnchor;
 } vrContact;
 
 ///The solver data put in portable form

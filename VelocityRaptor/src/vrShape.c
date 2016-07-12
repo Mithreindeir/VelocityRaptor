@@ -61,6 +61,7 @@ vrPolygonShape * vrPolyInit(vrPolygonShape * polygon)
 {
 	polygon->center = vrVect(0, 0);
 	polygon->num_vertices = 0;
+	polygon->num_axes = 0;
 	polygon->vertices = NULL;
 	polygon->axes = NULL;
 	return polygon;
@@ -170,8 +171,16 @@ void vrUpdatePolyAxes(vrPolygonShape * shape)
 {
 	if (shape->num_axes != shape->num_vertices)
 	{
-		shape->axes = vrRealloc(shape->axes, sizeof(vrVec2) * shape->num_vertices);
-		shape->num_axes = shape->num_vertices;
+		if (shape->num_axes == 0)
+		{
+			shape->axes = vrAlloc(sizeof(vrVec2) * shape->num_vertices);
+			shape->num_axes = shape->num_vertices;
+		}
+		else
+		{
+			shape->axes = vrRealloc(shape->axes, sizeof(vrVec2) * shape->num_vertices);
+			shape->num_axes = shape->num_vertices;
+		}
 	}
 	for (int i = 0; i < shape->num_vertices; i++)
 	{

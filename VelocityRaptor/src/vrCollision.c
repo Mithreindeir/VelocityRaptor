@@ -151,7 +151,6 @@ void vrPolyCircle(vrManifold * manifold, const vrPolygonShape A, const vrCircleS
 		axis = A.axes[i];
 		nE = vrPolyBestEdge(A, vrPolyGetFarthestVertex(A, axis), axis);
 
-		
 		vrFloat pen = vrDot(axis, vrSub(B.center, nE.a));
 		pen2 = vrDot(axis, vrSub(B.center, nE.b));
 		if (pen2 > pen) pen = pen2;

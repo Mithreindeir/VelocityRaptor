@@ -82,7 +82,10 @@ void vrWorldAddBody(vrWorld* world, vrRigidBody * body);
 ///Which detects collisions
 void vrWorldQueryCollisions(vrWorld* world);
 ///Solves the contact manifolds, using the number
-///Of velocity and position iterations
-void vrWorldSolve(vrWorld* world, vrFloat dt);
+///Of velocity iterations
+void vrWorldSolveVelocity(vrWorld* world, vrFloat dt);
+///Solves the contact manifolds, using the number
+///Of position iterations
+void vrWorldSolvePosition(vrWorld* world, vrFloat dt);
 
 #endif

@@ -21,6 +21,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#define DEBUG_DRAW_SHAPE 0
+#define DEBUG_DRAW_CONTACTS 1
 
 #ifdef _MSC_VER
 #include "malloc.h"
@@ -29,7 +31,7 @@
 #endif
 
 #ifdef _MSC_VER
-#define inline __inline
+#define inline __forceinline
 #endif
 
 #ifndef vrBOOL

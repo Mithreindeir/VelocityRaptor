@@ -34,9 +34,9 @@ vrWorld * vrWorldInit(vrWorld * world)
 	world->bodies = vrArrayInit(vrArrayAlloc(), sizeof(vrRigidBody*));
 	world->accumulator = 0;
 	world->lastTime = 0;
-	world->timeStep = (1.0f / 180.0f);
+	world->timeStep = (1.0f / 60.0f);
 	world->gravity = vrVect(0, 981);
-	world->velIterations = 20;
+	world->velIterations = 25;
 	world->posIterations = 10;
 	world->manifoldMap = vrHashTableInit(vrHashTableAlloc(), 1000);
 	world->manifoldMap->deleteFunc = &vrManifoldDestroy;
@@ -89,7 +89,7 @@ void vrWorldStep(vrWorld * world)
 		//Get collisions 
 		vrWorldQueryCollisions(world);
 		//Solve velocities and positions
-		vrWorldSolve(world, world->timeStep);
+		vrWorldSolveVelocity(world, world->timeStep);
 		for (int j = 0; j < world->velIterations; j++)
 		{
 			for (int i = 0; i < world->joints->sizeof_active; i++)
@@ -101,10 +101,53 @@ void vrWorldStep(vrWorld * world)
 					joint->solveVelocity(joint);
 			}
 		}
+		
 		//Integrate velocity
 		for (int i = 0; i < world->bodies->sizeof_active; i++)
 		{
 			vrBodyIntegrateVelocity(((vrRigidBody*)world->bodies->data[i]), world->timeStep);
+		}
+		vrWorldSolvePosition(world, world->timeStep);
+
+		for (int i = 0; i < world->bodies->sizeof_active; i++)
+		{
+			vrRigidBody* body = world->bodies->data[i];
+			vrFloat dt = world->timeStep;
+			//Integrate velocity
+			body->position = vrAdd(body->position, vrScale(body->vel_bias, dt));
+
+			for (int i = 0; i < body->shape->sizeof_active; i++)
+			{
+				vrShape* shape = body->shape->data[i];
+				shape->move(shape->shape, vrScale(body->vel_bias, dt));
+			}
+
+			body->orientation += (body->angv_bias )* dt;
+			//Get center
+			vrVec2 center = vrVect(0, 0);
+			for (int i = 0; i < body->shape->sizeof_active; i++)
+			{
+				vrShape* shape = body->shape->data[i];
+				center = vrAdd(center, shape->getCenter(shape->shape));
+			}
+			center = vrScale(center, 1.0 / body->shape->sizeof_active);
+			body->center = center;
+			//Rotate
+			for (int i = 0; i < body->shape->sizeof_active; i++)
+			{
+				vrShape* shape = body->shape->data[i];
+				shape->rotate(shape->shape, (body->angv_bias)* dt, center);
+			}
+			//Update Oriented Bounding box
+			for (int i = 0; i < body->shape->sizeof_active; i++)
+			{
+				vrShape* shape = body->shape->data[i];
+				shape->obb = shape->updateOBB(shape->shape);
+			}
+			vrBodyUpdateOBB(body);
+
+			body->angv_bias = 0;
+			body->vel_bias = vrVect(0, 0);
 		}
 		/* Step Finished */
 		world->accumulator = world->accumulator - world->timeStep;
@@ -266,45 +309,8 @@ void vrWorldQueryCollisions(vrWorld * world)
 
 }
 
-void vrWorldSolve(vrWorld * world, vrFloat dt)
+void vrWorldSolvePosition(vrWorld * world, vrFloat dt)
 {
-	for (int i = 0; i < world->manifoldMap->buckets->sizeof_active; i++)
-	{
-		if (world->manifoldMap->buckets->data[i])
-		{
-
-			vrHashEntry* m = world->manifoldMap->buckets->data[i];
-			vrHashEntry* prev = NULL;
-			while (m)
-			{
-				vrManifold* manifold = m->data;
-				vrManifoldPreStep(manifold, dt);
-				manifold->firstTime = vrFALSE;
-				m = m->next;
-			}
-		}
-	}
-
-	for (int j = 0; j < world->velIterations; j++)
-	{
-		for (int i = 0; i < world->manifoldMap->buckets->sizeof_active; i++)
-		{
-			if (world->manifoldMap->buckets->data[i])
-			{
-
-				vrHashEntry* m = world->manifoldMap->buckets->data[i];
-				vrHashEntry* prev = NULL;
-				while (m)
-				{
-					vrManifold* manifold = m->data;
-					vrManifoldSolveVelocity(manifold);
-					manifold->firstTime = vrFALSE;
-					m = m->next;
-				}
-			}
-		}
-	}
-
 	for (int i = 0; i < world->manifoldMap->buckets->sizeof_active; i++)
 	{
 		if (world->manifoldMap->buckets->data[i])
@@ -342,6 +348,77 @@ void vrWorldSolve(vrWorld * world, vrFloat dt)
 		}
 
 	}
-	
+}
+
+void vrWorldSolveVelocity(vrWorld * world, vrFloat dt)
+{
+	if(DEBUG_DRAW_CONTACTS)
+	{
+		glPointSize(8.0);
+		glColor3f(1, 0, 0);
+		glBegin(GL_POINTS);
+		for (int i = 0; i < world->manifoldMap->buckets->sizeof_active; i++)
+		{
+			if (world->manifoldMap->buckets->data[i])
+			{
+
+				vrHashEntry* m = world->manifoldMap->buckets->data[i];
+				vrHashEntry* prev = NULL;
+				while (m)
+				{
+					vrManifold* t = m->data;
+
+
+
+					for (int i = 0; i < t->contact_points; i++)
+					{
+
+						glVertex2f(t->contacts[i].point.x, t->contacts[i].point.y);
+					}
+
+
+					t->firstTime = vrFALSE;
+					m = m->next;
+				}
+			}
+		}
+		glEnd();
+	}
+	for (int i = 0; i < world->manifoldMap->buckets->sizeof_active; i++)
+	{
+		if (world->manifoldMap->buckets->data[i])
+		{
+
+			vrHashEntry* m = world->manifoldMap->buckets->data[i];
+			vrHashEntry* prev = NULL;
+			while (m)
+			{
+				vrManifold* manifold = m->data;
+				vrManifoldPreStep(manifold, dt);
+				manifold->firstTime = vrFALSE;
+				m = m->next;
+			}
+		}
+	}
+
+	for (int j = 0; j < world->velIterations; j++)
+	{
+		for (int i = 0; i < world->manifoldMap->buckets->sizeof_active; i++)
+		{
+			if (world->manifoldMap->buckets->data[i])
+			{
+
+				vrHashEntry* m = world->manifoldMap->buckets->data[i];
+				vrHashEntry* prev = NULL;
+				while (m)
+				{
+					vrManifold* manifold = m->data;
+					vrManifoldSolveVelocity(manifold);
+					manifold->firstTime = vrFALSE;
+					m = m->next;
+				}
+			}
+		}
+	}	
 }
 
