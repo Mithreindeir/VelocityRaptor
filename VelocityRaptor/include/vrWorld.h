@@ -32,9 +32,9 @@
 #include <time.h>
 #include "vrRigidBody.h"
 #include "vrArray.h"
+#include "vrManifold.h"
 #include "vrHashMap.h"
 #include "vrJoint.h"
-
 
 ///Container of bodies that interact with each other
 typedef struct vrWorld
@@ -65,6 +65,8 @@ typedef struct vrWorld
 	vrArray* joints;
 	///Array holding manifolds to recycle
 	vrArray* manifoldPool;
+	vrManifold* manifolds;
+	int num_manifolds;
 } vrWorld;
 
 ///Allocates memory for a world

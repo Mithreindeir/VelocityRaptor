@@ -1,29 +1,29 @@
 /*
-* Copyright (c) 2016 Cormac Grindall (Mithreindeir)
-*
-* This software is provided 'as-is', without any express or implied
-* warranty.  In no event will the authors be held liable for any damages
-* arising from the use of this software.
-* Permission is granted to anyone to use this software for any purpose,
-* including commercial applications, and to alter it and redistribute it
-* vrFreely, subject to the following restrictions:
-* 1. The origin of this software must not be misrepresented; you must not
-* claim that you wrote the original software. If you use this software
-* in a product, an acknowledgment in the product documentation would be
-* appreciated but is not required.
-* 2. Altered source versions must be plainly marked as such, and must not be
-* misrepresented as being the original software.
-* 3. This notice may not be removed or altered from any source distribution.
-*/
+ * Copyright (c) 2016 Cormac Grindall (Mithreindeir)
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty.  In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * vrFreely, subject to the following restrictions:
+ * 1. The origin of this software must not be misrepresented; you must not
+ * claim that you wrote the original software. If you use this software
+ * in a product, an acknowledgment in the product documentation would be
+ * appreciated but is not required.
+ * 2. Altered source versions must be plainly marked as such, and must not be
+ * misrepresented as being the original software.
+ * 3. This notice may not be removed or altered from any source distribution.
+ */
 
 #include "../include/vrMemoryPool.h"
 
-vrMemoryPool* vrMemoryPoolAlloc()
+vrMemoryPool * vrMemoryPoolAlloc()
 {
 	return vrAlloc(sizeof(vrMemoryPool));
 }
 
-vrMemoryPool * vrMemoryPoolInit(vrMemoryPool * pool, int sizeofdata, int sizeofpool)
+vrMemoryPool  * vrMemoryPoolInit(vrMemoryPool  * pool, int sizeofdata, int sizeofpool)
 {
 	pool->sizeof_data = sizeofdata;
 	pool->sizeof_pool = sizeofpool;
@@ -47,7 +47,7 @@ vrMemoryPool * vrMemoryPoolInit(vrMemoryPool * pool, int sizeofdata, int sizeofp
 	return pool;
 }
 
-vrMemoryResource* vrMemoryPoolGetMemory(vrMemoryPool* pool)
+vrMemoryResource * vrMemoryPoolGetMemory(vrMemoryPool * pool)
 {
 	if (pool->firstAvailable == pool->lastAvailable)
 	{
@@ -55,13 +55,13 @@ vrMemoryResource* vrMemoryPoolGetMemory(vrMemoryPool* pool)
 		abort();
 	}
 
-	vrMemoryResource* newMem = pool->firstAvailable;
+	vrMemoryResource * newMem = pool->firstAvailable;
 	pool->firstAvailable = pool->firstAvailable->next;
 
 	return newMem;
 }
 
-void vrMemoryPoolvrFreeMemory(vrMemoryPool* pool, vrMemoryResource * memory)
+void vrMemoryPoolvrFreeMemory(vrMemoryPool * pool, vrMemoryResource  * memory)
 {
 	pool->lastAvailable->next = memory;
 
@@ -69,7 +69,7 @@ void vrMemoryPoolvrFreeMemory(vrMemoryPool* pool, vrMemoryResource * memory)
 	pool->lastAvailable->next = NULL;
 }
 
-void vrMemoryPoolDestroy(vrMemoryPool * pool)
+void vrMemoryPoolDestroy(vrMemoryPool  * pool)
 {
 	vrFree(pool->memory);
 	vrFree(pool);

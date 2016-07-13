@@ -20,9 +20,9 @@
 #define HEADER_VRMATH
 #include <math.h>
 #include "velocityraptor.h"
-#include <mmintrin.h>
+#include <nmmintrin.h>
 
-typedef double vrFloat;
+typedef float vrFloat;
 
 #define EPSILON 1.192092896e-07f
 #define NUM_PRIMES 26
@@ -55,15 +55,32 @@ static unsigned int primes[] =
 	805306457,
 	1610612741
 };
+
 typedef struct vrVec2
 {
-	vrFloat x;
-	vrFloat y;
+	union
+	{
+		struct
+		{
+			vrFloat x;
+			vrFloat y;
+		};
+		vrFloat m[2];
+	};
 } vrVec2;
+
 typedef struct vrMat2
 {
-	vrVec2 m;
-	vrVec2 n;
+	union
+	{
+		struct
+		{
+			vrVec2 m;
+			vrVec2 n;
+		};
+
+		vrFloat mn[4];
+	};
 } vrMat2;
 
 extern inline vrMat2 vrMat(const vrVec2 m, const vrVec2 n);

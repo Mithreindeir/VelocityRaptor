@@ -34,7 +34,7 @@ vrWorld * vrWorldInit(vrWorld * world)
 	world->bodies = vrArrayInit(vrArrayAlloc(), sizeof(vrRigidBody*));
 	world->accumulator = 0;
 	world->lastTime = 0;
-	world->timeStep = (1.0f / 60.0f);
+	world->timeStep = (1.0f / 180.0f);
 	world->gravity = vrVect(0, 981);
 	world->velIterations = 25;
 	world->posIterations = 10;
@@ -43,7 +43,7 @@ vrWorld * vrWorldInit(vrWorld * world)
 	world->num_bodies = 0;
 	world->joints = vrArrayInit(vrArrayAlloc(), sizeof(vrJoint*));
 	world->manifoldPool = vrArrayInit(vrArrayAlloc(), sizeof(vrManifold*));
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 500; i++)
 	{
 		vrArrayPush(world->manifoldPool, vrAlloc(sizeof(vrManifold)));
 	}
@@ -99,6 +99,10 @@ void vrWorldStep(vrWorld * world)
 					joint->preSolve(joint, world->timeStep);
 				if (joint->solveVelocity)
 					joint->solveVelocity(joint);
+				if (joint->postSolve)
+					joint->postSolve(joint, world->timeStep);
+				if (joint->solvePosition)
+					joint->solvePosition(joint);
 			}
 		}
 		
@@ -352,38 +356,8 @@ void vrWorldSolvePosition(vrWorld * world, vrFloat dt)
 
 void vrWorldSolveVelocity(vrWorld * world, vrFloat dt)
 {
-	if(DEBUG_DRAW_CONTACTS)
-	{
-		glPointSize(8.0);
-		glColor3f(1, 0, 0);
-		glBegin(GL_POINTS);
-		for (int i = 0; i < world->manifoldMap->buckets->sizeof_active; i++)
-		{
-			if (world->manifoldMap->buckets->data[i])
-			{
 
-				vrHashEntry* m = world->manifoldMap->buckets->data[i];
-				vrHashEntry* prev = NULL;
-				while (m)
-				{
-					vrManifold* t = m->data;
-
-
-
-					for (int i = 0; i < t->contact_points; i++)
-					{
-
-						glVertex2f(t->contacts[i].point.x, t->contacts[i].point.y);
-					}
-
-
-					t->firstTime = vrFALSE;
-					m = m->next;
-				}
-			}
-		}
-		glEnd();
-	}
+	int num_m = 0;
 	for (int i = 0; i < world->manifoldMap->buckets->sizeof_active; i++)
 	{
 		if (world->manifoldMap->buckets->data[i])
@@ -393,32 +367,76 @@ void vrWorldSolveVelocity(vrWorld * world, vrFloat dt)
 			vrHashEntry* prev = NULL;
 			while (m)
 			{
-				vrManifold* manifold = m->data;
-				vrManifoldPreStep(manifold, dt);
-				manifold->firstTime = vrFALSE;
+				num_m++;
 				m = m->next;
 			}
 		}
 	}
-
-	for (int j = 0; j < world->velIterations; j++)
+	if(world->num_manifolds == 0)
+		world->manifolds = vrAlloc(sizeof(vrManifold) * num_m);
+	else
 	{
-		for (int i = 0; i < world->manifoldMap->buckets->sizeof_active; i++)
+		world->manifolds = vrRealloc(world->manifolds, sizeof(vrManifold) * num_m);
+	}
+	world->num_manifolds = num_m;
+	int iter = 0;
+	for (int i = 0; i < world->manifoldMap->buckets->sizeof_active; i++)
+	{
+		if (world->manifoldMap->buckets->data[i])
 		{
-			if (world->manifoldMap->buckets->data[i])
+			vrHashEntry* m = world->manifoldMap->buckets->data[i];
+			vrHashEntry* prev = NULL;
+			while (m)
 			{
-
-				vrHashEntry* m = world->manifoldMap->buckets->data[i];
-				vrHashEntry* prev = NULL;
-				while (m)
-				{
-					vrManifold* manifold = m->data;
-					vrManifoldSolveVelocity(manifold);
-					manifold->firstTime = vrFALSE;
-					m = m->next;
-				}
+				world->manifolds[iter] = *((vrManifold*)m->data);
+				iter++;
+				m = m->next;
 			}
 		}
-	}	
+	}
+	if (DEBUG_DRAW_CONTACTS)
+	{
+		glPointSize(8.0);
+		glColor3f(1, 0, 0);
+		glBegin(GL_POINTS);
+		for (int i = 0; i < num_m; i++)
+		{
+			vrManifold manifold = world->manifolds[i];
+			for (int i = 0; i < manifold.contact_points; i++)
+			{
+
+				glVertex2f(manifold.contacts[i].point.x, manifold.contacts[i].point.y);
+			}
+		}
+		glEnd();
+	}
+	for (int j = 0; j < num_m; j++)
+	{
+		vrManifoldPreStep(&world->manifolds[j], dt);
+		world->manifolds[j].firstTime = vrFALSE;
+	}
+	for (int j = 0; j < world->velIterations; j++)
+	{
+
+		for (int i = 0; i < num_m; i++)
+		{
+			vrManifoldSolveVelocity(&world->manifolds[i]);
+		}
+	}
+	iter = 0;
+	for (int i = 0; i < world->manifoldMap->buckets->sizeof_active; i++)
+	{
+		if (world->manifoldMap->buckets->data[i])
+		{
+			vrHashEntry* m = world->manifoldMap->buckets->data[i];
+			vrHashEntry* prev = NULL;
+			while (m)
+			{
+				*((vrManifold*)m->data) = world->manifolds[iter];
+				iter++;
+				m = m->next;
+			}
+		}
+	}
 }
 

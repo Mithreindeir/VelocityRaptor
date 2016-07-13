@@ -84,7 +84,7 @@ void vrArrayReserve(vrArray * arr, int size)
 
 int vrArrayErase(vrArray* arr, int index)
 {
-	if (index > arr->sizeof_array || index < 0) return;
+	if (index > arr->sizeof_array || index < 0) return -1;
 
 	void** buffer = vrCalloc(arr->sizeof_data, arr->sizeof_array - 1);
 

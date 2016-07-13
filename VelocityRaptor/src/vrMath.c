@@ -70,13 +70,11 @@ inline vrBOOL vrVec2Equals(const vrVec2 a, const vrVec2 b)
 
 inline vrVec2 vrVect(vrFloat x, vrFloat y)
 {
-	vrVec2 v;
-	v.x = x;
-	v.y = y;
+	vrVec2 v = { x, y };
 	return v;
 }
 
-inline inline vrVec2 vrAdd(const vrVec2 a, const vrVec2 b)
+inline vrVec2 vrAdd(const vrVec2 a, const vrVec2 b)
 {
 	return vrVect(a.x + b.x, a.y + b.y);
 }
@@ -101,7 +99,7 @@ inline vrVec2 vrDiv(const vrVec2 a, const vrVec2 b)
 
 inline vrFloat vrDot(const vrVec2 a, const vrVec2 b)
 {
-	return (a.x * b.x + a.y * b.y);
+	return a.x * b.x + a.y * b.y;
 }
 
 inline vrFloat vrCross(const vrVec2 a, const vrVec2 b)
@@ -111,7 +109,7 @@ inline vrFloat vrCross(const vrVec2 a, const vrVec2 b)
 
 inline vrVec2 vrCrossScalar(const vrFloat a, const vrVec2 b)
 {
-	return vrVect(-a*b.y, a*b.x);
+	return vrVect(-a * b.y, a * b.x);
 }
 
 inline vrVec2 vrScale(const vrVec2 a, const vrFloat scale)
@@ -156,7 +154,7 @@ void vrVec2Log(const vrVec2 v)
 
 inline vrVec2 vrNormalize(const vrVec2 a)
 {
-	vrFloat len = vrDist(vrVect(0, 0), a);
+	vrFloat len = vrLength(a);
 	return vrVect(a.x / len, a.y / len);
 }
 

@@ -87,13 +87,11 @@ typedef struct vrManifold
 	///Body involved in contact, which
 	///Holds the incident shape
 	vrRigidBody* B;
-
 	///Contacts on the shape
 	///Only a max of 2 per shape
 	vrContact contacts[2];
 	///Number of contacts
 	int contact_points;
-
 	///Normal of edges colliding
 	///Points from A to B
 	vrVec2 normal;
@@ -106,10 +104,8 @@ typedef struct vrManifold
 	vrFloat friction;
 	///Amount the bodies are penetrating
 	vrFloat penetration;
-
-	//For block contacts
+	///For block contacts
 	vrBlockSolverData solverData;
-
 	///Direction of normal
 	vrBOOL flip;
 	///If the manifold has been resolved
@@ -139,12 +135,14 @@ void vrManifoldSolveVelocity(vrManifold* manifold);
 void vrManifoldSolvePosition(vrManifold* manifold, vrFloat dt);
 ///A mini block LPC solver if there is two contacts
 vrVec2 vrManifoldGuassSeidel(vrBlockSolverData solverData);
+///Clamps the normal impulse so the accumulated impulse is never negative
+vrFloat vrManifoldClampNormalImpulse(vrManifold* manifold, vrFloat im, int index);
 ///A mini block LPC solver if there is two contacts
 vrVec2 vrManifoldConjugateGradient(vrBlockSolverData solverData, vrFloat tolerance);
 ///Applies impulses from a point
 void vrManifoldApplyImpulse(vrRigidBody* A, vrRigidBody* b, vrVec2 ra, vrVec2 rb, vrVec2 impulse);
 ///Applies bias impulses from a point (bias impulses don't create energy)
-void vrManifoldApplyBiasImpulse(vrRigidBody* A, vrRigidBody* B, vrVec2 ra, vrVec2 rb, vrVec2 impulse);
+extern inline void vrManifoldApplyBiasImpulse(vrRigidBody* A, vrRigidBody* B, vrVec2 ra, vrVec2 rb, vrVec2 impulse);
 ///Updates contact points
 void vrManifoldAddContactPoints(vrManifold* old_manifold, const vrManifold new_manifold);
 ///Sets bodies

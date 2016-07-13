@@ -43,6 +43,9 @@ vrJoint * vrDistanceJointInit(vrJoint * joint, vrRigidBody* A, vrRigidBody* B, v
 	joint->anchorB = vrLocalPointInit(B, pointB);
 	joint->preSolve = &vrDistanceJointPreSolve;
 	joint->solveVelocity = &vrDistanceJointSolve;
+	joint->postSolve = &vrDistanceJointPostSolve;
+	joint->solvePosition = &vrDistanceJointSolvePosition;
+
 	joint->jointData = vrDistanceInit(vrDistanceAlloc());
 	vrDistanceJoint* sj = joint->jointData;
 	sj->bias = 0;
@@ -89,7 +92,7 @@ void vrDistanceJointPreSolve(vrJoint * joint, vrFloat dt)
 		n = vrScale(n, 1.0 / len);
 
 	sj->dir = n;
-	//sj->bias = (len - sj->restLength) / dt;
+	sj->bias = (len - sj->restLength) / dt;
 
 	vrRigidBody* A = joint->A;
 	vrRigidBody* B = joint->B;
@@ -106,6 +109,22 @@ void vrDistanceJointPreSolve(vrJoint * joint, vrFloat dt)
 	B->velocity = vrSub(B->velocity, vrScale(impulse, B->bodyMaterial.invMass));
 	B->angularVelocity += B->bodyMaterial.invMomentInertia * vrCross(impulse, rb);
 	
+	impulse = vrScale(n, sj->bias/dt);
+
+	A->velocity = vrAdd(A->velocity, vrScale(impulse, A->bodyMaterial.invMass));
+	A->angularVelocity -= A->bodyMaterial.invMomentInertia * vrCross(impulse, ra);
+
+	B->velocity = vrSub(B->velocity, vrScale(impulse, B->bodyMaterial.invMass));
+	B->angularVelocity += B->bodyMaterial.invMomentInertia * vrCross(impulse, rb);
+
+}
+
+void vrDistanceJointPostSolve(vrJoint * joint, vrFloat dt)
+{
+}
+
+void vrDistanceJointSolvePosition(vrJoint joint)
+{
 }
 
 void vrDistanceJointSolve(vrJoint * joint)
@@ -121,12 +140,12 @@ void vrDistanceJointSolve(vrJoint * joint)
 
 	vrFloat j = vrDot(rv, n);
 	if (sj->invMass != 0) j /= sj->invMass;
-	vrVec2 impulse = vrScale(n, j + sj->bias);
-	impulse = vrScale(impulse, (1.0 - sj->damping));
+	vrVec2 impulse = vrScale(n, j);
+
 	A->velocity = vrAdd(A->velocity, vrScale(impulse, A->bodyMaterial.invMass));
 	A->angularVelocity -= A->bodyMaterial.invMomentInertia * vrCross(impulse, ra);
 
 	B->velocity = vrSub(B->velocity, vrScale(impulse, B->bodyMaterial.invMass));
 	B->angularVelocity += B->bodyMaterial.invMomentInertia * vrCross(impulse, rb);
-	sj->accumImpulse += j*(1.0 - sj->damping);
+	sj->accumImpulse += j;
 }

@@ -14,6 +14,7 @@
 #define GLEW_STATIC
 #include <glew.h>
 #include <glfw3.h>
+#include <nmmintrin.h>
 void vrDebugDrawPolygon(vrPolygonShape* shape);
 void vrDebugDrawCircle(vrCircleShape* circle);
 void vrManifoldDestroy(vrManifold* manifold);
@@ -126,9 +127,10 @@ main(void)
 	vrVec2* polygon = NULL;
 	int polygonSize = 0;
 	int b = 0;
+	
 	int x = 20;
 	int sp = 0;
-	
+
 	for (int i = 0; i < 20; i++)
 	{
 	for (int j = 0; j < x - sp; j++)
@@ -152,24 +154,28 @@ main(void)
 	}
 	
 	/*
-	for (int i = 0; i < 5; i++)
+	for (int j = 0; j < 15; j++)
 	{
-		vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
+		for (int i = 0; i < 20; i++)
+		{
+			vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
 
-		vrShape* s = vrShapeInit(vrShapeAlloc());
-		s = vrShapePolyInit(s);
+			vrShape* s = vrShapeInit(vrShapeAlloc());
+			s = vrShapePolyInit(s);
 
-		s->shape = vrPolyBoxInit(s->shape, 350 , -i * 60 + 00, 60, 60);
-		vrArrayPush(body3->shape, s);
+			s->shape = vrPolyBoxInit(s->shape, i*40, -j * 40 + 670, 40, 40);
+			vrArrayPush(body3->shape, s);
 
-		body3->bodyMaterial.restitution = 0.0;
-		body3->bodyMaterial.mass = 1;
-		body3->bodyMaterial.invMass = 1.0 / body3->bodyMaterial.mass;
-		body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForCircle(50, body3->bodyMaterial.mass);
-		vrWorldAddBody(world, body3
-		);
+			body3->bodyMaterial.restitution = 0.0;
+			body3->bodyMaterial.mass = 1;
+			body3->bodyMaterial.invMass = 1.0 / body3->bodyMaterial.mass;
+			body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForCircle(50, body3->bodyMaterial.mass);
+			vrWorldAddBody(world, body3);
+		}
 	}
 	*/
+	
+
 
 	while (!glfwWindowShouldClose(window))
 	{

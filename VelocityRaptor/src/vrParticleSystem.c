@@ -190,7 +190,7 @@ void vrParticleSystemCollide(vrParticleSystem * system, vrRigidBody * body, vrFl
 						{
 							vrManifoldSetBodies(manifold, system->pBody, body);
 							vrManifoldPreStep(manifold, dt);
-							vrManifoldSolveVelocity(manifold);
+							//vrManifoldSolveVelocity(manifold);
 							vrManifoldPostStep(manifold, dt);
 							vrManifoldSolvePosition(manifold, dt);
 							p->vel = vrScale(system->pBody->velocity, 1.0 / scale);
@@ -216,7 +216,7 @@ void vrParticleSystemCollide(vrParticleSystem * system, vrRigidBody * body, vrFl
 							vrManifoldSetBodies(manifold, system->pBody, body);
 							vrManifoldPreStep(manifold, dt);
 
-							vrManifoldSolveVelocity(manifold);
+							//vrManifoldSolveVelocity(manifold);
 							vrManifoldPostStep(manifold, dt);
 							vrManifoldSolvePosition(manifold, dt);
 
