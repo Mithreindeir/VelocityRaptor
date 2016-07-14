@@ -92,22 +92,29 @@ void vrWorldStep(vrWorld * world)
 
 		//Solve velocities and positions
 		vrWorldSolveVelocity(world, world->timeStep);
+		for (int i = 0; i < world->joints->sizeof_active; i++)
+		{
+			vrJoint* joint = world->joints->data[i];
+			if (joint->preSolve)
+				joint->preSolve(joint, world->timeStep);
+		}
 		for (int j = 0; j < world->velIterations; j++)
 		{
 			for (int i = 0; i < world->joints->sizeof_active; i++)
 			{
 				vrJoint* joint = world->joints->data[i];
-				if (joint->preSolve)
-					joint->preSolve(joint, world->timeStep);
+
 				if (joint->solveVelocity)
 					joint->solveVelocity(joint);
-				if (joint->postSolve)
-					joint->postSolve(joint, world->timeStep);
-				if (joint->solvePosition)
-					joint->solvePosition(joint);
+
 			}
 		}
-		
+		for (int i = 0; i < world->joints->sizeof_active; i++)
+		{
+			vrJoint* joint = world->joints->data[i];
+			if (joint->postSolve)
+				joint->postSolve(joint, world->timeStep);
+		}
 		//Integrate velocity
 		for (int i = 0; i < world->bodies->sizeof_active; i++)
 		{

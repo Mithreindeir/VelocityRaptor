@@ -130,29 +130,29 @@ main(void)
 	
 	int x = 25;
 	int sp = 0;
-
+	/*
 	for (int i = 0; i < 25; i++)
 	{
-	for (int j = 0; j < x - sp; j++)
-	{
-	vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
+		for (int j = 0; j < x - sp; j++)
+		{
+			vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
 
-	vrShape* s = vrShapeInit(vrShapeAlloc());
-	s = vrShapePolyInit(s);
+			vrShape* s = vrShapeInit(vrShapeAlloc());
+			s = vrShapePolyInit(s);
 
-	s->shape = vrPolyBoxInit(s->shape, 100 + sp*10 + j*20, -i*25 + 675, 20, 25);
-	vrArrayPush(body3->shape, s);
+			s->shape = vrPolyBoxInit(s->shape, 100 + sp*10 + j*20, -i*25 + 675, 20, 25);
+			vrArrayPush(body3->shape, s);
 
-	body3->bodyMaterial.restitution = 0.0;
-	body3->bodyMaterial.mass = 5;
-	body3->bodyMaterial.invMass = 1.0 / body3->bodyMaterial.mass;
-	body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForBox(20, 25, body3->bodyMaterial.mass);
-	vrWorldAddBody(world, body3);
-	vrUpdatePolyAxes(s->shape);
+			body3->bodyMaterial.restitution = 0.0;
+			body3->bodyMaterial.mass = 2;
+			body3->bodyMaterial.invMass = 1.0 / body3->bodyMaterial.mass;
+			body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForBox(20, 25, body3->bodyMaterial.mass);
+			vrWorldAddBody(world, body3);
+			vrUpdatePolyAxes(s->shape);
+		}
+		sp++;
 	}
-	sp++;
-	}
-	
+	*/
 	/*
 	for (int j = 0; j < 15; j++)
 	{
@@ -216,11 +216,11 @@ main(void)
 				vrRigidBody* A = body3;
 				vrRigidBody* B = world->bodies->data[world->bodies->sizeof_active - 2];
 
-				vrJoint* joint = vrDistanceJointInit(vrJointAlloc(), A, B, A->center, B->center);
+				vrJoint* joint = vrDistanceJointInit(vrJointAlloc(), A, B, vrAdd(A->center, vrVect(0, 50)), vrAdd(B->center, vrVect(0, -50)));
+				//vrJoint* joint = vrDistanceJointInit(vrJointAlloc(), A, B, A->center , B->center );
+
 				joint->anchorA.initialOrientation = 0;
-				joint->anchorA.initialPoint = vrVect(0, 50);
 				joint->anchorB.initialOrientation = 0;
-				joint->anchorB.initialPoint = vrVect(0, -50);
 				vrArrayPush(world->joints, joint);
 			}
 			b++;
@@ -377,7 +377,15 @@ main(void)
 				{
 					glColor3f(vbody->color.r, vbody->color.g, vbody->color.b);
 					vrDebugDrawPolygon(shape->shape);
-
+					vrVec2 center = ((vrPolygonShape*)shape->shape)->center;
+					if (((vrPolygonShape*)shape->shape)->num_vertices > 0)
+					{
+						vrVec2 v = ((vrPolygonShape*)shape->shape)->vertices[0];
+						glBegin(GL_LINES);
+						glVertex2f(center.x, center.y);
+						glVertex2f(v.x, v.y);
+						glEnd();
+					}
 
 				}
 				else

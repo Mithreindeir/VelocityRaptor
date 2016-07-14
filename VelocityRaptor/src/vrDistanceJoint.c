@@ -36,6 +36,7 @@ vrDistanceJoint * vrDistanceInit(vrDistanceJoint * joint)
 
 vrJoint * vrDistanceJointInit(vrJoint * joint, vrRigidBody* A, vrRigidBody* B, vrVec2 pointA, vrVec2 pointB)
 {
+
 	joint = vrJointInit(joint);
 	joint->A = A;
 	joint->B = B;
@@ -48,7 +49,6 @@ vrJoint * vrDistanceJointInit(vrJoint * joint, vrRigidBody* A, vrRigidBody* B, v
 
 	joint->jointData = vrDistanceInit(vrDistanceAlloc());
 	vrDistanceJoint* sj = joint->jointData;
-	sj->bias = 0;
 	sj->ra = vrGetLocalPoint(&joint->anchorA);
 	sj->rb = vrGetLocalPoint(&joint->anchorB);
 	sj->damping = 0.4;
@@ -57,6 +57,7 @@ vrJoint * vrDistanceJointInit(vrJoint * joint, vrRigidBody* A, vrRigidBody* B, v
 	vrVec2 rb = vrGetLocalPoint(&joint->anchorB);
 	vrVec2 ca = joint->A->center;
 	vrVec2 cb = joint->B->center;
+
 
 	vrVec2 n = vrSub(pointB, pointA);
 	vrFloat len = vrLength(n);
@@ -92,7 +93,6 @@ void vrDistanceJointPreSolve(vrJoint * joint, vrFloat dt)
 		n = vrScale(n, 1.0 / len);
 
 	sj->dir = n;
-	sj->bias = (len - sj->restLength) / dt;
 
 	vrRigidBody* A = joint->A;
 	vrRigidBody* B = joint->B;
@@ -100,23 +100,15 @@ void vrDistanceJointPreSolve(vrJoint * joint, vrFloat dt)
 	vrFloat ran = vrCross(ra, n);
 	vrFloat rbn = vrCross(rb, n);
 	sj->invMass = A->bodyMaterial.invMass + B->bodyMaterial.invMass + (ran*ran) * A->bodyMaterial.invMomentInertia + (rbn*rbn) * B->bodyMaterial.invMomentInertia;
+	sj->bias = (len - sj->restLength) / dt;
 
 	vrVec2 impulse = vrScale(n, sj->accumImpulse);
-
 	A->velocity = vrAdd(A->velocity, vrScale(impulse, A->bodyMaterial.invMass));
 	A->angularVelocity -= A->bodyMaterial.invMomentInertia * vrCross(impulse, ra);
 
 	B->velocity = vrSub(B->velocity, vrScale(impulse, B->bodyMaterial.invMass));
 	B->angularVelocity += B->bodyMaterial.invMomentInertia * vrCross(impulse, rb);
 	
-	impulse = vrScale(n, sj->bias/dt);
-
-	A->velocity = vrAdd(A->velocity, vrScale(impulse, A->bodyMaterial.invMass));
-	A->angularVelocity -= A->bodyMaterial.invMomentInertia * vrCross(impulse, ra);
-
-	B->velocity = vrSub(B->velocity, vrScale(impulse, B->bodyMaterial.invMass));
-	B->angularVelocity += B->bodyMaterial.invMomentInertia * vrCross(impulse, rb);
-
 }
 
 void vrDistanceJointPostSolve(vrJoint * joint, vrFloat dt)
@@ -138,7 +130,7 @@ void vrDistanceJointSolve(vrJoint * joint)
 	vrRigidBody* B = joint->B;
 	vrVec2 rv = vrSub(vrAdd(B->velocity, vrCrossScalar(B->angularVelocity, rb)), vrAdd(A->velocity, vrCrossScalar(A->angularVelocity, ra)));
 
-	vrFloat j = vrDot(rv, n);
+	vrFloat j = vrDot(rv, n) + sj->bias;
 	if (sj->invMass != 0) j /= sj->invMass;
 	vrVec2 impulse = vrScale(n, j);
 
