@@ -18,6 +18,7 @@
 
 #ifndef HEADER_VRMANIFOLD
 #define HEADER_VRMANIFOLD
+
 #include "vrRigidBody.h"
 #include "velocityraptor.h"
 #include "vrJoint.h"

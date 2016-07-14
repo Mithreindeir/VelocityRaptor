@@ -128,10 +128,10 @@ main(void)
 	int polygonSize = 0;
 	int b = 0;
 	
-	int x = 20;
+	int x = 25;
 	int sp = 0;
 
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < 25; i++)
 	{
 	for (int j = 0; j < x - sp; j++)
 	{
@@ -140,13 +140,13 @@ main(void)
 	vrShape* s = vrShapeInit(vrShapeAlloc());
 	s = vrShapePolyInit(s);
 
-	s->shape = vrPolyBoxInit(s->shape, 100 + sp*15 + j*30, -i*30 + 670, 30, 30);
+	s->shape = vrPolyBoxInit(s->shape, 100 + sp*10 + j*20, -i*25 + 675, 20, 25);
 	vrArrayPush(body3->shape, s);
 
 	body3->bodyMaterial.restitution = 0.0;
 	body3->bodyMaterial.mass = 5;
 	body3->bodyMaterial.invMass = 1.0 / body3->bodyMaterial.mass;
-	body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForCircle(50, body3->bodyMaterial.mass);
+	body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForBox(20, 25, body3->bodyMaterial.mass);
 	vrWorldAddBody(world, body3);
 	vrUpdatePolyAxes(s->shape);
 	}
@@ -200,7 +200,7 @@ main(void)
 			vrArrayPush(body3->shape, s);
 
 			body3->bodyMaterial.restitution = 0.0;
-			body3->bodyMaterial.mass = 5;
+			body3->bodyMaterial.mass = 50;
 			body3->bodyMaterial.invMass = 1.0 / body3->bodyMaterial.mass;
 			body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForCircle(50, body3->bodyMaterial.mass);
 			vrWorldAddBody(world, body3);

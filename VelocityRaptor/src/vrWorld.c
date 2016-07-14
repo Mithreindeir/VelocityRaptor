@@ -34,10 +34,10 @@ vrWorld * vrWorldInit(vrWorld * world)
 	world->bodies = vrArrayInit(vrArrayAlloc(), sizeof(vrRigidBody*));
 	world->accumulator = 0;
 	world->lastTime = 0;
-	world->timeStep = (1.0f / 180.0f);
+	world->timeStep = (1.0f / 60.0f);
 	world->gravity = vrVect(0, 981);
-	world->velIterations = 25;
-	world->posIterations = 10;
+	world->velIterations = 20;
+	world->posIterations = 15;
 	world->manifoldMap = vrHashTableInit(vrHashTableAlloc(), 1000);
 	world->manifoldMap->deleteFunc = &vrManifoldDestroy;
 	world->num_bodies = 0;
@@ -88,6 +88,8 @@ void vrWorldStep(vrWorld * world)
 
 		//Get collisions 
 		vrWorldQueryCollisions(world);
+		vrWorldSolvePosition(world, world->timeStep);
+
 		//Solve velocities and positions
 		vrWorldSolveVelocity(world, world->timeStep);
 		for (int j = 0; j < world->velIterations; j++)
@@ -110,48 +112,6 @@ void vrWorldStep(vrWorld * world)
 		for (int i = 0; i < world->bodies->sizeof_active; i++)
 		{
 			vrBodyIntegrateVelocity(((vrRigidBody*)world->bodies->data[i]), world->timeStep);
-		}
-		vrWorldSolvePosition(world, world->timeStep);
-
-		for (int i = 0; i < world->bodies->sizeof_active; i++)
-		{
-			vrRigidBody* body = world->bodies->data[i];
-			vrFloat dt = world->timeStep;
-			//Integrate velocity
-			body->position = vrAdd(body->position, vrScale(body->vel_bias, dt));
-
-			for (int i = 0; i < body->shape->sizeof_active; i++)
-			{
-				vrShape* shape = body->shape->data[i];
-				shape->move(shape->shape, vrScale(body->vel_bias, dt));
-			}
-
-			body->orientation += (body->angv_bias )* dt;
-			//Get center
-			vrVec2 center = vrVect(0, 0);
-			for (int i = 0; i < body->shape->sizeof_active; i++)
-			{
-				vrShape* shape = body->shape->data[i];
-				center = vrAdd(center, shape->getCenter(shape->shape));
-			}
-			center = vrScale(center, 1.0 / body->shape->sizeof_active);
-			body->center = center;
-			//Rotate
-			for (int i = 0; i < body->shape->sizeof_active; i++)
-			{
-				vrShape* shape = body->shape->data[i];
-				shape->rotate(shape->shape, (body->angv_bias)* dt, center);
-			}
-			//Update Oriented Bounding box
-			for (int i = 0; i < body->shape->sizeof_active; i++)
-			{
-				vrShape* shape = body->shape->data[i];
-				shape->obb = shape->updateOBB(shape->shape);
-			}
-			vrBodyUpdateOBB(body);
-
-			body->angv_bias = 0;
-			body->vel_bias = vrVect(0, 0);
 		}
 		/* Step Finished */
 		world->accumulator = world->accumulator - world->timeStep;

@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #define DEBUG_DRAW_SHAPE 0
-#define DEBUG_DRAW_CONTACTS 0
+#define DEBUG_DRAW_CONTACTS 1
 
 #ifdef _MSC_VER
 #include "malloc.h"
