@@ -31,6 +31,7 @@
 
 #include <time.h>
 #include "vrRigidBody.h"
+#include "vrBroadphase.h"
 #include "vrArray.h"
 #include "vrManifold.h"
 #include "vrHashMap.h"
@@ -67,6 +68,8 @@ typedef struct vrWorld
 	vrArray* manifoldPool;
 	vrManifold* manifolds;
 	int num_manifolds;
+	///Broadphase struct
+	vrBroadphase* broadphase;
 } vrWorld;
 
 ///Allocates memory for a world

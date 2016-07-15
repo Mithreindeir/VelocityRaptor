@@ -155,7 +155,8 @@ void vrVec2Log(const vrVec2 v)
 inline vrVec2 vrNormalize(const vrVec2 a)
 {
 	vrFloat len = vrLength(a);
-	return vrVect(a.x / len, a.y / len);
+	len = 1.0 / len;
+	return vrVect(a.x * len, a.y * len);
 }
 
 inline vrFloat vrClamp(vrFloat a, vrFloat low, vrFloat high)

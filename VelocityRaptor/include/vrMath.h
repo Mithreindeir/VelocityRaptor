@@ -64,6 +64,13 @@ typedef struct vrVec2
 		{
 			vrFloat x;
 			vrFloat y;
+			/*
+			started using simd, but I can't include m128 in struct
+			otherwise stack won't be properly aligned in functions.
+			I could pass in vrVec2 pointers, but I don't want to rewrite
+			every function with a vrVec2 as an argument
+			*/
+			//__m128d n;
 		};
 		vrFloat m[2];
 	};
