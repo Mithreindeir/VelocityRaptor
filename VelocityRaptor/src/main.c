@@ -44,10 +44,6 @@ main(void)
 	glewExperimental = GL_TRUE;
 	glewInit();
 
-	vrFloat dt = 1 / 60.0f;
-	vrFloat lastTime = 0.0;
-	vrFloat currentTime = 0.0;
-	vrFloat accumulator = 0.0;
 	glfwSwapInterval(1);
 	glfwSetKeyCallback(window, key_callback);
 	vrFloat avgFT = 0;
@@ -55,7 +51,7 @@ main(void)
 	world = vrWorldInit(vrWorldAlloc());
 
 
-
+	/*
 	if (1)
 	{
 		vrRigidBody* body2 = vrBodyInit(vrBodyAlloc());
@@ -95,17 +91,17 @@ main(void)
 		body2->bodyMaterial.invMomentInertia = 0;
 		vrWorldAddBody(world, body2);
 	}
-
+	*/
 	vrRigidBody* bodyt = vrBodyInit(vrBodyAlloc());
 	bodyt->bodyMaterial.invMass = 0;
 	bodyt->bodyMaterial.invMomentInertia = 0;
-	/*
-
+	
 	vrShape* sh = vrShapeInit(vrShapeAlloc());
 	sh = vrShapePolyInit(sh);
 	sh->shape = vrPolyBoxInit(sh->shape, 0, 700, 800, 100);
 	vrArrayPush(bodyt->shape, sh);
-	*/
+	
+	/*
 	vrShapeMold mold = vrShapeMoldInit();
 	vrShapeMoldBind(&mold);
 	vrPolyBegin(VR_CONVEX_POLYGON);
@@ -118,6 +114,7 @@ main(void)
 	vrArrayCopy(bodyt->shape, arr);
 	vrArrayDestroy(arr);
 	//bodyt->shape = vrShapeMoldGetShape(&mold);
+	*/
 	bodyt->bodyMaterial.invMass = 0;
 	bodyt->bodyMaterial.invMomentInertia = 0;
 	vrWorldAddBody(world, bodyt);
@@ -130,7 +127,7 @@ main(void)
 	
 	int x = 25;
 	int sp = 0;
-	/*
+	
 	for (int i = 0; i < 25; i++)
 	{
 		for (int j = 0; j < x - sp; j++)
@@ -152,7 +149,7 @@ main(void)
 		}
 		sp++;
 	}
-	*/
+	
 	/*
 	for (int j = 0; j < 15; j++)
 	{
@@ -200,12 +197,12 @@ main(void)
 			vrArrayPush(body3->shape, s);
 
 			body3->bodyMaterial.restitution = 0.0;
-			body3->bodyMaterial.mass = 50;
+			body3->bodyMaterial.mass = 5;
 			body3->bodyMaterial.invMass = 1.0 / body3->bodyMaterial.mass;
 			body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForCircle(50, body3->bodyMaterial.mass);
 			vrWorldAddBody(world, body3);
 
-			
+			/*
 			if (b == 0)
 			{
 				body3->bodyMaterial.invMass = 0;
@@ -224,7 +221,7 @@ main(void)
 				vrArrayPush(world->joints, joint);
 			}
 			b++;
-			
+			*/
 			timer = glfwGetTime();
 		}
 		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))
@@ -241,13 +238,6 @@ main(void)
 			timer = glfwGetTime();
 		}
 
-		lastTime = currentTime;
-		currentTime = glfwGetTime();
-		vrFloat deltaTime = currentTime - lastTime;
-		vrFloat frameTime = currentTime - lastTime;
-		lastTime = currentTime;
-		accumulator += frameTime;
-		if (accumulator > 0.2) accumulator = 0.2;
 
 		int display_w, display_h;
 		glfwGetFramebufferSize(window, &display_w, &display_h);
@@ -348,22 +338,6 @@ main(void)
 			}
 			vrFree(tri);
 		}
-		/*
-		for (int i = 0; i < world->bodies->sizeof_active; i++)
-		{
-		vrRigidBody* b = world->bodies->data[i];
-		vrVec2 center = b->shape->getCenter(b->shape->shape);
-		if (center.y > 900)
-		{
-		vrFloat move = -200 - center.y;
-		vrVec2 mov = vrVect(0, move);
-		b->shape->move(b->shape->shape, mov);
-		b->position = vrAdd(b->position, mov);
-		}
-
-		}
-		*/
-
 		for (int i = 0; i < world->bodies->sizeof_active; i++)
 		{
 			vrRigidBody* vbody = world->bodies->data[i];
@@ -424,16 +398,8 @@ main(void)
 
 
 		vrFloat f = glfwGetTime();
-		vrWorldStep(world);
-		vrFloat ts = 1.0 / 60.0;
 
-		while (accumulator > ts)
-		{
-			for (int i = 0; i < world->bodies->sizeof_active; i++)
-				vrParticleSystemCollide(psys, world->bodies->data[i], 133.333, ts);
-			vrParticleSystemStep(psys, ts);
-			accumulator -= ts;
-		}
+		vrWorldStep(world);
 		f = glfwGetTime() - f;
 
 		printf("Framerate: %f\n", 1 / f);

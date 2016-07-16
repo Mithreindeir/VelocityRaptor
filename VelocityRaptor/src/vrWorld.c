@@ -33,11 +33,12 @@ vrWorld * vrWorldInit(vrWorld * world)
 {
 	world->bodies = vrArrayInit(vrArrayAlloc(), sizeof(vrRigidBody*));
 	world->accumulator = 0;
+	world->num_manifolds = 0;
 	world->lastTime = 0;
 	world->timeStep = (1.0f / 60.0f);
 	world->gravity = vrVect(0, 981);
-	world->velIterations = 30;
-	world->posIterations = 25;
+	world->velIterations = 15;
+	world->posIterations = 5;
 	world->manifoldMap = vrHashTableInit(vrHashTableAlloc(), 1000);
 	world->manifoldMap->deleteFunc = &vrManifoldDestroy;
 	world->num_bodies = 0;
@@ -89,10 +90,11 @@ void vrWorldStep(vrWorld * world)
 
 		//Get collisions 
 		vrWorldQueryCollisions(world);
-		vrWorldSolvePosition(world, world->timeStep);
 
 		//Solve velocities and positions
 		vrWorldSolveVelocity(world, world->timeStep);
+		vrWorldSolvePosition(world, world->timeStep);
+
 		for (int i = 0; i < world->joints->sizeof_active; i++)
 		{
 			vrJoint* joint = world->joints->data[i];
