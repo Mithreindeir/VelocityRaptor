@@ -9,6 +9,8 @@
 #include "../include/vrTriangulation.h"
 #include "../include/vrShapeCreate.h"
 #include "../include/vrDistanceJoint.h"
+#include "../include/vrRevoluteJoint.h"
+
 #include <stdio.h>
 #include <conio.h>
 #define GLEW_STATIC
@@ -127,7 +129,7 @@ main(void)
 	
 	int x = 25;
 	int sp = 0;
-	
+	/*
 	for (int i = 0; i < 25; i++)
 	{
 		for (int j = 0; j < x - sp; j++)
@@ -149,7 +151,7 @@ main(void)
 		}
 		sp++;
 	}
-	
+	*/
 	/*
 	for (int j = 0; j < 15; j++)
 	{
@@ -171,7 +173,50 @@ main(void)
 		}
 	}
 	*/
-	
+
+	if (1)
+	{
+		vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
+
+		vrShape* s = vrShapeInit(vrShapeAlloc());
+		s = vrShapePolyInit(s);
+
+		s->shape = vrPolyBoxInit(s->shape, 80, 400, 60, 60);
+		vrArrayPush(body3->shape, s);
+
+		body3->bodyMaterial.restitution = 0.0;
+		body3->bodyMaterial.mass = 2;
+		body3->bodyMaterial.invMass = 1.0 / body3->bodyMaterial.mass;
+		body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForBox(20, 25, body3->bodyMaterial.mass);
+
+		//body3->bodyMaterial.invMass = 0;
+		//body3->bodyMaterial.invMomentInertia = 0;
+		vrWorldAddBody(world, body3);
+		vrUpdatePolyAxes(s->shape);
+		vrRigidBody* body4 = vrBodyInit(vrBodyAlloc());
+
+		s = vrShapeInit(vrShapeAlloc());
+		s = vrShapePolyInit(s);
+
+		s->shape = vrPolyBoxInit(s->shape, 140 , 400, 60, 60);
+		vrArrayPush(body4->shape, s);
+
+		body4->bodyMaterial.restitution = 0.0;
+		body4->bodyMaterial.mass = 2;
+		body4->bodyMaterial.invMass = 1.0 / body4->bodyMaterial.mass;
+		body4->bodyMaterial.invMomentInertia = 1.0 / vrMomentForBox(20, 25, body4->bodyMaterial.mass);
+		vrWorldAddBody(world, body4);
+		vrUpdatePolyAxes(s->shape);
+		
+
+		vrRigidBody* A = body3;
+		vrRigidBody* B = body4;
+		vrJoint* joint = vrRevoluteJointInit(vrJointAlloc(), A, B, vrAdd(A->center, vrVect(30, -30)), vrAdd(B->center, vrVect(-30, -30)));
+
+		joint->anchorA.initialOrientation = 0;
+		joint->anchorB.initialOrientation = 0;
+		vrArrayPush(world->joints, joint);
+	}
 
 
 	while (!glfwWindowShouldClose(window))

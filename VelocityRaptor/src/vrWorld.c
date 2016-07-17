@@ -37,8 +37,8 @@ vrWorld * vrWorldInit(vrWorld * world)
 	world->lastTime = 0;
 	world->timeStep = (1.0f / 60.0f);
 	world->gravity = vrVect(0, 981);
-	world->velIterations = 15;
-	world->posIterations = 5;
+	world->velIterations = 20;
+	world->posIterations = 15;
 	world->manifoldMap = vrHashTableInit(vrHashTableAlloc(), 1000);
 	world->manifoldMap->deleteFunc = &vrManifoldDestroy;
 	world->num_bodies = 0;
@@ -95,29 +95,7 @@ void vrWorldStep(vrWorld * world)
 		vrWorldSolveVelocity(world, world->timeStep);
 		vrWorldSolvePosition(world, world->timeStep);
 
-		for (int i = 0; i < world->joints->sizeof_active; i++)
-		{
-			vrJoint* joint = world->joints->data[i];
-			if (joint->preSolve)
-				joint->preSolve(joint, world->timeStep);
-		}
-		for (int j = 0; j < world->velIterations; j++)
-		{
-			for (int i = 0; i < world->joints->sizeof_active; i++)
-			{
-				vrJoint* joint = world->joints->data[i];
 
-				if (joint->solveVelocity)
-					joint->solveVelocity(joint);
-
-			}
-		}
-		for (int i = 0; i < world->joints->sizeof_active; i++)
-		{
-			vrJoint* joint = world->joints->data[i];
-			if (joint->postSolve)
-				joint->postSolve(joint, world->timeStep);
-		}
 		//Integrate velocity
 		for (int i = 0; i < world->bodies->sizeof_active; i++)
 		{
@@ -273,6 +251,12 @@ void vrWorldQueryCollisions(vrWorld * world)
 
 void vrWorldSolvePosition(vrWorld * world, vrFloat dt)
 {
+	for (int i = 0; i < world->joints->sizeof_active; i++)
+	{
+		vrJoint* joint = world->joints->data[i];
+		if (joint->postSolve)
+			joint->postSolve(joint, world->timeStep);
+	}
 	for (int i = 0; i < world->manifoldMap->buckets->sizeof_active; i++)
 	{
 		if (world->manifoldMap->buckets->data[i])
@@ -289,6 +273,7 @@ void vrWorldSolvePosition(vrWorld * world, vrFloat dt)
 			}
 		}
 	}
+
 
 	for (int j = 0; j < world->posIterations; j++)
 	{
@@ -308,7 +293,15 @@ void vrWorldSolvePosition(vrWorld * world, vrFloat dt)
 				}
 			}
 		}
-
+		for (int j = 0; j < world->posIterations; j++)
+		{
+			for (int i = 0; i < world->joints->sizeof_active; i++)
+			{
+				vrJoint* joint = world->joints->data[i];
+				if (joint->solvePosition)
+					joint->solvePosition(joint, world->timeStep);
+			}
+		}
 	}
 }
 
@@ -373,12 +366,27 @@ void vrWorldSolveVelocity(vrWorld * world, vrFloat dt)
 		vrManifoldPreStep(&world->manifolds[j], dt);
 		world->manifolds[j].firstTime = vrFALSE;
 	}
+	for (int i = 0; i < world->joints->sizeof_active; i++)
+	{
+		vrJoint* joint = world->joints->data[i];
+		if (joint->preSolve)
+			joint->preSolve(joint, world->timeStep);
+	}
+
 	for (int j = 0; j < world->velIterations; j++)
 	{
 
 		for (int i = 0; i < num_m; i++)
 		{
 			vrManifoldSolveVelocity(&world->manifolds[i]);
+		}
+		for (int i = 0; i < world->joints->sizeof_active; i++)
+		{
+			vrJoint* joint = world->joints->data[i];
+
+			if (joint->solveVelocity)
+				joint->solveVelocity(joint);
+
 		}
 	}
 	iter = 0;

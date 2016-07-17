@@ -30,7 +30,7 @@ typedef struct vrRevoluteConstraint
 	vrVec2 ra;
 	///Relative point on B
 	vrVec2 rb;
-	vrVec2 b;
+	vrVec2 accum;
 } vrRevoluteConstraint;
 
 ///Allocates memory for revolute joint data
@@ -44,6 +44,10 @@ void vrRevoluteJointDestroy(vrJoint * joint);
 ///Velocity pre solve function for a revolute joint
 void vrRevoluteJointPreSolve(vrJoint * joint, vrFloat dt);
 ///Velocity solve function for a revolute joint
-void vrRevoluteJointSolve(vrJoint * joint);
+void vrRevoluteJointSolveVelocity(vrJoint * joint);
+///Position pre solve function for a revolute joint
+void vrRevoluteJointPostSolve(vrJoint * joint, vrFloat dt);
+///Position solve function for a revolute joint
+void vrRevoluteJointSolvePosition(vrJoint * joint);
 
 #endif
