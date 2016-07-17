@@ -31,7 +31,7 @@ vrJoint * vrJointInit(vrJoint * joint)
 	joint->postSolve = NULL;
 	joint->solveVelocity = NULL;
 	joint->solvePosition = NULL;
-	
+	joint->drawJoint = NULL;
 	return joint;
 }
 

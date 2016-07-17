@@ -198,7 +198,7 @@ main(void)
 		s = vrShapeInit(vrShapeAlloc());
 		s = vrShapePolyInit(s);
 
-		s->shape = vrPolyBoxInit(s->shape, 140 , 400, 60, 60);
+		s->shape = vrPolyBoxInit(s->shape, 180 , 400, 60, 60);
 		vrArrayPush(body4->shape, s);
 
 		body4->bodyMaterial.restitution = 0.0;
@@ -211,7 +211,7 @@ main(void)
 
 		vrRigidBody* A = body3;
 		vrRigidBody* B = body4;
-		vrJoint* joint = vrRevoluteJointInit(vrJointAlloc(), A, B, vrAdd(A->center, vrVect(30, -30)), vrAdd(B->center, vrVect(-30, -30)));
+		vrJoint* joint = vrRevoluteJointInit(vrJointAlloc(), A, B, vrAdd(A->center, vrVect(50, -30)), vrAdd(B->center, vrVect(-50, -30)));
 
 		joint->anchorA.initialOrientation = 0;
 		joint->anchorB.initialOrientation = 0;
@@ -258,15 +258,16 @@ main(void)
 				vrRigidBody* A = body3;
 				vrRigidBody* B = world->bodies->data[world->bodies->sizeof_active - 2];
 
-				vrJoint* joint = vrDistanceJointInit(vrJointAlloc(), A, B, vrAdd(A->center, vrVect(0, 50)), vrAdd(B->center, vrVect(0, -50)));
-				//vrJoint* joint = vrDistanceJointInit(vrJointAlloc(), A, B, A->center , B->center );
+				vrJoint* joint = vrDistanceConstraintInit(vrJointAlloc(), A, B, vrAdd(A->center, vrVect(0, 50)), vrAdd(B->center, vrVect(0, -50)));
+				//vrJoint* joint = vrDistanceConstraintInit(vrJointAlloc(), A, B, A->center , B->center );
 
-				joint->anchorA.initialOrientation = 0;
-				joint->anchorB.initialOrientation = 0;
+				//joint->anchorA.initialOrientation = 0;
+				//joint->anchorB.initialOrientation = 0;
 				vrArrayPush(world->joints, joint);
 			}
 			b++;
 			*/
+			
 			timer = glfwGetTime();
 		}
 		if ((glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS) && ((timer + 0.4) < glfwGetTime()))

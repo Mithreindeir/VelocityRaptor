@@ -18,6 +18,9 @@
 
 #include "../include/vrRevoluteJoint.h"
 #include "../include/vrManifold.h"
+#define GLEW_STATIC
+#include <glew.h>
+#include <glfw3.h>
 
 vrRevoluteConstraint * vrRevoluteAlloc()
 {
@@ -44,6 +47,7 @@ vrJoint * vrRevoluteJointInit(vrJoint * joint, vrRigidBody * A, vrRigidBody * B,
 	joint->postSolve = &vrRevoluteJointPostSolve;
 	joint->solvePosition = &vrRevoluteJointSolvePosition;
 	joint->jointData = vrRevoluteInit(vrRevoluteAlloc());
+	joint->drawJoint = &vrRevoluteJointDraw;
 	return joint;
 }
 
@@ -80,7 +84,7 @@ void vrRevoluteJointPreSolve(vrJoint * joint, vrFloat dt)
 
 	rc->K.n.x = -A->bodyMaterial.invMomentInertia * ra.x * ra.y;
 	rc->K.n.x += -B->bodyMaterial.invMomentInertia * rb.x * rb.y;
-	return;
+
 	vrVec2 impulse = rc->accum;
 	A->velocity = vrSub(A->velocity, vrScale(impulse, A->bodyMaterial.invMass));
 	A->angularVelocity -= A->bodyMaterial.invMomentInertia * vrCross(ra, impulse);
@@ -141,6 +145,26 @@ void vrRevoluteJointSolvePosition(vrJoint * joint)
 
 	B->vel_bias = vrAdd(B->vel_bias, vrScale(impulse, B->bodyMaterial.invMass));
 	B->angv_bias += B->bodyMaterial.invMomentInertia * vrCross(rb, impulse);
+}
+
+void vrRevoluteJointDraw(vrJoint * joint)
+{
+	vrRevoluteConstraint* rc = joint->jointData;
+	rc->ra = vrGetLocalPoint(&joint->anchorA);
+	rc->rb = vrGetLocalPoint(&joint->anchorB);
+
+	vrVec2 ra = rc->ra;
+	vrVec2 rb = rc->rb;
+	vrVec2 ca = joint->A->center;
+	vrVec2 cb = joint->B->center;
+	ca = vrAdd(ca, ra);
+	cb = vrAdd(cb, rb);
+	vrVec2 p = vrScale(vrAdd(ca, cb), 1.0 / 2.0);
+	glColor3f(1, 0, 0);
+	glPointSize(8.0);
+	glBegin(GL_POINTS);
+	glVertex2f(p.x, p.y);
+	glEnd();
 }
 
 void vrRevoluteJointSolveVelocity(vrJoint * joint)

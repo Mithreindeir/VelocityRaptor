@@ -27,6 +27,8 @@ typedef void(*vrJointPreSolveFunc)(vrJoint* joint, vrFloat dt);
 typedef void(*vrJointSolveVelocityFunc)(vrJoint* joint);
 typedef void(*vrJointPostSolveFunc)(vrJoint* joint);
 typedef void(*vrJointSolvePositionFunc)(vrJoint* joint);
+typedef void(*vrJointDrawFunc)(vrJoint* joint);
+
 typedef void* vrJointData;
 
 ///Point relative to body's center, changes as body rotates
@@ -63,6 +65,8 @@ struct vrJoint
 	vrJointSolvePositionFunc solvePosition;
 	///Void pointer to data for joint
 	vrJointData jointData;
+	///function to draw constraint
+	vrJointDrawFunc drawJoint;
 };
 
 ///Allocates memory for a joint
@@ -75,4 +79,5 @@ void vrJointDestroy(vrJoint* joint);
 vrLocalPoint vrLocalPointInit(vrRigidBody* body, vrVec2 point);
 ///Updates the local point and returns it
 vrVec2 vrGetLocalPoint(vrLocalPoint* localPoint);
+
 #endif

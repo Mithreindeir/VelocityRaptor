@@ -49,5 +49,6 @@ void vrRevoluteJointSolveVelocity(vrJoint * joint);
 void vrRevoluteJointPostSolve(vrJoint * joint, vrFloat dt);
 ///Position solve function for a revolute joint
 void vrRevoluteJointSolvePosition(vrJoint * joint);
-
+///Drawing function
+void vrRevoluteJointDraw(vrJoint* joint);
 #endif

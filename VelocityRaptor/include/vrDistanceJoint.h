@@ -22,7 +22,7 @@
 #include "vrMath.h"
 
 ///Data structure for distance joint
-typedef struct vrDistanceJoint
+typedef struct vrDistanceConstraint
 {
 	///Holds inverse mass
 	vrFloat invMass;
@@ -42,22 +42,22 @@ typedef struct vrDistanceJoint
 	vrFloat restLength;
 	///Damping
 	vrFloat damping;
-} vrDistanceJoint;
+} vrDistanceConstraint;
 
 ///Allocates memory for spring joint data
-vrDistanceJoint* vrDistanceAlloc();
+vrDistanceConstraint* vrDistanceAlloc();
 ///Initializes spring joint data
-vrDistanceJoint* vrDistanceInit(vrDistanceJoint* joint);
+vrDistanceConstraint* vrDistanceInit(vrDistanceConstraint* joint);
 ///Initializes a spring joint with a joint
-vrJoint* vrDistanceJointInit(vrJoint* joint, vrRigidBody* A, vrRigidBody* B, vrVec2 pointA, vrVec2 pointB);
+vrJoint* vrDistanceConstraintInit(vrJoint* joint, vrRigidBody* A, vrRigidBody* B, vrVec2 pointA, vrVec2 pointB);
 ///Frees memory
-void vrDistanceJointDestroy(vrJoint* joint);
+void vrDistanceConstraintDestroy(vrJoint* joint);
 ///Velocity pre solve function for a spring joint
-void vrDistanceJointPreSolve(vrJoint* joint, vrFloat dt);
+void vrDistanceConstraintPreSolve(vrJoint* joint, vrFloat dt);
 ///Velocity solve function for a spring joint
-void vrDistanceJointSolve(vrJoint joint);
+void vrDistanceConstraintSolve(vrJoint joint);
 ///Velocity post solve function for a spring joint
-void vrDistanceJointPostSolve(vrJoint* joint, vrFloat dt);
+void vrDistanceConstraintPostSolve(vrJoint* joint, vrFloat dt);
 ///Position solve function for a spring joint
-void vrDistanceJointSolvePosition(vrJoint joint);
+void vrDistanceConstraintSolvePosition(vrJoint* joint);
 #endif

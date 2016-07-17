@@ -17,12 +17,12 @@
 */
 #include "..\include\vrDistanceJoint.h"
 
-vrDistanceJoint * vrDistanceAlloc()
+vrDistanceConstraint * vrDistanceAlloc()
 {
-	return vrAlloc(sizeof(vrDistanceJoint));
+	return vrAlloc(sizeof(vrDistanceConstraint));
 }
 
-vrDistanceJoint * vrDistanceInit(vrDistanceJoint * joint)
+vrDistanceConstraint * vrDistanceInit(vrDistanceConstraint * joint)
 {
 	joint->accumImpulse = 0;
 	joint->stiffness = 0.1;
@@ -34,7 +34,7 @@ vrDistanceJoint * vrDistanceInit(vrDistanceJoint * joint)
 	return joint;
 }
 
-vrJoint * vrDistanceJointInit(vrJoint * joint, vrRigidBody* A, vrRigidBody* B, vrVec2 pointA, vrVec2 pointB)
+vrJoint * vrDistanceConstraintInit(vrJoint * joint, vrRigidBody* A, vrRigidBody* B, vrVec2 pointA, vrVec2 pointB)
 {
 
 	joint = vrJointInit(joint);
@@ -42,13 +42,13 @@ vrJoint * vrDistanceJointInit(vrJoint * joint, vrRigidBody* A, vrRigidBody* B, v
 	joint->B = B;
 	joint->anchorA = vrLocalPointInit(A, pointA);
 	joint->anchorB = vrLocalPointInit(B, pointB);
-	joint->preSolve = &vrDistanceJointPreSolve;
-	joint->solveVelocity = &vrDistanceJointSolve;
-	joint->postSolve = &vrDistanceJointPostSolve;
-	joint->solvePosition = &vrDistanceJointSolvePosition;
+	joint->preSolve = &vrDistanceConstraintPreSolve;
+	joint->solveVelocity = &vrDistanceConstraintSolve;
+	joint->postSolve = &vrDistanceConstraintPostSolve;
+	joint->solvePosition = &vrDistanceConstraintSolvePosition;
 
 	joint->jointData = vrDistanceInit(vrDistanceAlloc());
-	vrDistanceJoint* sj = joint->jointData;
+	vrDistanceConstraint* sj = joint->jointData;
 	sj->ra = vrGetLocalPoint(&joint->anchorA);
 	sj->rb = vrGetLocalPoint(&joint->anchorB);
 	sj->damping = 0.4;
@@ -67,15 +67,15 @@ vrJoint * vrDistanceJointInit(vrJoint * joint, vrRigidBody* A, vrRigidBody* B, v
 	return joint;
 }
 
-void vrDistanceJointDestroy(vrJoint * joint)
+void vrDistanceConstraintDestroy(vrJoint * joint)
 {
 	vrFree(joint->jointData);
 	vrFree(joint);
 }
 
-void vrDistanceJointPreSolve(vrJoint * joint, vrFloat dt)
+void vrDistanceConstraintPreSolve(vrJoint * joint, vrFloat dt)
 {
-	vrDistanceJoint* sj = joint->jointData;
+	vrDistanceConstraint* sj = joint->jointData;
 
 	sj->ra = vrGetLocalPoint(&joint->anchorA);
 	sj->rb = vrGetLocalPoint(&joint->anchorB);
@@ -111,17 +111,56 @@ void vrDistanceJointPreSolve(vrJoint * joint, vrFloat dt)
 	
 }
 
-void vrDistanceJointPostSolve(vrJoint * joint, vrFloat dt)
+void vrDistanceConstraintPostSolve(vrJoint * joint, vrFloat dt)
 {
 }
 
-void vrDistanceJointSolvePosition(vrJoint joint)
+void vrDistanceConstraintSolvePosition(vrJoint* joint)
 {
+	vrDistanceConstraint* dc = joint->jointData;
+	vrRigidBody* A = joint->A;
+	vrRigidBody* B = joint->B;
+	dc->ra = vrGetLocalPoint(&joint->anchorA);
+	dc->rb = vrGetLocalPoint(&joint->anchorB);
+
+	vrVec2 ra = dc->ra;
+	vrVec2 rb = dc->rb;
+	vrVec2 ca = joint->A->center;
+	vrVec2 cb = joint->B->center;
+	ca = vrAdd(ca, A->vel_bias);
+	cb = vrAdd(cb, B->vel_bias);
+
+	vrFloat nca = VR_COSINE(A->angv_bias);
+	vrFloat nsa = VR_SINE(A->angv_bias);
+	ra = vrVect(ra.x * nca - ra.y * nsa, ra.x * nsa + ra.y * nca);
+
+	nca = VR_COSINE(B->angv_bias);
+	nsa = VR_SINE(B->angv_bias);
+	rb = vrVect(rb.x * nca - rb.y * nsa, rb.x * nsa + rb.y * nca);
+
+	vrVec2 n = vrSub(vrAdd(cb, rb), vrAdd(ca, ra));
+	vrFloat len = vrLength(n);
+	if (len == 0)
+		n = vrVect(0, 0);
+	else
+		n = vrScale(n, 1.0 / len);
+
+	vrFloat ran = vrCross(ra, n);
+	vrFloat rbn = vrCross(rb, n);
+	vrFloat invm = A->bodyMaterial.invMass + B->bodyMaterial.invMass + (ran*ran) * A->bodyMaterial.invMomentInertia + (rbn*rbn) * B->bodyMaterial.invMomentInertia;
+	vrFloat j = (len - dc->restLength)  * (1.0 / invm);
+
+	vrVec2 impulse = vrScale(n, -j);
+	//A->vel_bias = vrSub(A->vel_bias, vrScale(impulse, A->bodyMaterial.invMass));
+	//A->angv_bias -= A->bodyMaterial.invMomentInertia * vrCross(ra, impulse);
+
+	//B->vel_bias = vrAdd(B->vel_bias, vrScale(impulse, B->bodyMaterial.invMass));
+	//B->angv_bias += B->bodyMaterial.invMomentInertia * vrCross(rb, impulse);
 }
 
-void vrDistanceJointSolve(vrJoint * joint)
+void vrDistanceConstraintSolve(vrJoint * joint)
 {
-	vrDistanceJoint* sj = joint->jointData;
+	vrDistanceConstraint* sj = joint->jointData;
 
 	vrVec2 n = sj->dir;
 	vrVec2 ra = sj->ra;
@@ -130,7 +169,7 @@ void vrDistanceJointSolve(vrJoint * joint)
 	vrRigidBody* B = joint->B;
 	vrVec2 rv = vrSub(vrAdd(B->velocity, vrCrossScalar(B->angularVelocity, rb)), vrAdd(A->velocity, vrCrossScalar(A->angularVelocity, ra)));
 
-	vrFloat j = vrDot(rv, n) + sj->bias;
+	vrFloat j = vrDot(rv, n);
 	if (sj->invMass != 0) j /= sj->invMass;
 	vrVec2 impulse = vrScale(n, j);
 

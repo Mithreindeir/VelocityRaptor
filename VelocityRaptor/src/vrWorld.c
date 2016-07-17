@@ -104,22 +104,14 @@ void vrWorldStep(vrWorld * world)
 		/* Step Finished */
 		world->accumulator = world->accumulator - world->timeStep;
 	}
+	
 	for (int i = 0; i < world->joints->sizeof_active; i++)
 	{
 		vrJoint* joint = world->joints->data[i];
-
-		vrVec2 pa, pb;
-		pa = ((vrDistanceJoint*)joint->jointData)->ra;
-		pb = ((vrDistanceJoint*)joint->jointData)->rb;
-		pa = vrAdd(pa, joint->A->center);
-		pb = vrAdd(pb, joint->B->center);
-
-		glBegin(GL_LINES);
-		glVertex2f(pa.x, pa.y);
-		glVertex2f(pb.x, pb.y);
-		glEnd();
-
+		if (joint->drawJoint)
+			joint->drawJoint(joint);
 	}
+	
 	world->lastTime = currentTime;
 }
 
