@@ -236,6 +236,7 @@ main(void)
 			s = vrShapeCircleInit(s);
 			((vrCircleShape*)s->shape)->radius = 50;
 			((vrCircleShape*)s->shape)->center = vrVect(x, y);
+			body3->center = vrVect(x, y);
 			//s = vrShapePolyInit(s);
 
 			//s->shape = vrPolyBoxInit(s->shape, x, y, 60, 60);
@@ -247,7 +248,7 @@ main(void)
 			body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForCircle(50, body3->bodyMaterial.mass);
 			vrWorldAddBody(world, body3);
 
-			/*
+			
 			if (b == 0)
 			{
 				body3->bodyMaterial.invMass = 0;
@@ -261,12 +262,12 @@ main(void)
 				vrJoint* joint = vrDistanceConstraintInit(vrJointAlloc(), A, B, vrAdd(A->center, vrVect(0, 50)), vrAdd(B->center, vrVect(0, -50)));
 				//vrJoint* joint = vrDistanceConstraintInit(vrJointAlloc(), A, B, A->center , B->center );
 
-				//joint->anchorA.initialOrientation = 0;
-				//joint->anchorB.initialOrientation = 0;
+				joint->anchorA.initialOrientation = 0;
+				joint->anchorB.initialOrientation = 0;
 				vrArrayPush(world->joints, joint);
 			}
 			b++;
-			*/
+			
 			
 			timer = glfwGetTime();
 		}

@@ -60,4 +60,7 @@ void vrDistanceConstraintSolve(vrJoint joint);
 void vrDistanceConstraintPostSolve(vrJoint* joint, vrFloat dt);
 ///Position solve function for a spring joint
 void vrDistanceConstraintSolvePosition(vrJoint* joint);
+///Drawing function
+void vrDistanceConstraintDraw(vrJoint* joint);
+
 #endif

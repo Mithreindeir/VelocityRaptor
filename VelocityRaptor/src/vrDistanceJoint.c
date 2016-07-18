@@ -16,6 +16,9 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 #include "..\include\vrDistanceJoint.h"
+#define GLEW_STATIC
+#include <glew.h>
+#include <glfw3.h>
 
 vrDistanceConstraint * vrDistanceAlloc()
 {
@@ -46,6 +49,7 @@ vrJoint * vrDistanceConstraintInit(vrJoint * joint, vrRigidBody* A, vrRigidBody*
 	joint->solveVelocity = &vrDistanceConstraintSolve;
 	joint->postSolve = &vrDistanceConstraintPostSolve;
 	joint->solvePosition = &vrDistanceConstraintSolvePosition;
+	joint->drawJoint = &vrDistanceConstraintDraw;
 
 	joint->jointData = vrDistanceInit(vrDistanceAlloc());
 	vrDistanceConstraint* sj = joint->jointData;
@@ -145,17 +149,32 @@ void vrDistanceConstraintSolvePosition(vrJoint* joint)
 	else
 		n = vrScale(n, 1.0 / len);
 
-	vrFloat ran = vrCross(ra, n);
-	vrFloat rbn = vrCross(rb, n);
-	vrFloat invm = A->bodyMaterial.invMass + B->bodyMaterial.invMass + (ran*ran) * A->bodyMaterial.invMomentInertia + (rbn*rbn) * B->bodyMaterial.invMomentInertia;
-	vrFloat j = (len - dc->restLength)  * (1.0 / invm);
+	vrFloat j = (len - dc->restLength)  * -(1.0 / dc->invMass);
 
-	vrVec2 impulse = vrScale(n, -j);
-	//A->vel_bias = vrSub(A->vel_bias, vrScale(impulse, A->bodyMaterial.invMass));
-	//A->angv_bias -= A->bodyMaterial.invMomentInertia * vrCross(ra, impulse);
+	vrVec2 impulse = vrScale(n, j);
+	A->vel_bias = vrSub(A->vel_bias, vrScale(impulse, A->bodyMaterial.invMass));
+	A->angv_bias -= A->bodyMaterial.invMomentInertia * vrCross(ra, impulse);
 
-	//B->vel_bias = vrAdd(B->vel_bias, vrScale(impulse, B->bodyMaterial.invMass));
-	//B->angv_bias += B->bodyMaterial.invMomentInertia * vrCross(rb, impulse);
+	B->vel_bias = vrAdd(B->vel_bias, vrScale(impulse, B->bodyMaterial.invMass));
+	B->angv_bias += B->bodyMaterial.invMomentInertia * vrCross(rb, impulse);
+}
+
+void vrDistanceConstraintDraw(vrJoint * joint)
+{
+	vrDistanceConstraint* sj = joint->jointData;
+	sj->ra = vrGetLocalPoint(&joint->anchorA);
+	sj->rb = vrGetLocalPoint(&joint->anchorB);
+
+	vrVec2 ra = sj->ra;
+	vrVec2 rb = sj->rb;
+	vrVec2 ca = joint->A->center;
+	vrVec2 cb = joint->B->center;
+	ca = vrAdd(ca, ra);
+	cb = vrAdd(cb, rb);
+	glBegin(GL_LINES);
+	glVertex2f(cb.x, cb.y);
+	glVertex2f(ca.x, ca.y);
+	glEnd();
 }
 
 void vrDistanceConstraintSolve(vrJoint * joint)
