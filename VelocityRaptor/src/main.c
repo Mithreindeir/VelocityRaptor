@@ -129,7 +129,7 @@ main(void)
 	
 	int x = 25;
 	int sp = 0;
-	/*
+	
 	for (int i = 0; i < 25; i++)
 	{
 		for (int j = 0; j < x - sp; j++)
@@ -151,7 +151,7 @@ main(void)
 		}
 		sp++;
 	}
-	*/
+	
 	/*
 	for (int j = 0; j < 15; j++)
 	{
@@ -174,7 +174,7 @@ main(void)
 	}
 	*/
 
-	if (1)
+	if (1 && 0)
 	{
 		vrRigidBody* body3 = vrBodyInit(vrBodyAlloc());
 
@@ -234,7 +234,7 @@ main(void)
 
 			vrShape* s = vrShapeInit(vrShapeAlloc());
 			s = vrShapeCircleInit(s);
-			((vrCircleShape*)s->shape)->radius = 50;
+			((vrCircleShape*)s->shape)->radius = 25;
 			((vrCircleShape*)s->shape)->center = vrVect(x, y);
 			body3->center = vrVect(x, y);
 			//s = vrShapePolyInit(s);
@@ -245,7 +245,7 @@ main(void)
 			body3->bodyMaterial.restitution = 0.0;
 			body3->bodyMaterial.mass = 5;
 			body3->bodyMaterial.invMass = 1.0 / body3->bodyMaterial.mass;
-			body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForCircle(50, body3->bodyMaterial.mass);
+			body3->bodyMaterial.invMomentInertia = 1.0 / vrMomentForCircle(25, body3->bodyMaterial.mass);
 			vrWorldAddBody(world, body3);
 
 			
@@ -259,8 +259,8 @@ main(void)
 				vrRigidBody* A = body3;
 				vrRigidBody* B = world->bodies->data[world->bodies->sizeof_active - 2];
 
-				vrJoint* joint = vrDistanceConstraintInit(vrJointAlloc(), A, B, vrAdd(A->center, vrVect(0, 50)), vrAdd(B->center, vrVect(0, -50)));
-				//vrJoint* joint = vrDistanceConstraintInit(vrJointAlloc(), A, B, A->center , B->center );
+				//vrJoint* joint = vrDistanceConstraintInit(vrJointAlloc(), A, B, vrAdd(A->center, vrVect(0, 50)), vrAdd(B->center, vrVect(0, -50)));
+				vrJoint* joint = vrDistanceConstraintInit(vrJointAlloc(), A, B, A->center , B->center );
 
 				joint->anchorA.initialOrientation = 0;
 				joint->anchorB.initialOrientation = 0;

@@ -15,18 +15,5 @@
 * misrepresented as being the original software.
 * 3. This notice may not be removed or altered from any source distribution.
 */
-#ifndef HEADER_VRMARCHINGCUBES
-#define HEADER_VRMARCHINGCUBES
 
-#include "velocityraptor.h"
-#include "vrMath.h"
-
-typedef vrBOOL(*vrPointInShapeFunc)(void* userdata, vrVec2 point);
-
-typedef struct vrMarchingCubes
-{
-	int iterations;
-	vrPointInShapeFunc pointInShape;
-} vrMarchingCubes;
-
-#endif
+#include "../include/vrMarchingSquares.h"

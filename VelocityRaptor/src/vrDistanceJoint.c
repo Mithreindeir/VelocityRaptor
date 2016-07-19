@@ -66,7 +66,7 @@ vrJoint * vrDistanceConstraintInit(vrJoint * joint, vrRigidBody* A, vrRigidBody*
 	vrVec2 n = vrSub(pointB, pointA);
 	vrFloat len = vrLength(n);
 
-	sj->restLength = 120;
+	sj->restLength = len;
 
 	return joint;
 }
