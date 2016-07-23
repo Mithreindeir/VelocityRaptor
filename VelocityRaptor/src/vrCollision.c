@@ -28,7 +28,7 @@ void vrPolyPoly(vrManifold* manifold, const vrPolygonShape A, const vrPolygonSha
 	vrFloat penB = vrPolyGetLeastAxis(B, A, &faceB, &edgeB, vrSub(A.center, B.center));
 	if (penB <= 0) return;
 
-	if (BiasGreater(penA, penB))
+	if (penA >= penB)
 	{
 		penetration = penB;
 		normal = faceB;
