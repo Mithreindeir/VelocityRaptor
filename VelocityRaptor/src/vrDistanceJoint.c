@@ -15,7 +15,7 @@
 * misrepresented as being the original software.
 * 3. This notice may not be removed or altered from any source distribution.
 */
-#include "..\include\vrDistanceJoint.h"
+#include "../include/vrDistanceJoint.h"
 vrDistanceConstraint * vrDistanceAlloc()
 {
 	return vrAlloc(sizeof(vrDistanceConstraint));

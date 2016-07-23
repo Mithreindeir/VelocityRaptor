@@ -17,7 +17,7 @@
 */
 
 
-#include "..\include\vrTriangulation.h"
+#include "../include/vrTriangulation.h"
 
 vrTriangle * vrEarClip(vrVec2* polygon, int num_vertices, int* num_triangles)
 {

@@ -1,4 +1,4 @@
-#include "..\include\vrManifold.h"
+#include "../include/vrManifold.h"
 
 vrManifold* vrManifoldAlloc()
 {

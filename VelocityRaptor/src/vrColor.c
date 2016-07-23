@@ -16,8 +16,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "..\include\vrColor.h"
-
+#include "../include/vrColor.h"
 vrColor vrColorCreateNormalized(vrFloat r, vrFloat g, vrFloat b)
 {
 	return vrColorNormalize(vrColorCreate(r, g, b));
