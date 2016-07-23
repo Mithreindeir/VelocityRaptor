@@ -1,8 +1,4 @@
-language: c
-os:
-  - linux
-compiler:
-  - gcc
+sudo: required
 addons:
 apt:
   sources:
@@ -10,6 +6,11 @@ apt:
   packages:
     - cmake
     - cmake-data
+language: c
+os:
+  - linux
+compiler:
+  - gcc
 script:
   - cd VelocityRaptor
   - mkdir build
