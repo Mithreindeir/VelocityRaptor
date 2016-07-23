@@ -288,7 +288,7 @@ void vrWorldSolvePosition(vrWorld * world, vrFloat dt)
 			{
 				vrJoint* joint = world->joints->data[i];
 				if (joint->solvePosition)
-					joint->solvePosition(joint, world->timeStep);
+					joint->solvePosition(joint);
 			}
 		}
 	}
