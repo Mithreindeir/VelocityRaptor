@@ -1,5 +1,7 @@
 # VelocityRaptor
 [![Build Status](https://upload.wikimedia.org/wikipedia/commons/f/f8/License_icon-mit-88x31-2.svg)]()
+[![Build Status](https://travis-ci.org/Mithreindeir/VelocityRaptor.svg?branch=master)](https://travis-ci.org/Mithreindeir/VelocityRaptor)
+
 
 2D physics engine, written in highly portable C, with no dependencies other than the standard library. Designed to be fast, stable and accurate. Velocity Raptor is free to use in commercial and non-commercial applications.
 
