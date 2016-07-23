@@ -41,6 +41,6 @@ struct vrBroadphase
 
 vrBroadphase* vrBroadphaseAlloc();
 vrBroadphase* vrBroadphaseInit(vrBroadphase* broadphase);
-vrCollisionPair* vrDefaultBroadphaseFunc(vrBroadphase* bp, vrArray* body_arr);
+vrCollisionPair * vrDefaultBroadphaseFunc(vrBroadphase * bp, vrArray * body_arr, int* num_pairs);
 
 #endif
