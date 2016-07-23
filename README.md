@@ -5,4 +5,4 @@
 
 2D physics engine, written in highly portable C, with no dependencies other than the standard library. Designed to be fast, stable and accurate. Velocity Raptor is free to use in commercial and non-commercial applications.
 
-It features Collision detection for convex polygons with the Separate Axis Theorum, and it can support concanve shapes, by using ear clipping to turn concave shapes into triangles. Collision's are resolved with impulses, and for bodies with two contacts, a mini-block solver will solve them together. The only joint currently available is the distance joint. This engine is still under development and not ready for use. 
+It features Collision detection for convex polygons with the Separate Axis Theorum, and it can support concanve shapes, by using ear clipping to turn concave shapes into triangles. Collision's are resolved with impulses, and for bodies with two contacts, a mini-block solver will solve them together. The engine is completely ready for use (but still in development), however it has yet to be documented so you may have to dig through the source code. 
