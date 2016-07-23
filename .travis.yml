@@ -6,3 +6,4 @@ compiler:
   - gcc
   - clang
 script:
+gcc -c src/*.c -o velocity_raptor.o
