@@ -7,4 +7,4 @@ compiler:
   - clang
 script:
   - cd src
-  - gcc *.c -o velocity_raptor.o
+  - gcc (wildcard *.c) -o velocity_raptor.o
