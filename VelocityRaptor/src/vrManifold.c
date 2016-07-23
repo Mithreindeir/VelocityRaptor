@@ -1,7 +1,4 @@
 #include "..\include\vrManifold.h"
-#define GLEW_STATIC
-#include <glew.h>
-#include <glfw3.h>
 
 vrManifold* vrManifoldAlloc()
 {

@@ -18,9 +18,6 @@
 
 #include "../include/vrRevoluteJoint.h"
 #include "../include/vrManifold.h"
-#define GLEW_STATIC
-#include <glew.h>
-#include <glfw3.h>
 
 vrRevoluteConstraint * vrRevoluteAlloc()
 {
@@ -160,11 +157,6 @@ void vrRevoluteJointDraw(vrJoint * joint)
 	ca = vrAdd(ca, ra);
 	cb = vrAdd(cb, rb);
 	vrVec2 p = vrScale(vrAdd(ca, cb), 1.0 / 2.0);
-	glColor3f(1, 0, 0);
-	glPointSize(8.0);
-	glBegin(GL_POINTS);
-	glVertex2f(p.x, p.y);
-	glEnd();
 }
 
 void vrRevoluteJointSolveVelocity(vrJoint * joint)

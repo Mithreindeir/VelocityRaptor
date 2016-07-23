@@ -19,9 +19,6 @@
 #include "../include/vrWorld.h"
 #include "../include/vrCollision.h"
 #include "../include/velocityraptor.h"
-#define GLEW_STATIC
-#include <glew.h>
-#include <glfw3.h>
 #include "../include/vrDistanceJoint.h"
 
 vrWorld * vrWorldAlloc()
@@ -339,19 +336,6 @@ void vrWorldSolveVelocity(vrWorld * world, vrFloat dt)
 	}
 	if (DEBUG_DRAW_CONTACTS)
 	{
-		glPointSize(8.0);
-		glColor3f(1, 0, 0);
-		glBegin(GL_POINTS);
-		for (int i = 0; i < num_m; i++)
-		{
-			vrManifold manifold = world->manifolds[i];
-			for (int i = 0; i < manifold.contact_points; i++)
-			{
-
-				glVertex2f(manifold.contacts[i].point.x, manifold.contacts[i].point.y);
-			}
-		}
-		glEnd();
 	}
 	for (int j = 0; j < num_m; j++)
 	{

@@ -1,7 +1,4 @@
 #include "..\include\vrCollision.h"
-#define GLEW_STATIC
-#include <glew.h>
-#include <glfw3.h>
 
 inline vrBOOL BiasGreater(const vrFloat a, const vrFloat b)
 {
@@ -49,31 +46,6 @@ void vrPolyPoly(vrManifold* manifold, const vrPolygonShape A, const vrPolygonSha
 		inc = vrPolyBestEdge(B, vrPolyGetFarthestVertex(B, negative_normal), negative_normal);
 		flip = vrTRUE;
 	}
-
-	/*
-	glColor3f(0, 0.5, 1);
-	glBegin(GL_LINES);
-	glVertex2f(edgeA.a.x, edgeA.a.y);
-	glVertex2f(edgeA.b.x, edgeA.b.y);
-	glEnd();
-	glColor3f(0, 1, 0.5);
-	glBegin(GL_LINES);
-	glVertex2f(edgeB.a.x, edgeB.a.y);
-	glVertex2f(edgeB.b.x, edgeB.b.y);
-	glEnd();
-	
-	
-	glColor3f(1, 0, 0);
-	glBegin(GL_LINES);
-	glVertex2f(ref.a.x, ref.a.y);
-	glVertex2f(ref.b.x, ref.b.y);
-	glEnd();
-	glColor3f(0, 0, 1);
-	glBegin(GL_LINES);
-	glVertex2f(inc.a.x, inc.a.y);
-	glVertex2f(inc.b.x, inc.b.y);
-	glEnd();
-	*/
 
 	vrVec2 refV = vrNormalize(ref.edge);
 	vrVec2 refNorm = vrVect(refV.y, -refV.x);

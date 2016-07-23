@@ -16,10 +16,6 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 #include "..\include\vrDistanceJoint.h"
-#define GLEW_STATIC
-#include <glew.h>
-#include <glfw3.h>
-
 vrDistanceConstraint * vrDistanceAlloc()
 {
 	return vrAlloc(sizeof(vrDistanceConstraint));
@@ -171,10 +167,7 @@ void vrDistanceConstraintDraw(vrJoint * joint)
 	vrVec2 cb = joint->B->center;
 	ca = vrAdd(ca, ra);
 	cb = vrAdd(cb, rb);
-	glBegin(GL_LINES);
-	glVertex2f(cb.x, cb.y);
-	glVertex2f(ca.x, ca.y);
-	glEnd();
+
 }
 
 void vrDistanceConstraintSolve(vrJoint * joint)
