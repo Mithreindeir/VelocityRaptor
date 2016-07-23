@@ -1,9 +1,11 @@
+sudo: required
 language: c
 os:
   - linux
 compiler:
   - gcc
 script:
+  - sudo apt-get upgrade
   - cd VelocityRaptor
   - mkdir build
   - cd build
