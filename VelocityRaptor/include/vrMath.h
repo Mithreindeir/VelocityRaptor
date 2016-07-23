@@ -20,7 +20,6 @@
 #define HEADER_VRMATH
 #include <math.h>
 #include "velocityraptor.h"
-#include <nmmintrin.h>
 
 typedef float vrFloat;
 
