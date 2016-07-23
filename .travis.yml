@@ -6,4 +6,5 @@ compiler:
   - gcc
   - clang
 script:
+  - cd VelocityRaptor
   - gcc src/main.c              src/vrBroadphase.c     src/vrHashMap.c          src/vrMath.c            src/vrRevoluteJoint.c  src/vrStep.c src/vrArray.c           src/vrCollision.c      src/vrJoint.c            src/vrMemoryPool.c      src/vrRigidBody.c      src/vrTriangulation.c src/vrBlockAllocator.c  src/vrColor.c          src/vrManifold.c         src/vrParticle.c        src/vrShape.c          src/vrWorld.c src/vrBoundingBox.c     src/vrDistanceJoint.c  src/vrMarchingSquares.c  src/vrParticleSystem.c  src/vrShapeCreate.c -o velocity_raptor.o
