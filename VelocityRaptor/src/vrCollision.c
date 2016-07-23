@@ -1,4 +1,5 @@
-#include "..\include\vrCollision.h"
+#include "../include/vrCollision.h"
+
 
 inline vrBOOL BiasGreater(const vrFloat a, const vrFloat b)
 {
