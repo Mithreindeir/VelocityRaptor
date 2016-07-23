@@ -55,7 +55,7 @@ void vrDistanceConstraintDestroy(vrJoint* joint);
 ///Velocity pre solve function for a spring joint
 void vrDistanceConstraintPreSolve(vrJoint* joint, vrFloat dt);
 ///Velocity solve function for a spring joint
-void vrDistanceConstraintSolve(vrJoint joint);
+void vrDistanceConstraintSolve(vrJoint* joint);
 ///Velocity post solve function for a spring joint
 void vrDistanceConstraintPostSolve(vrJoint* joint, vrFloat dt);
 ///Position solve function for a spring joint

@@ -244,7 +244,7 @@ void vrWorldSolvePosition(vrWorld * world, vrFloat dt)
 	{
 		vrJoint* joint = world->joints->data[i];
 		if (joint->postSolve)
-			joint->postSolve(joint, world->timeStep);
+			joint->postSolve(joint);
 	}
 	for (int i = 0; i < world->manifoldMap->buckets->sizeof_active; i++)
 	{
