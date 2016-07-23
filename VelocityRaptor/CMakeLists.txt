@@ -9,7 +9,7 @@ macro(use_c99)
   endif ()
 endmacro(use_c99)
 use_c99()
-cmake_minimum_required (VERSION 2.8.7)
+cmake_minimum_required (VERSION 3.1)
 project (VELOCITYRAPTOR)
 file (GLOB SOURCES "src/*.c")
 
