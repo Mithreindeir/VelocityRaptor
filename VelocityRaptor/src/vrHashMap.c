@@ -17,7 +17,7 @@
 */
 
 #include "../include/vrHashMap.h"
-#include "../include/velocityraptor.h"
+#include "../include/vr.h"
 
 
 vrHashTable * vrHashTableAlloc()

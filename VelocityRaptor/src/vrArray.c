@@ -17,7 +17,7 @@
 */
 
 #include "../include/vrArray.h"
-#include "../include/velocityraptor.h"
+#include "../include/vr.h"
 
 vrArray * vrArrayAlloc()
 {

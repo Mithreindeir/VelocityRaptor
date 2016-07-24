@@ -18,7 +18,7 @@
 #ifndef HEADER_VRMARCHINGSQUARES
 #define HEADER_VRMARCHINGSQUARES
 
-#include "velocityraptor.h"
+#include "vr.h"
 #include "vrMath.h"
 
 /*

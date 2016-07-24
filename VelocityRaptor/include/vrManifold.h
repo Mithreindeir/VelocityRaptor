@@ -20,7 +20,7 @@
 #define HEADER_VRMANIFOLD
 
 #include "vrRigidBody.h"
-#include "velocityraptor.h"
+#include "vr.h"
 #include "vrJoint.h"
 
 #define MAX_IMPULSE 10000

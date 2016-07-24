@@ -17,7 +17,7 @@
 */
 
 #include "../include/vrParticleSystem.h"
-#include "../include/velocityraptor.h"
+#include "../include/vr.h"
 
 
 vrParticleSystem * vrParticleSystemAlloc()

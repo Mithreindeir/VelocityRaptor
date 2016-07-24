@@ -20,7 +20,7 @@
 #define HEADER_VRSHAPE
 #include "vrMath.h"
 
-#include "velocityraptor.h"
+#include "vr.h"
 #include "vrBoundingBox.h"
 #include "vrTriangulation.h"
 

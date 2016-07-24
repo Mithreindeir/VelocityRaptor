@@ -19,7 +19,7 @@
 #ifndef HEADER_VRCOLOR
 #define HEADER_VRCOLOR
 
-#include "velocityraptor.h"
+#include "vr.h"
 #include "vrMath.h"
 
 ///RGB Color struct normalized(values from 0 to 1)

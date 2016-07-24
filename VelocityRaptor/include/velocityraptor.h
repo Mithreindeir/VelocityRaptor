@@ -15,55 +15,12 @@
 * misrepresented as being the original software.
 * 3. This notice may not be removed or altered from any source distribution.
 */
-
 #ifndef HEADER_VELOCITYRAPTOR
 #define HEADER_VELOCITYRAPTOR
 
-#include <stdlib.h>
-#include <stdio.h>
-#define DEBUG_DRAW_SHAPE 0
-#define DEBUG_DRAW_CONTACTS 0
-
-#ifdef _MSC_VER
-#include "malloc.h"
-#else
-#include <alloca.h>
-#endif
-
-#ifdef _MSC_VER
-#define inline __inline
-#endif
-
-#ifndef vrBOOL
-#define vrBOOL int
-	#ifndef vrTRUE
-		#define vrTRUE 1
-	#endif
-	#ifndef vrFALSE
-		#define vrFALSE 0
-	#endif
-#endif
-
-#ifndef VR_ASSERT
-#define VR_ASSERT(_condition_, msg) if(!_condition_) { printf(msg); abort(); }
-#endif
-
-#ifndef vrAlloc
-#define vrAlloc malloc
-#endif
-#ifndef vrFree
-#define vrFree(a) free(a); a = NULL;
-#endif
-#ifndef vrCalloc
-#define vrCalloc calloc
-#endif
-#ifndef vrRealloc
-#define vrRealloc realloc
-#endif
-
-#ifndef COMBINE_INTS
-//Credit to Chipmunk2D for this hashing macro
-#define COMBINE_INTS(a, b) (((unsigned int)(a)*(3344921057ul) ^ (unsigned int)(b)*(3344921057ul)))
-#endif
+#include "vrMath.h"
+#include "vrWorld.h"
+#include "vrRigidBody.h"
+#include "vrShape.h"
 
 #endif

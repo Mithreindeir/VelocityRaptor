@@ -18,7 +18,7 @@
 
 #include "../include/vrWorld.h"
 #include "../include/vrCollision.h"
-#include "../include/velocityraptor.h"
+#include "../include/vr.h"
 #include "../include/vrDistanceJoint.h"
 
 vrWorld * vrWorldAlloc()

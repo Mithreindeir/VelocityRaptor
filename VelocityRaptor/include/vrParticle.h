@@ -19,7 +19,7 @@
 #ifndef HEADER_VRPARTICLE
 #define HEADER_VRPARTICLE
 #include "vrMath.h"
-#include "velocityraptor.h"
+#include "vr.h"
 #include "vrColor.h"
 
 ///Particle data container

@@ -19,7 +19,7 @@
 #ifndef HEADER_VRBOUNDBOX
 #define HEADER_VRBOUNDBOX
 
-#include "velocityraptor.h"
+#include "vr.h"
 #include "vrMath.h"
 
 typedef struct vrOrientedBoundingBox

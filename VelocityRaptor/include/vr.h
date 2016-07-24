@@ -15,34 +15,54 @@
 * misrepresented as being the original software.
 * 3. This notice may not be removed or altered from any source distribution.
 */
+#ifndef HEADER_VR
+#define HEADER_VR
 
-#ifndef HEADER_VRpool
-#define HEADER_VRpool
+#include <stdlib.h>
+#include <stdio.h>
+#define DEBUG_DRAW_SHAPE 0
+#define DEBUG_DRAW_CONTACTS 0
 
-#include "vr.h"
+#ifdef _MSC_VER
+#include "malloc.h"
+#else
+#include <alloca.h>
+#endif
 
-typedef struct vrMemoryResource;
+#ifdef _MSC_VER
+#define inline __inline
+#endif
 
-typedef struct vrMemoryResource
-{
-	void* object;
-	struct vrMemoryResource* next;
-} vrMemoryResource;
+#ifndef vrBOOL
+#define vrBOOL int
+	#ifndef vrTRUE
+		#define vrTRUE 1
+	#endif
+	#ifndef vrFALSE
+		#define vrFALSE 0
+	#endif
+#endif
 
-typedef struct vrMemoryPool
-{
-	vrMemoryResource** memory;
+#ifndef VR_ASSERT
+#define VR_ASSERT(_condition_, msg) if(!_condition_) { printf(msg); abort(); }
+#endif
 
-	int sizeof_data;
-	int sizeof_pool;
+#ifndef vrAlloc
+#define vrAlloc malloc
+#endif
+#ifndef vrFree
+#define vrFree(a) free(a); a = NULL;
+#endif
+#ifndef vrCalloc
+#define vrCalloc calloc
+#endif
+#ifndef vrRealloc
+#define vrRealloc realloc
+#endif
 
-	vrMemoryResource* firstAvailable;
-	vrMemoryResource* lastAvailable;
-} vrMemoryPool;
+#ifndef COMBINE_INTS
+//Credit to Chipmunk2D for this hashing macro
+#define COMBINE_INTS(a, b) (((unsigned int)(a)*(3344921057ul) ^ (unsigned int)(b)*(3344921057ul)))
+#endif
 
-vrMemoryPool* vrMemoryPoolAlloc();
-vrMemoryPool* vrMemoryPoolInit(vrMemoryPool* pool, int sizeofdata, int sizeofpool);
-vrMemoryResource* vrMemoryPoolGetMemory(vrMemoryPool* pool);
-void vrMemoryPoolvrFreeMemory(vrMemoryPool* pool, vrMemoryResource* memory);
-void vrMemoryPoolDestroy(vrMemoryPool* pool);
 #endif
