@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "vrArray.h"
+#include "vrMath.h"
 
 typedef unsigned int vrHashValue;
 typedef vrHashValue*(*vrHashFunc)(unsigned int key);
