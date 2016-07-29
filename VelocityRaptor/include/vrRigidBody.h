@@ -99,7 +99,8 @@ vrRigidBody* vrBodyAlloc();
 vrRigidBody* vrBodyInit(vrRigidBody* body);
 ///Destroys a body
 void vrBodyDestroy(vrRigidBody* body);
-
+///Sets the bodys position and angle
+void vrBodySet(vrRigidBody* body, vrVec2 position, vrFloat angle);
 ///Initializes and returns default values
 vrMaterial vrMaterialInit();
 ///Applies an impulse

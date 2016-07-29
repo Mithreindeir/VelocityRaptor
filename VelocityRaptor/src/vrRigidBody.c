@@ -68,6 +68,34 @@ void vrBodyDestroy(vrRigidBody * body)
 	vrFree(body);
 }
 
+void vrBodySet(vrRigidBody * body, vrVec2 position, vrFloat angle)
+{
+	vrVec2 move = vrSub(position, body->position);
+
+	for (int i = 0; i < body->shape->sizeof_active; i++)
+	{
+		vrShape* shape = body->shape->data[i];
+		shape->move(shape->shape, move);
+	}
+	body->position = move;
+
+	vrFloat moveA = angle - body->orientation;
+
+	vrVec2 center = vrVect(0, 0);
+	for (int i = 0; i < body->shape->sizeof_active; i++)
+	{
+		vrShape* shape = body->shape->data[i];
+		center = vrAdd(center, shape->getCenter(shape->shape));
+	}
+	center = vrScale(center, 1.0 / body->shape->sizeof_active);
+	body->center = center;
+	for (int i = 0; i < body->shape->sizeof_active; i++)
+	{
+		vrShape* shape = body->shape->data[i];
+		shape->rotate(shape->shape, moveA, center);
+	}
+}
+
 void vrBodyIntegrateForces(vrRigidBody * body, vrFloat dt)
 {
 	//Apply damping
