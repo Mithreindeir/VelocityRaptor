@@ -113,6 +113,8 @@ typedef struct vrManifold
 	vrBOOL active;
 	///If the manifold is new
 	vrBOOL firstTime;
+	///Hash key
+	unsigned int key;
 } vrManifold;
 
 ///Allocates memory for a manifold

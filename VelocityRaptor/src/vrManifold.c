@@ -100,8 +100,8 @@ void vrManifoldPreStep(vrManifold * manifold, vrFloat dt)
 void vrManifoldPostStep(vrManifold * manifold, vrFloat dt)
 {
 
-	vrFloat k_bias = 0.015;
-	vrFloat allowedPenetration = 0.3;
+	vrFloat k_bias = 0.15;
+	vrFloat allowedPenetration = 0.1;
 	for (int i = 0; i < manifold->contact_points; i++)
 	{
 		
@@ -148,7 +148,7 @@ void vrManifoldSolveVelocity(vrManifold * manifold)
 		j = manifold->contacts[i].tangentImpulseSum - oldAccum;
 		vrManifoldApplyImpulse(manifold->A, manifold->B, manifold->contacts[i].ra, manifold->contacts[i].rb, vrScale(manifold->tangent, j));
 	}
-	if (cp == 1)
+	if (cp == 1 || (manifold->A->bodyMaterial.invMomentInertia == 0 && manifold->B->bodyMaterial.invMomentInertia == 0))
 	{
 		for (int i = 0; i < cp; i++)
 		{
@@ -166,7 +166,7 @@ void vrManifoldSolveVelocity(vrManifold * manifold)
 		manifold->solverData.contactVel = vrVect(-manifold->contacts[0].bias + vrManifoldGetContactVel(manifold, 0) + manifold->contacts[0].velocityBias, -manifold->contacts[1].bias + vrManifoldGetContactVel(manifold, 1) + manifold->contacts[1].velocityBias);
 		manifold->solverData.lo = vrVect(-manifold->contacts[0].normalImpulseSum, -manifold->contacts[1].normalImpulseSum);
 		//vrVec2 t = vrManifoldGuassSeidel(manifold->solverData);
-		vrVec2 t = vrManifoldConjugateGradient(manifold->solverData, 1e-4);
+		vrVec2 t = vrManifoldConjugateGradient(manifold->solverData, 1e-8);
 		//vrVec2 t = vrMat2Mult(vrMat2Invert(manifold->solverData.A), manifold->solverData.contactVel);
 		//printf("%f and %f \t %f and %f\n", t.x, t.y, t2.x, t2.y);
 
@@ -202,7 +202,7 @@ void vrManifoldSolvePosition(vrManifold * manifold, vrFloat dt)
 		vrBlockSolverData solverData = manifold->solverData;
 		solverData.contactVel.x = -(manifold->contacts[0].bias - vrDot(vrSub(vrAdd(manifold->B->vel_bias, vrCrossScalar(manifold->B->angv_bias, manifold->contacts[0].rb)), vrAdd(manifold->A->vel_bias, vrCrossScalar(manifold->A->angv_bias, manifold->contacts[0].ra))), manifold->normal));
 		solverData.contactVel.y = -(manifold->contacts[1].bias - vrDot(vrSub(vrAdd(manifold->B->vel_bias, vrCrossScalar(manifold->B->angv_bias, manifold->contacts[1].rb)), vrAdd(manifold->A->vel_bias, vrCrossScalar(manifold->A->angv_bias, manifold->contacts[1].ra))), manifold->normal));
-		vrVec2 t = vrManifoldConjugateGradient(solverData, 1e-4);
+		vrVec2 t = vrManifoldConjugateGradient(solverData, 1e-8);
 
 		vrFloat oldbn = manifold->contacts[0].biasImpulseSum;
 		manifold->contacts[0].biasImpulseSum = VR_MAX(oldbn + t.x, 0);

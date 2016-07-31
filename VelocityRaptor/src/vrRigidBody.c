@@ -17,6 +17,7 @@
 */
 
 #include "../include/vrRigidBody.h"
+#include "../include/vrManifold.h"
 
 
 vrRigidBody * vrBodyInit(vrRigidBody* body)
@@ -33,6 +34,7 @@ vrRigidBody * vrBodyInit(vrRigidBody* body)
 	body->bodyMaterial = vrMaterialInit();
 	body->color = vrColorCreate(fmod(rand(), 0.8) + 0.2, fmod(rand(), 0.8) + 0.2, fmod(rand(), 0.8) + 0.2);
 	body->shape = vrArrayInit(vrArrayAlloc(), sizeof(vrShape*));
+	body->manifolds = vrArrayInit(vrArrayAlloc(), sizeof(vrManifold*));
 	return body;
 }
 
@@ -64,7 +66,11 @@ inline void vrBodyApplyImpulse(vrRigidBody * body, const vrVec2 impulse, const v
 
 void vrBodyDestroy(vrRigidBody * body)
 {
-	vrShapeDestroy(body->shape);
+	for (int i = 0; i < body->shape->sizeof_active; i++)
+	{
+		vrShapeDestroy(body->shape->data[i]);
+	}
+	vrArrayDestroy(body->shape);
 	vrFree(body);
 }
 

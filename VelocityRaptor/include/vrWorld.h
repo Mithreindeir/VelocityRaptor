@@ -83,6 +83,8 @@ void vrWorldDestroy(vrWorld* world);
 void vrWorldStep(vrWorld* world);
 ///Adds a body to the world
 void vrWorldAddBody(vrWorld* world, vrRigidBody * body);
+///Removes a body from the world
+void vrWorldRemoveBody(vrWorld* world, vrRigidBody* body);
 ///Function called from inside vrWorldStep
 ///Which detects collisions
 void vrWorldQueryCollisions(vrWorld* world);

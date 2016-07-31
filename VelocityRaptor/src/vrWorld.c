@@ -124,6 +124,19 @@ void vrWorldAddBody(vrWorld* world, vrRigidBody * body)
 	world->num_bodies++;
 }
 
+void vrWorldRemoveBody(vrWorld * world, vrRigidBody * body)
+{
+	for (int i = 0; i < world->bodies->sizeof_active; i++)
+	{
+		vrRigidBody* b = world->bodies->data[i];
+		if (b == body)
+		{
+			vrBodyDestroy(body);
+			vrArrayErase(world->bodies, i);
+		}
+	}
+}
+
 void vrWorldQueryCollisions(vrWorld * world)
 {
 	for (int i = 0; i < world->manifoldMap->buckets->sizeof_active; i++)
@@ -198,12 +211,53 @@ void vrWorldQueryCollisions(vrWorld * world)
 			{
 				m->active = vrTRUE;
 				vrManifoldAddContactPoints(m, *manifold);
+				m->key = key;
 				if (manifold) vrArrayPush(world->manifoldPool, manifold);
+				vrBOOL contains = vrFALSE;
+				for (int i = 0; i < body->manifolds->sizeof_active; i++)
+				{
+					vrManifold* m = body->manifolds->data[i];
+					if (m->key == key)
+						contains = vrTRUE;
+				}
+				if (!contains)
+					vrArrayPush(body->manifolds, m);
+
+				contains = vrFALSE;
+				for (int i = 0; i < body2->manifolds->sizeof_active; i++)
+				{
+					vrManifold* m = body2->manifolds->data[i];
+					if (m->key == key)
+						contains = vrTRUE;
+				}
+				if (!contains)
+					vrArrayPush(body2->manifolds, m);
 
 			}
 			else
 			{
+				manifold->key = key;
 				vrHashTableInsert(world->manifoldMap, manifold, key);
+				vrBOOL contains = vrFALSE;
+				for (int i = 0; i < body->manifolds->sizeof_active; i++)
+				{
+					vrManifold* m = body->manifolds->data[i];
+					if (m->key == key)
+						contains = vrTRUE;
+				}
+				if (!contains)
+					vrArrayPush(body->manifolds, manifold);
+
+				contains = vrFALSE;
+				for (int i = 0; i < body2->manifolds->sizeof_active; i++)
+				{
+					vrManifold* m = body2->manifolds->data[i];
+					if (m->key == key)
+						contains = vrTRUE;
+				}
+				if (!contains)
+					vrArrayPush(body2->manifolds, manifold);
+
 			}
 		}
 		else if (manifold)
@@ -227,6 +281,19 @@ void vrWorldQueryCollisions(vrWorld * world)
 					vrManifold* manifold = head->data;
 					if (!manifold->active)
 					{
+						vrBOOL contains = vrFALSE;
+						for (int i = 0; i < manifold->A->manifolds->sizeof_active; i++)
+						{
+							vrManifold* m = manifold->A->manifolds->data[i];
+							if (m == manifold)
+								vrArrayErase(manifold->A->manifolds, i);
+						}
+						for (int i = 0; i < manifold->B->manifolds->sizeof_active; i++)
+						{
+							vrManifold* m = manifold->B->manifolds->data[i];
+							if (m == manifold)
+								vrArrayErase(manifold->B->manifolds, i);
+						}
 						vrArrayPush(world->manifoldPool, manifold);
 						vrHashTableRemove(world->manifoldMap, head->key);
 					}

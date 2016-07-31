@@ -31,17 +31,14 @@ typedef struct vrMaterial
 	vrFloat restitution;
 	///Friction
 	vrFloat friction;
-
 	///Mass of a object
 	vrFloat mass;
 	///Resistance to rotate
 	vrFloat momentInertia;
-
 	///1/mass
 	vrFloat invMass;
 	///1/momentInertia
 	vrFloat invMomentInertia;
-
 	///Linear velocity damping
 	vrFloat linearDamping;
 	///Angular velocity damping
@@ -91,6 +88,8 @@ typedef struct vrRigidBody
 	vrVec2 center;
 	///OBB that contains all the shapes
 	vrOrientedBoundingBox obb;
+	///Array holding all manifolds with this body
+	vrArray* manifolds;
 } vrRigidBody;
 
 ///Allocates a body
