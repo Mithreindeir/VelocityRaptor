@@ -40,6 +40,10 @@ To add a polygon shape:
     vrAddVertexToPolyShape(shape->shape, vrVect(0, 10));
     vrArrayPush(body->shape, shape);
     
+Every tick, call this to update the world:
+
+    vrWorldStep(world);
+    
 To add a circle shape:
 
     vrShape* shape = vrShapeInit(vrShapeAlloc());
