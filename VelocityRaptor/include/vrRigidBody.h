@@ -90,6 +90,8 @@ typedef struct vrRigidBody
 	vrOrientedBoundingBox obb;
 	///Array holding all manifolds with this body
 	vrArray* manifolds;
+	///Whether or not to apply gravity
+	vrBOOL gravity;
 } vrRigidBody;
 
 ///Allocates a body

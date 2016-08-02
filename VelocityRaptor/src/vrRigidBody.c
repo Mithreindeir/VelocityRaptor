@@ -35,6 +35,9 @@ vrRigidBody * vrBodyInit(vrRigidBody* body)
 	body->color = vrColorCreate(fmod(rand(), 0.8) + 0.2, fmod(rand(), 0.8) + 0.2, fmod(rand(), 0.8) + 0.2);
 	body->shape = vrArrayInit(vrArrayAlloc(), sizeof(vrShape*));
 	body->manifolds = vrArrayInit(vrArrayAlloc(), sizeof(vrManifold*));
+	body->gravity = vrTRUE;
+	body->collisionData.categoryMask = 1;
+	body->collisionData.maskBit = 1;
 	return body;
 }
 
