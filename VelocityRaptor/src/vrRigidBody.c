@@ -74,7 +74,9 @@ void vrBodyDestroy(vrRigidBody * body)
 		vrShapeDestroy(body->shape->data[i]);
 	}
 	vrArrayDestroy(body->shape);
+	vrArrayDestroy(body->manifolds);
 	vrFree(body);
+	body = NULL;
 }
 
 void vrBodySet(vrRigidBody * body, vrVec2 position, vrFloat angle)
@@ -103,6 +105,7 @@ void vrBodySet(vrRigidBody * body, vrVec2 position, vrFloat angle)
 		vrShape* shape = body->shape->data[i];
 		shape->rotate(shape->shape, moveA, center);
 	}
+	body->orientation = angle;
 }
 
 void vrBodyIntegrateForces(vrRigidBody * body, vrFloat dt)
