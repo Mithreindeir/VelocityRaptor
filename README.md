@@ -66,3 +66,11 @@ To add a circle shape:
 Every tick, call this to update the world:
 
     vrWorldStep(world);
+    
+To clean up, and free all memory:
+
+    vrWorldDestroy(world);
+    
+To remove a body from the world and free its memory  before destruction of world
+
+    vrWorldRemoveBody(world, body);
