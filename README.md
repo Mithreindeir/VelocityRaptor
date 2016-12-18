@@ -21,7 +21,9 @@ It features Collision detection for convex polygons with the Separate Axis Theor
 
 [Velocity Raptor concave and composite polyons](https://youtu.be/nplQNW8RBYk)
 
-##UsageTo create a world:
+##Usage
+
+To create a world:
 
     vrWorld* world = vrWorldInit(vrWorldAlloc());
     world->gravity = vrVect(0, 9.81);
