@@ -15,12 +15,13 @@ It features Collision detection for convex polygons with the Separate Axis Theor
 [Topdown Shooter](https://www.youtube.com/watch?v=gGHBFwacEIc)
 
 ##Velocity Raptor Demo videos
-[Velocity Raptor Speed Demo](https://www.youtube.com/watch?v=uhLYXmzzZp8&index=1&list=PLbl-UC7p03cuFCSpCfEVoQxMQfcG3zm9K)
+[Velocity Raptor Benchmark and Joints](https://www.youtube.com/watch?v=uhLYXmzzZp8&index=1&list=PLbl-UC7p03cuFCSpCfEVoQxMQfcG3zm9K)
 
 [Velocity Raptor Fluids](https://www.youtube.com/watch?v=pnyTvRR69EI&index=2&list=PLbl-UC7p03cuFCSpCfEVoQxMQfcG3zm9K)
 
-##Usage
-To create a world:
+[Velocity Raptor concave and composite polyons](https://youtu.be/nplQNW8RBYk)
+
+##UsageTo create a world:
 
     vrWorld* world = vrWorldInit(vrWorldAlloc());
     world->gravity = vrVect(0, 9.81);
