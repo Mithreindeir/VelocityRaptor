@@ -21,6 +21,13 @@
 
 #include "vrShape.h"
 
+///Type of polygon, (if unknown, go with concave)
+enum vrShapePolyType
+{
+        VR_CONVEX_POLYGON,
+        VR_CONCAVE_POLYGON
+};
+
 typedef enum vrShapePolyType vrShapePolyType;
 typedef struct vrShapeMold vrShapeMold;
 ///Current mold being edited
@@ -29,13 +36,6 @@ static vrShapeMold* currentMold;
 static vrShapePolyType currentPolyType;
 ///Current type of shape being edited
 static vrShapeType currentShapeType;
-
-///Type of polygon, (if unknown, go with concave)
-enum vrShapePolyType
-{
-	VR_CONVEX_POLYGON,
-	VR_CONCAVE_POLYGON
-};
 
 ///Holds info needed for polygon
 typedef struct vrPolygonMold
