@@ -25,7 +25,7 @@ typedef float vrFloat;
 
 #define EPSILON 1.192092896e-07f
 #define NUM_PRIMES 26
-static unsigned int primes[] = 
+static unsigned int primes[] =
 {
 	53,
 	97,
@@ -57,36 +57,14 @@ static unsigned int primes[] =
 
 typedef struct vrVec2
 {
-	union
-	{
-		struct
-		{
-			vrFloat x;
-			vrFloat y;
-			/*
-			started using simd, but I can't include m128 in struct
-			otherwise stack won't be properly aligned in functions.
-			I could pass in vrVec2 pointers, but I don't want to rewrite
-			every function with a vrVec2 as an argument
-			*/
-			//__m128d n;
-		};
-		vrFloat m[2];
-	};
+	vrFloat x;
+	vrFloat y;
 } vrVec2;
 
 typedef struct vrMat2
 {
-	union
-	{
-		struct
-		{
-			vrVec2 m;
-			vrVec2 n;
-		};
-
-		vrFloat mn[4];
-	};
+	vrVec2 m;
+	vrVec2 n;
 } vrMat2;
 
 extern inline vrMat2 vrMat(const vrVec2 m, const vrVec2 n);

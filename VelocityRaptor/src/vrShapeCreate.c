@@ -17,22 +17,22 @@ void vrPolyBegin(vrShapePolyType shapeT)
 {
 	if (currentMold->type == VR_NOSHAPE)
 	{
-		currentMold->polyMold.num_vertices = 0;
-		currentMold->polyMold.polygon = NULL;
+		currentMold->mold.polyMold.num_vertices = 0;
+		currentMold->mold.polyMold.polygon = NULL;
 	}
 	currentMold->type = VR_POLYGON;
-	currentMold->polyMold.polyType = shapeT;
-	
+	currentMold->mold.polyMold.polyType = shapeT;
+
 }
 
 void vrAddVertex(vrVec2 v)
 {
-	currentMold->polyMold.num_vertices += 1;
-	if (currentMold->polyMold.num_vertices > 1)
-		currentMold->polyMold.polygon = vrRealloc(currentMold->polyMold.polygon, currentMold->polyMold.num_vertices*sizeof(vrVec2));
+	currentMold->mold.polyMold.num_vertices += 1;
+	if (currentMold->mold.polyMold.num_vertices > 1)
+		currentMold->mold.polyMold.polygon = vrRealloc(currentMold->mold.polyMold.polygon, currentMold->mold.polyMold.num_vertices*sizeof(vrVec2));
 	else
-		currentMold->polyMold.polygon = vrAlloc(sizeof(vrVec2));
-	currentMold->polyMold.polygon[currentMold->polyMold.num_vertices - 1] = v;
+		currentMold->mold.polyMold.polygon = vrAlloc(sizeof(vrVec2));
+	currentMold->mold.polyMold.polygon[currentMold->mold.polyMold.num_vertices - 1] = v;
 }
 
 void vrPolyEnd()
@@ -48,22 +48,22 @@ vrArray * vrShapeMoldGetShape(vrShapeMold * shapemold)
 		vrShape* shape = vrShapeInit(vrShapeAlloc());
 		shape->shape = vrShapeCircleInit(shape);
 		vrCircleShape* circle = shape->shape;
-		circle->center = shapemold->circleMold.center;
-		circle->radius = shapemold->circleMold.radius;
+		circle->center = shapemold->mold.circleMold.center;
+		circle->radius = shapemold->mold.circleMold.radius;
 		vrArrayPush(shapes, shape);
 	}
 	else if (shapemold->type == VR_POLYGON)
 	{
-		if (shapemold->polyMold.polyType == VR_CONCAVE_POLYGON)
+		if (shapemold->mold.polyMold.polyType == VR_CONCAVE_POLYGON)
 		{
 			//Use a buffer, because ear clip vrFrees the arrays memory
 			int size = 0;
-			vrVec2* polygon_buffer = vrAlloc(sizeof(vrVec2) * shapemold->polyMold.num_vertices);
-			for (int i = 0; i < shapemold->polyMold.num_vertices; i++)
+			vrVec2* polygon_buffer = vrAlloc(sizeof(vrVec2) * shapemold->mold.polyMold.num_vertices);
+			for (int i = 0; i < shapemold->mold.polyMold.num_vertices; i++)
 			{
-				polygon_buffer[i] = shapemold->polyMold.polygon[i];
+				polygon_buffer[i] = shapemold->mold.polyMold.polygon[i];
 			}
-			vrTriangle * tri = vrEarClip(polygon_buffer, shapemold->polyMold.num_vertices, &size);
+			vrTriangle * tri = vrEarClip(polygon_buffer, shapemold->mold.polyMold.num_vertices, &size);
 
 			for (int i = 0; i < size; i++)
 			{
@@ -83,9 +83,9 @@ vrArray * vrShapeMoldGetShape(vrShapeMold * shapemold)
 			vrShape* s = vrShapeInit(vrShapeAlloc());
 
 			s = vrShapePolyInit(s);
-			for (int i = 0; i < shapemold->polyMold.num_vertices; i++)
+			for (int i = 0; i < shapemold->mold.polyMold.num_vertices; i++)
 			{
-				vrAddVertexToPolyShape(s->shape, shapemold->polyMold.polygon[i]);
+				vrAddVertexToPolyShape(s->shape, shapemold->mold.polyMold.polygon[i]);
 			}
 			vrUpdatePolyAxes(s->shape);
 			vrArrayPush(shapes, s);

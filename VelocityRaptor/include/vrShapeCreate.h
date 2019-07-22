@@ -63,7 +63,7 @@ struct vrShapeMold
 	{
 		vrPolygonMold polyMold;
 		vrCircleMold circleMold;
-	};
+	} mold;
 };
 
 ///Initializes a shape mold
