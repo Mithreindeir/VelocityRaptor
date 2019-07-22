@@ -28,12 +28,11 @@ typedef unsigned int vrHashValue;
 typedef vrHashValue*(*vrHashFunc)(unsigned int key);
 typedef void*(*vrDataDeleteFunc)(void* data);
 
-typedef struct vrHashEntry vrHashEntry;
 typedef struct vrHashEntry
 {
 	void* data;
 	unsigned int key;
-	vrHashEntry* next;
+	struct vrHashEntry* next;
 } vrHashEntry;
 
 typedef struct vrHashTable
