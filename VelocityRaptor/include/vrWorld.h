@@ -29,7 +29,6 @@
 #ifndef HEADER_VRWORLD
 #define HEADER_VRWORLD
 
-#include <time.h>
 #include "vrRigidBody.h"
 #include "vrBroadphase.h"
 #include "vrArray.h"

@@ -16,6 +16,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#include <time.h>
+
 #include "../include/vrParticleSystem.h"
 #include "../include/vr.h"
 
