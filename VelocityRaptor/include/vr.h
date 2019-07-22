@@ -23,10 +23,17 @@
 #define DEBUG_DRAW_SHAPE 0
 #define DEBUG_DRAW_CONTACTS 0
 
-#ifdef _MSC_VER
-#include "malloc.h"
+#if !defined(alloca)
+#if defined(__GLIBC__) || defined(__sun) || defined(__CYGWIN__) || defined(__APPLE__) || defined(__SWITCH__)
+#include <alloca.h>     // alloca (glibc uses <alloca.h>. Note that Cygwin may have _WIN32 defined, so the order matters here)
+#elif defined(_WIN32)
+#include <malloc.h>     // alloca
+#if !defined(alloca)
+#define alloca _alloca  // for clang with MS Codegen
+#endif
 #else
-#include <alloca.h>
+#include <stdlib.h>     // alloca
+#endif
 #endif
 
 #ifdef _MSC_VER
