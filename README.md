@@ -8,7 +8,7 @@ Mostly Erin Catto, and his "Physics for Game Programmers Talk".
 For Collision Detection, credit to Dyn4J for best Separate Axis Theorem explanation I've seen,
 http://www.dyn4j.org/2010/01/sat/
 
-It features Collision detection for convex polygons with the Separate Axis Theorum, and it can support concanve shapes, by using ear clipping to turn concave shapes into triangles. Collision's are resolved with impulses, and for bodies with two contacts. The engine is completely ready for use (but still in development), however it has yet to be documented so you may have to dig through the source code. Units are in pixels.
+It features Collision detection for convex polygons with the Separate Axis Theorum, and it can support concanve shapes, by using ear clipping to turn concave shapes into triangles. Collision's are resolved with impulses. Units are in pixels.
 
 ##Projects Using Velocity Raptor
 [Crown Room](https://www.youtube.com/watch?v=mb8CKdHvIpo)
