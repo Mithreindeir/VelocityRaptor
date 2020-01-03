@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/Mithreindeir/VelocityRaptor.svg?branch=master)](https://travis-ci.org/Mithreindeir/VelocityRaptor)
 
 A programming exercise to make a physics engine. 
-The design and math is due mostly Erin Catto, and his "Fast and Simple Physics
+The design and math is due mostly to Erin Catto, and his "Fast and Simple Physics
 using Sequential Impulses" and "Physics for Game Programmers Talk".
 For Collision Detection, credit to Dyn4J for best Separate Axis Theorem explanation I've seen,
 http://www.dyn4j.org/2010/01/sat/
