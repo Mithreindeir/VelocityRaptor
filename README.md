@@ -11,6 +11,7 @@ http://www.dyn4j.org/2010/01/sat/
 It features Collision detection for convex polygons with the Separate Axis Theorum, and it can support concanve shapes, by using ear clipping to turn concave shapes into triangles. Collision's are resolved with impulses. Units are in pixels.
 
 ##Projects Using Velocity Raptor
+
 [Crown Room](https://www.youtube.com/watch?v=mb8CKdHvIpo)
 
 [Chicken Coup](https://www.youtube.com/watch?v=Fd2WpBGHzi4)
@@ -18,6 +19,7 @@ It features Collision detection for convex polygons with the Separate Axis Theor
 [Topdown Shooter](https://www.youtube.com/watch?v=gGHBFwacEIc)
 
 ##Velocity Raptor Demo videos
+
 [Velocity Raptor Benchmark and Joints](https://www.youtube.com/watch?v=uhLYXmzzZp8&index=1&list=PLbl-UC7p03cuFCSpCfEVoQxMQfcG3zm9K)
 
 [Velocity Raptor Fluids](https://www.youtube.com/watch?v=pnyTvRR69EI&index=2&list=PLbl-UC7p03cuFCSpCfEVoQxMQfcG3zm9K)
