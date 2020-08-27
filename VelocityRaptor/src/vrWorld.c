@@ -64,8 +64,7 @@ void vrWorldDestroy(vrWorld * world)
 vrBOOL b = vrFALSE;
 void vrWorldStep(vrWorld * world)
 {
-	vrFloat currentTime = clock();
-	vrFloat frameTime = (currentTime - world->lastTime) / CLOCKS_PER_SEC;
+	vrFloat frameTime = world->timeStep;
 
 	//Stops spiral of death
 	if (frameTime > 0.2) frameTime = 0.2;
@@ -109,7 +108,7 @@ void vrWorldStep(vrWorld * world)
 			joint->drawJoint(joint);
 	}
 	
-	world->lastTime = currentTime;
+	world->lastTime += frameTime;
 }
 
 void vrWorldAddBody(vrWorld* world, vrRigidBody * body)

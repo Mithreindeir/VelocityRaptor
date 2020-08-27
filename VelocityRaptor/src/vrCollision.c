@@ -98,8 +98,6 @@ void vrPolyPoly(vrManifold* manifold, const vrPolygonShape A, const vrPolygonSha
 	manifold->normal = refNorm;
 	manifold->flip = flip;
 	manifold->penetration = penetration;
-
-	return manifold;
 }
 
 void vrPolyCircle(vrManifold * manifold, const vrPolygonShape A, const vrCircleShape B)
@@ -287,7 +285,7 @@ vrFloat vrPolyGetLeastAxis(const vrPolygonShape a, const vrPolygonShape b, vrVec
 
 int vrPolyGetFarthestVertex(const vrPolygonShape shape, const vrVec2 normal)
 {
-	if (shape.num_vertices == 0) return;
+	if (shape.num_vertices == 0) return -1;
 	int f = 0;
 	vrVec2 fv = shape.vertices[0];
 	vrFloat max = vrDot(normal, fv);
@@ -306,7 +304,7 @@ int vrPolyGetFarthestVertex(const vrPolygonShape shape, const vrVec2 normal)
 
 vrEdge vrPolyBestEdge(const vrPolygonShape shape, int index, const vrVec2 normal)
 {
-	if (shape.num_vertices == 0) return;
+	if (shape.num_vertices == 0) return (vrEdge){};
 	vrEdge edge;
 	vrVec2 v = shape.vertices[index];
 	vrVec2 	v1 = (index < (shape.num_vertices - 1)) ? shape.vertices[index + 1] : shape.vertices[0];
@@ -339,7 +337,7 @@ vrEdge vrPolyBestEdge(const vrPolygonShape shape, int index, const vrVec2 normal
 }
 vrProjection vrProject(const vrPolygonShape a, const vrVec2 axis)
 {
-	if (a.num_vertices == 0) return;
+	if (a.num_vertices == 0) return (vrProjection){};
 	vrFloat c = vrDot(a.vertices[0], axis);
 	//returns the min and the max
 	vrProjection p = vrInitProjection(c, c);
